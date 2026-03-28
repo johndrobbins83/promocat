@@ -159,11 +159,11 @@ body {
   background: var(--lcd-bg);
   border: 2px solid #0a1a0a;
   box-shadow: inset 2px 2px 4px rgba(0,0,0,.8), 0 0 8px rgba(51,255,102,.07);
-  padding: 6px 8px; margin-bottom: 6px;
-  position: relative; overflow: hidden; height: 54px;
+  padding: 10px 12px; margin-bottom: 6px;
+  position: relative; overflow: hidden; height: 90px;
 }
-@media (min-width: 900px) { .lcd { height: 100px; padding: 12px 18px; margin-bottom: 12px; }
-  .lcd-title { font-size: 14px !important; height: 26px !important; }
+@media (min-width: 900px) { .lcd { height: 130px; padding: 16px 20px; margin-bottom: 12px; }
+  .lcd-title { font-size: 26px !important; height: 28px !important; letter-spacing:2px; }
   .lcd-meta { font-size: 26px !important; margin-top: 5px !important; }
   .lcd-time { font-size: 26px !important; margin-top: 5px !important; }
   .lcd-st { font-size: 11px !important; }
@@ -174,10 +174,10 @@ body {
   pointer-events:none; z-index:2;
 }
 .lcd-title {
-  font-family:'Press Start 2P',monospace; font-size:7px;
+  font-family:'VT323', monospace; font-size:18px;
   color: var(--lcd-green); text-shadow:0 0 6px rgba(51,255,102,.8);
   white-space:nowrap; overflow:hidden;
-  position:relative; z-index:1; height:14px;
+  position:relative; z-index:1; height:20px; letter-spacing:1px;
 }
 .lcd-title.scrolling .stext { display:inline-block; animation: lscroll 9s linear infinite; }
 @keyframes lscroll { 0%{transform:translateX(100%);} 100%{transform:translateX(-100%);} }
@@ -193,8 +193,15 @@ body {
   color:var(--lcd-green); text-shadow:0 0 8px rgba(51,255,102,.9);
   position:relative; z-index:1; margin-top:3px; letter-spacing:1px;
 }
-.lcd-st { font-family:'Press Start 2P',monospace; font-size:6px; color:#115522; }
-.lcd-st.on { color:#22ff44; text-shadow:0 0 4px rgba(34,255,68,.8); animation:blink 1s steps(1) infinite; }
+.lcd-st { display:none; }
+.lcd-mode {
+  font-family:'Press Start 2P',monospace; font-size:5px;
+  color: var(--lcd-green); opacity:.7;
+  position:relative; z-index:1; margin-top:3px;
+  letter-spacing:.5px; height:10px; line-height:1;
+  text-shadow: 0 0 4px rgba(51,255,102,.6);
+}
+@media (min-width:900px) { .lcd-mode { font-size:8px !important; height:14px !important; margin-top:4px !important; } }
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
 
 /* SCANLINES */
@@ -277,12 +284,13 @@ body {
 .t-prev,.t-next { width:28px; height:22px; }
 .t-play { width:32px; height:22px; }
 .t-pause,.t-stop { width:28px; height:22px; }
-.t-eject { width:22px; height:22px; margin-left:auto; }
+.t-eject { width:22px; height:22px; margin-left:auto; display:none; }
+.admin-unlocked .t-eject { display:flex; }
 @media (min-width: 900px) {
   .t-prev,.t-next { width:70px; height:52px; }
   .t-play { width:80px; height:52px; }
   .t-pause,.t-stop { width:70px; height:52px; }
-  .t-eject { width:54px; height:52px; }
+  .admin-unlocked .t-eject { width:54px; height:52px; }
   .transport { gap:8px; margin-bottom:12px; }
 }
 
@@ -299,10 +307,16 @@ body {
 }
 .mbtn:hover { color:var(--cat-hi); }
 .mbtn.on {
-  color:var(--cat-orange); background:var(--mbtn-on-bg);
+  color:var(--border-hi); background:var(--mbtn-on-bg);
   border-top:1px solid var(--mbtn-border-lo); border-left:1px solid var(--mbtn-border-lo);
   border-bottom:1px solid var(--mbtn-border-hi); border-right:1px solid var(--mbtn-border-hi);
-  text-shadow:0 0 6px rgba(255,140,50,.8);
+  text-shadow:0 0 8px var(--border-hi), 0 0 16px var(--cat-orange);
+  box-shadow: 0 0 8px rgba(255,200,80,.35), inset 0 0 6px rgba(255,150,50,.15);
+  animation: btn-glow .9s ease-in-out infinite alternate;
+}
+@keyframes btn-glow {
+  from { text-shadow: 0 0 6px var(--border-hi), 0 0 10px var(--cat-orange); }
+  to   { text-shadow: 0 0 12px var(--border-hi), 0 0 22px var(--cat-orange), 0 0 4px #fff; }
 }
 
 /* PAW ROW */
@@ -333,7 +347,7 @@ body {
   .pl-bar { padding: 8px 16px; }
   .pl-foot { padding: 8px 16px; }
   .pl-item { padding: 8px 16px; gap:12px; }
-  .pl-buy, .pl-wav, .pl-mp3, .pl-email { font-size:7px !important; padding:4px 8px !important; } }
+  .pl-btn { font-size:7px !important; padding:4px 8px !important; height:28px !important; min-width:48px !important; } }
 .pl-list::-webkit-scrollbar { width:7px; }
 .pl-list::-webkit-scrollbar-track { background:#0a1a0a; }
 .pl-list::-webkit-scrollbar-thumb { background:#226622; border:1px solid #0a1a0a; }
@@ -414,46 +428,46 @@ body {
 }
 
 /* Buy button in playlist items */
-.pl-buy {
+/* ── Unified playlist action buttons ── */
+.pl-btn {
   font-family:'Press Start 2P',monospace; font-size:5px;
-  color:#ffcc44; background:rgba(80,50,0,.5);
-  border:1px solid #886600; padding:2px 5px;
+  padding:3px 6px; border:1px solid;
   cursor:pointer; text-decoration:none; white-space:nowrap;
-  transition:all .15s; display:inline-block; line-height:1.6;
+  transition:all .15s; display:inline-flex; align-items:center;
+  justify-content:center; line-height:1;
+  height:20px; min-width:36px; text-align:center;
+  vertical-align:middle;
 }
-.pl-buy:hover { background:rgba(140,90,0,.7); color:#ffee88; box-shadow:0 0 6px rgba(255,200,0,.3); }
-.pl-email {
+.pl-buy   { color:#ffcc44; background:rgba(80,50,0,.5);    border-color:#886600; }
+.pl-buy:hover { background:rgba(140,90,0,.7); color:#ffee88; box-shadow:0 0 5px rgba(255,200,0,.3); }
+.pl-dl    { color:#aaffcc; background:rgba(0,70,35,.5);    border-color:#007744; position:relative; }
+.pl-dl:hover { background:rgba(0,110,55,.7); color:#ccffdd; }
+.pl-dl-menu {
+  display:none; position:absolute; bottom:calc(100% + 2px); left:0;
+  background:#0a1a0a; border:1px solid #007744;
+  box-shadow:0 0 8px rgba(0,200,80,.2); z-index:100;
+  flex-direction:column; min-width:70px;
+}
+.pl-dl:hover .pl-dl-menu,
+.pl-dl:focus-within .pl-dl-menu { display:flex; }
+.pl-dl-opt {
   font-family:'Press Start 2P',monospace; font-size:5px;
-  color:#88ddff; background:rgba(0,60,100,.45);
-  border:1px solid #0077aa; padding:2px 5px;
-  cursor:pointer; text-decoration:none; white-space:nowrap;
-  transition:all .15s; display:inline-block; line-height:1.6;
+  color:#aaffcc; padding:4px 6px; white-space:nowrap;
+  text-decoration:none; display:block;
+  transition:background .1s;
 }
-.pl-email:hover { background:rgba(0,100,160,.65); color:#ccf0ff; box-shadow:0 0 6px rgba(0,180,255,.3); }
-.pl-wav {
-  font-family:'Press Start 2P',monospace; font-size:5px;
-  color:#aaffcc; background:rgba(0,80,40,.45);
-  border:1px solid #006633; padding:2px 5px;
-  cursor:pointer; text-decoration:none; white-space:nowrap;
-  transition:all .15s; display:inline-block; line-height:1.6;
-}
-.pl-wav:hover { background:rgba(0,120,60,.65); color:#ccffdd; box-shadow:0 0 6px rgba(0,255,100,.25); }
-.pl-mp3 {
-  font-family:'Press Start 2P',monospace; font-size:5px;
-  color:#ffaadd; background:rgba(100,0,60,.45);
-  border:1px solid #880044; padding:2px 5px;
-  cursor:pointer; text-decoration:none; white-space:nowrap;
-  transition:all .15s; display:inline-block; line-height:1.6;
-}
-.pl-mp3:hover { background:rgba(150,0,80,.65); color:#ffccee; box-shadow:0 0 6px rgba(255,0,120,.25); }
+.pl-dl-opt:hover { background:rgba(0,160,60,.3); color:#ccffdd; }
+.pl-email { color:#88ddff; background:rgba(0,50,90,.5);    border-color:#005588; }
+.pl-email:hover { background:rgba(0,90,150,.7); color:#ccf0ff; box-shadow:0 0 5px rgba(0,180,255,.25); }
 @media (min-width:900px) {
-  .pl-wav, .pl-mp3 { font-size:6px !important; padding:3px 7px !important; }
+  .pl-btn { font-size:6px !important; height:26px !important; min-width:46px !important; padding:4px 8px !important; }
+  .pl-dl-opt { font-size:6px !important; padding:5px 8px !important; }
 }
 @media (min-width:900px) {
   .pl-controls { padding:8px 16px; gap:8px; }
   .cat-btn { font-size:8px !important; padding:5px 10px !important; }
   .sort-btn { font-size:8px !important; padding:5px 10px !important; }
-  .pl-buy { font-size:7px !important; padding:4px 8px !important; }
+
 }
 
 
@@ -745,6 +759,79 @@ body {
   .star { font-size: 15px !important; gap: 2px; }
 }
 
+
+/* ── COLLAPSIBLE FILTER BAR ── */
+.filter-bar {
+  background: var(--pl-bar-bg);
+  border-bottom: 1px solid var(--border-lo);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 4px 7px;
+  align-items: center;
+}
+@media (min-width:900px) { .filter-bar { padding: 6px 14px; gap:6px; } }
+
+.filter-group { position: relative; display: inline-block; }
+
+.filter-toggle {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--mbtn-color); letter-spacing: .4px;
+  background: linear-gradient(180deg, var(--btn-bg), var(--win-bg));
+  border-top: 1px solid var(--mbtn-border-hi); border-left: 1px solid var(--mbtn-border-hi);
+  border-bottom: 1px solid var(--mbtn-border-lo); border-right: 1px solid var(--mbtn-border-lo);
+  padding: 3px 7px; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 4px;
+  transition: color .1s;
+}
+.filter-toggle:hover { color: var(--cat-hi); }
+.filter-toggle .arrow { font-size: 6px; transition: transform .2s; display:inline-block; }
+.filter-toggle.active { color: var(--cat-orange); text-shadow: 0 0 5px rgba(255,140,50,.6); }
+.filter-toggle.active .arrow { transform: rotate(180deg); }
+@media (min-width:900px) { .filter-toggle { font-size:7px !important; padding:5px 10px !important; } }
+
+.filter-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px); left: 0;
+  background: var(--win-bg);
+  border: 1px solid var(--border-lo);
+  box-shadow: 0 4px 16px rgba(0,0,0,.6);
+  z-index: 200;
+  padding: 6px;
+  min-width: 160px;
+  max-width: 320px;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.filter-dropdown.open { display: flex; }
+
+/* Active filter indicator dot on toggle */
+.filter-toggle .active-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cat-orange);
+  box-shadow: 0 0 4px rgba(255,140,50,.8);
+  display: none; flex-shrink: 0;
+}
+.filter-toggle.has-filter .active-dot { display: inline-block; }
+
+/* Sort bar — stays always visible, horizontal */
+.sort-bar {
+  background: var(--pl-bar-bg);
+  border-bottom: 2px solid var(--border-lo);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 4px 7px;
+  align-items: center;
+}
+@media (min-width:900px) { .sort-bar { padding: 6px 14px; gap:6px; } }
+.sort-bar-label {
+  font-family:'Press Start 2P',monospace; font-size:5px;
+  color: var(--border-lo); margin-right:2px; white-space:nowrap;
+}
+@media (min-width:900px) { .sort-bar-label { font-size:7px !important; } }
+
 /* ── NOTIFICATION ── */
 .notif {
   position:fixed; bottom:20px; right:20px;
@@ -835,11 +922,12 @@ body {
           <div class="scanlines"></div>
           <div class="lcd-title" id="lcd-title"><span class="stext" id="lcd-title-text">— NO TRACK LOADED —</span></div>
           <div class="lcd-meta">
-            <span id="lcd-artist">ARTIST</span>
-            <span id="lcd-album">ALBUM</span>
-            <span class="lcd-st" id="lcd-st">■ STOP</span>
+            <span style="opacity:.5;">ARTIST:</span> <span id="lcd-artist">—</span>
+            &nbsp;&nbsp;
+            <span style="opacity:.5;">ALBUM:</span> <span id="lcd-album">—</span>
           </div>
           <div class="lcd-time" id="lcd-time">0:00 / 0:00</div>
+          <div class="lcd-mode" id="lcd-mode"></div>
         </div>
 
         <!-- Visualiser -->
@@ -858,13 +946,6 @@ body {
             <div class="strk" onclick="sliderClick(event,'vol')">
               <div class="sfill" id="vol-fill" style="width:80%"></div>
               <div class="sthumb" id="vol-thumb" style="left:80%"></div>
-            </div>
-          </div>
-          <div class="sg">
-            <div class="slbl">⟺ BAL</div>
-            <div class="strk" onclick="sliderClick(event,'bal')">
-              <div class="sfill" id="bal-fill" style="width:50%"></div>
-              <div class="sthumb" id="bal-thumb" style="left:50%"></div>
             </div>
           </div>
         </div>
@@ -893,7 +974,7 @@ body {
 
         <!-- Mode buttons -->
         <div class="modes">
-          <button class="mbtn on" id="m-shuffle" onclick="toggle('shuffle')">SHUFFLE</button>
+          <button class="mbtn" id="m-shuffle" onclick="toggle('shuffle')">SHUFFLE</button>
           <button class="mbtn" id="m-repeat" onclick="toggle('repeat')">REPEAT</button>
           <button class="mbtn mood-btn" onclick="randomTheme()" title="Random Color Scheme">🎨 MOOD</button>
         </div>
@@ -907,32 +988,71 @@ body {
           <span class="pl-bar-title">🐾 PLAYLIST</span>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
         </div>
-        <!-- Controls: category filters + sort -->
-        <div class="pl-controls">
-          <div class="pl-cats">
-            <button class="cat-btn on" data-cat="all"     onclick="setCat('all')">ALL</button>
-            <button class="cat-btn"    data-cat="dj"      onclick="setCat('dj')">DJ STUFF</button>
-            <button class="cat-btn"    data-cat="listen"  onclick="setCat('listen')">LISTENING</button>
-            <button class="cat-btn"    data-cat="nonelec" onclick="setCat('nonelec')">NON ELEC</button>
+        <!-- FILTER BAR — compact dropdowns -->
+        <div class="filter-bar">
+          <!-- Category -->
+          <div class="filter-group" id="fg-cat">
+            <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')">
+              <span class="active-dot"></span>CATEGORY <span class="arrow">▼</span>
+            </button>
+            <div class="filter-dropdown" id="fd-cat">
+              <button class="cat-btn on" data-cat="all"     onclick="setCat('all');closeFilters()">ALL</button>
+              <button class="cat-btn"    data-cat="dj"      onclick="setCat('dj');closeFilters()">DJ STUFF</button>
+              <button class="cat-btn"    data-cat="listen"  onclick="setCat('listen');closeFilters()">LISTENING</button>
+              <button class="cat-btn"    data-cat="nonelec" onclick="setCat('nonelec');closeFilters()">NON ELECTRONIC</button>
+            </div>
           </div>
-          <div class="pl-sorts">
-            <button class="sort-btn on" data-sort="default"    onclick="setSort('default')">DEFAULT</button>
-            <button class="sort-btn"    data-sort="artist"     onclick="setSort('artist')">ARTIST</button>
-            <button class="sort-btn"    data-sort="album"      onclick="setSort('album')">ALBUM</button>
-            <button class="sort-btn"    data-sort="avail"      onclick="setSort('avail')">AVAIL</button>
-            <button class="sort-btn"    data-sort="rating"     onclick="setSort('rating')">★ RATING</button>
+          <!-- Availability -->
+          <div class="filter-group" id="fg-avail">
+            <button class="filter-toggle" id="ft-avail" onclick="toggleFilter('avail')">
+              <span class="active-dot"></span>STATUS <span class="arrow">▼</span>
+            </button>
+            <div class="filter-dropdown" id="fd-avail">
+              <button class="cat-btn on" data-avail="all"       onclick="setAvail('all');closeFilters()">ALL STATUS</button>
+              <button class="cat-btn"    data-avail="available" onclick="setAvail('available');closeFilters()" style="color:#44ff88;">AVAILABLE</button>
+              <button class="cat-btn"    data-avail="signed"    onclick="setAvail('signed');closeFilters()"    style="color:#8888ff;">SIGNED</button>
+              <button class="cat-btn"    data-avail="freebie"   onclick="setAvail('freebie');closeFilters()"   style="color:#ffdd44;">FREEBIE</button>
+              <button class="cat-btn"    data-avail="bootleg"   onclick="setAvail('bootleg');closeFilters()"   style="color:#ff7744;">BOOTLEG</button>
+              <button class="cat-btn"    data-avail="undecided" onclick="setAvail('undecided');closeFilters()" style="color:#aaaaaa;">UNDECIDED</button>
+            </div>
+          </div>
+          <!-- Genre -->
+          <div class="filter-group" id="fg-genre">
+            <button class="filter-toggle" id="ft-genre" onclick="toggleFilter('genre')">
+              <span class="active-dot"></span>GENRE <span class="arrow">▼</span>
+            </button>
+            <div class="filter-dropdown" id="fd-genre">
+              <button class="cat-btn on" data-genre="all"          onclick="setGenre('all');closeFilters()">ALL GENRES</button>
+              <button class="cat-btn" data-genre="dubstep"         onclick="setGenre('dubstep');closeFilters()">DUBSTEP</button>
+              <button class="cat-btn" data-genre="drum-and-bass"   onclick="setGenre('drum-and-bass');closeFilters()">DRUM AND BASS</button>
+              <button class="cat-btn" data-genre="jungle"          onclick="setGenre('jungle');closeFilters()">JUNGLE</button>
+              <button class="cat-btn" data-genre="glitch-hop"      onclick="setGenre('glitch-hop');closeFilters()">GLITCH HOP</button>
+              <button class="cat-btn" data-genre="ambient"         onclick="setGenre('ambient');closeFilters()">AMBIENT</button>
+              <button class="cat-btn" data-genre="metal-rock"      onclick="setGenre('metal-rock');closeFilters()">METAL/ROCK</button>
+              <button class="cat-btn" data-genre="breaks"          onclick="setGenre('breaks');closeFilters()">BREAKS</button>
+              <button class="cat-btn" data-genre="trip-hop"        onclick="setGenre('trip-hop');closeFilters()">TRIP HOP</button>
+              <button class="cat-btn" data-genre="house"           onclick="setGenre('house');closeFilters()">HOUSE</button>
+              <button class="cat-btn" data-genre="electro"         onclick="setGenre('electro');closeFilters()">ELECTRO</button>
+              <button class="cat-btn" data-genre="idm"             onclick="setGenre('idm');closeFilters()">IDM</button>
+              <button class="cat-btn" data-genre="chill-out"       onclick="setGenre('chill-out');closeFilters()">CHILL OUT</button>
+              <button class="cat-btn" data-genre="techno"          onclick="setGenre('techno');closeFilters()">TECHNO</button>
+              <button class="cat-btn" data-genre="hardcore"        onclick="setGenre('hardcore');closeFilters()">HARDCORE</button>
+              <button class="cat-btn" data-genre="hardstyle"       onclick="setGenre('hardstyle');closeFilters()">HARDSTYLE</button>
+              <button class="cat-btn" data-genre="edm"             onclick="setGenre('edm');closeFilters()">EDM</button>
+              <button class="cat-btn" data-genre="trance"          onclick="setGenre('trance');closeFilters()">TRANCE</button>
+              <button class="cat-btn" data-genre="disco-house"     onclick="setGenre('disco-house');closeFilters()">DISCO HOUSE</button>
+            </div>
           </div>
         </div>
-        <!-- Availability filter row -->
-        <div class="pl-controls" style="padding-top:3px;padding-bottom:3px;border-top:1px solid var(--border-lo);">
-          <div class="pl-cats">
-            <button class="cat-btn on" data-avail="all"       onclick="setAvail('all')">ALL STATUS</button>
-            <button class="cat-btn"    data-avail="available" onclick="setAvail('available')" style="color:#44ff88;">AVAILABLE</button>
-            <button class="cat-btn"    data-avail="signed"    onclick="setAvail('signed')"    style="color:#8888ff;">SIGNED</button>
-            <button class="cat-btn"    data-avail="freebie"   onclick="setAvail('freebie')"   style="color:#ffdd44;">FREEBIE</button>
-            <button class="cat-btn"    data-avail="bootleg"   onclick="setAvail('bootleg')"   style="color:#ff7744;">BOOTLEG</button>
-            <button class="cat-btn"    data-avail="undecided" onclick="setAvail('undecided')" style="color:#aaaaaa;">UNDECIDED</button>
-          </div>
+        <!-- SORT BAR — always visible -->
+        <div class="sort-bar">
+          <span class="sort-bar-label">SORT:</span>
+          <button class="sort-btn on" data-sort="default" onclick="setSort('default')">DEFAULT</button>
+          <button class="sort-btn"    data-sort="artist"  onclick="setSort('artist')">ARTIST</button>
+          <button class="sort-btn"    data-sort="album"   onclick="setSort('album')">ALBUM</button>
+          <button class="sort-btn"    data-sort="avail"   onclick="setSort('avail')">STATUS</button>
+          <button class="sort-btn"    data-sort="rating"  onclick="setSort('rating')">★ RATING</button>
+          <button class="sort-btn"    data-sort="genre"   onclick="setSort('genre')">GENRE</button>
         </div>
         <div class="pl-list" id="pl-list">
           <div class="pl-empty">
@@ -988,6 +1108,30 @@ body {
         <div class="frow">
           <label class="flbl" for="f-year">📅 YEAR</label>
           <input class="finput" type="text" id="f-year" placeholder="e.g. 2024" maxlength="4">
+        </div>
+        <div class="frow">
+          <label class="flbl" for="f-genre">🎛️ GENRE</label>
+          <select class="finput" id="f-genre" style="cursor:pointer;">
+            <option value="">— Select Genre —</option>
+              <option value="dubstep">Dubstep</option>
+              <option value="drum-and-bass">Drum and Bass</option>
+              <option value="jungle">Jungle</option>
+              <option value="glitch-hop">Glitch Hop</option>
+              <option value="ambient">Ambient</option>
+              <option value="metal-rock">Metal/Rock</option>
+              <option value="breaks">Breaks</option>
+              <option value="trip-hop">Trip Hop</option>
+              <option value="house">House</option>
+              <option value="electro">Electro</option>
+              <option value="idm">IDM</option>
+              <option value="chill-out">Chill Out</option>
+              <option value="techno">Techno</option>
+              <option value="hardcore">Hardcore</option>
+              <option value="hardstyle">Hardstyle</option>
+              <option value="edm">EDM</option>
+              <option value="trance">Trance</option>
+              <option value="disco-house">Disco House</option>
+          </select>
         </div>
         <div class="frow">
           <label class="flbl">🎛️ CATEGORY</label>
@@ -1187,23 +1331,33 @@ function switchTab(name) {
 // ─────────────── LOCK / UNLOCK ───────────────
 let unlocked = false;
 
+// ── Secret admin token (change this too if you want a URL-based login) ──
+const ADMIN_TOKEN = 'promocat-admin-9x7z';
+
+function applyUnlock() {
+  unlocked = true;
+  document.body.classList.add('admin-unlocked');
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('upload-form').style.display = 'block';
+  document.getElementById('tab-upload').textContent = '🎵 ADD TRACK';
+  document.getElementById('tab-promo').style.display = 'block';
+  document.getElementById('tab-promo').textContent = '📧 PROMO';
+}
+
 function checkPass() {
   const val = document.getElementById('lock-input').value;
   const err = document.getElementById('lock-err');
   if (val === ADMIN_PASSWORD) {
-    unlocked = true;
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('upload-form').style.display = 'block';
-    document.getElementById('tab-upload').textContent = '🎵 ADD TRACK';
-    document.getElementById('tab-promo').style.display = 'block';
-    document.getElementById('tab-promo').textContent = '📧 PROMO';
+    // Save to localStorage so this device stays logged in
+    localStorage.setItem('promocat_auth', ADMIN_TOKEN);
+    applyUnlock();
     err.classList.remove('show');
     document.getElementById('lock-input').value = '';
+    notify('🐾', 'Logged in & remembered on this device!');
   } else {
     err.classList.add('show');
     document.getElementById('lock-input').value = '';
     document.getElementById('lock-input').focus();
-    // Shake animation
     const li = document.getElementById('lock-input');
     li.style.transition = 'transform .05s';
     let s = 0;
@@ -1215,10 +1369,26 @@ function checkPass() {
   }
 }
 
-// Re-lock when switching away from upload tab
+// ── Auto-unlock on page load: check localStorage OR URL token ──
+(function autoUnlock() {
+  // 1. Check URL param: https://johnthepm.com/promocat/?admin=promocat-admin-9x7z
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('admin');
+  if (urlToken === ADMIN_TOKEN) {
+    // Save to localStorage for this device too
+    localStorage.setItem('promocat_auth', ADMIN_TOKEN);
+    applyUnlock();
+    return;
+  }
+  // 2. Check localStorage (returning device)
+  if (localStorage.getItem('promocat_auth') === ADMIN_TOKEN) {
+    applyUnlock();
+  }
+})();
+
+// ── Re-lock when switching away from upload tab
 document.getElementById('tab-upload').addEventListener('click', function() {
   if (!unlocked) {
-    // show lock screen
     document.getElementById('lock-screen').style.display = 'flex';
     document.getElementById('upload-form').style.display = 'none';
   }
@@ -1383,6 +1553,7 @@ function addTrack() {
     album:    document.getElementById('f-album').value.trim()  || 'Unknown Album',
     year:     document.getElementById('f-year').value.trim(),
     status:   document.querySelector('input[name="status"]:checked').value,
+    genre:    document.getElementById('f-genre').value,
     category: document.querySelector('input[name="category"]:checked').value,
     buyLink:  document.getElementById('f-buy').value.trim(),
     avail:    document.querySelector('input[name="avail"]:checked').value,
@@ -1401,6 +1572,7 @@ function addTrack() {
   document.getElementById('f-album').value = '';
   document.getElementById('f-year').value = '';
   document.querySelector('input[name="status"][value="released"]').checked = true;
+  document.getElementById('f-genre').value = '';
   document.querySelector('input[name="category"][value="dj"]').checked = true;
   document.querySelector('input[name="avail"][value="available"]').checked = true;
   document.getElementById('f-buy').value = '';
@@ -1419,11 +1591,12 @@ function addTrack() {
 let activeCat   = 'all';
 let activeSort  = 'default';
 let activeAvail = 'all';
+let activeGenre = 'all';
 
 function setCat(cat) {
   activeCat = cat;
   document.querySelectorAll('[data-cat]').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
-  renderPlaylist();
+  renderPlaylist(); updateFilterDots();
 }
 
 function setSort(sort) {
@@ -1435,7 +1608,13 @@ function setSort(sort) {
 function setAvail(avail) {
   activeAvail = avail;
   document.querySelectorAll('[data-avail]').forEach(b => b.classList.toggle('on', b.dataset.avail === avail));
-  renderPlaylist();
+  renderPlaylist(); updateFilterDots();
+}
+
+function setGenre(genre) {
+  activeGenre = genre;
+  document.querySelectorAll('[data-genre]').forEach(b => b.classList.toggle('on', b.dataset.genre === genre));
+  renderPlaylist(); updateFilterDots();
 }
 
 function renderPlaylist() {
@@ -1457,6 +1636,11 @@ function renderPlaylist() {
     filtered = filtered.filter(({ t }) => (t.avail || 'undecided') === activeAvail);
   }
 
+  // Filter by genre
+  if (activeGenre !== 'all') {
+    filtered = filtered.filter(({ t }) => (t.genre || '') === activeGenre);
+  }
+
   // Sort
   const availOrder = { available:0, freebie:1, bootleg:2, undecided:3, signed:4 };
   if (activeSort === 'artist') {
@@ -1467,6 +1651,8 @@ function renderPlaylist() {
     filtered.sort((a, b) => (availOrder[a.t.avail||'undecided']||99) - (availOrder[b.t.avail||'undecided']||99));
   } else if (activeSort === 'rating') {
     filtered.sort((a, b) => (b.t.rating||0) - (a.t.rating||0));
+  } else if (activeSort === 'genre') {
+    filtered.sort((a, b) => (a.t.genre||'').localeCompare(b.t.genre||''));
   }
 
   if (!filtered.length) {
@@ -1479,7 +1665,7 @@ function renderPlaylist() {
       <span class="pl-num${origIdx===curIdx?' cur':''}">${String(dispIdx+1).padStart(2,'0')}</span>
       <div class="pl-info">
         <div class="pl-title">${esc(t.title)}</div>
-        <div class="pl-artist">${esc(t.artist)}${t.album?' · '+esc(t.album):''}${t.year?' ('+esc(t.year)+')':''}</div>
+        <div class="pl-artist">${esc(t.artist)}${t.album?' · '+esc(t.album):''}${t.year?' ('+esc(t.year)+')':''}${t.genre?' — '+esc(t.genre.replace(/-/g,' ')):''}</div>
       </div>
       <div class="star-rating" onclick="event.stopPropagation()"
            onmouseleave="hoverStars(${origIdx},0)">
@@ -1489,10 +1675,9 @@ function renderPlaylist() {
       </div>
       <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
       <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
-      ${t.buyLink ? `<a class="pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
-      ${t.wavLink ? `<a class="pl-wav" href="${esc(t.wavLink)}" target="_blank" download onclick="event.stopPropagation()">⬇ WAV</a>` : ''}
-      ${t.mp3Link ? `<a class="pl-mp3" href="${esc(t.mp3Link)}" target="_blank" download onclick="event.stopPropagation()">⬇ MP3</a>` : ''}
-      ${t.email ? `<a class="pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
+      ${t.buyLink ? `<a class="pl-btn pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
+      ${(t.wavLink||t.mp3Link) ? `<div class="pl-btn pl-dl" onclick="event.stopPropagation()">⬇ DL<div class="pl-dl-menu">${t.wavLink?`<a class="pl-dl-opt" href="${esc(t.wavLink)}" target="_blank" download>WAV</a>`:''}${t.mp3Link?`<a class="pl-dl-opt" href="${esc(t.mp3Link)}" target="_blank" download>MP3</a>`:''}</div></div>` : ''}
+      ${t.email ? `<a class="pl-btn pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
       <button class="pl-del" onclick="delTrack(event,${origIdx})">✕</button>
     </div>`).join('');
 }
@@ -1544,7 +1729,13 @@ function stopTrack() {
 
 function nextTrack() {
   if (!playlist.length) return;
-  curIdx = doShuffle ? Math.floor(Math.random()*playlist.length) : (curIdx+1)%playlist.length;
+  if (doShuffle && playlist.length > 1) {
+    let next;
+    do { next = Math.floor(Math.random() * playlist.length); } while (next === curIdx);
+    curIdx = next;
+  } else {
+    curIdx = (curIdx + 1) % playlist.length;
+  }
   loadTrack(curIdx);
   if (isPlaying) audio.play().catch(()=>{});
 }
@@ -1596,12 +1787,20 @@ function sliderClick(e, id) {
 }
 
 // ─────────────── MODE TOGGLES ───────────────
-const modes = { shuffle: false, repeat: false, eq: false };
+const modes = { shuffle: false, repeat: false };
 function toggle(m) {
   modes[m] = !modes[m];
   document.getElementById('m-'+m).classList.toggle('on', modes[m]);
   if (m==='shuffle') doShuffle = modes[m];
   if (m==='repeat')  doRepeat  = modes[m];
+  updateLcdMode();
+}
+
+function updateLcdMode() {
+  const parts = [];
+  if (doShuffle) parts.push('⇄ SHUFFLE');
+  if (doRepeat)  parts.push('↺ REPEAT');
+  document.getElementById('lcd-mode').textContent = parts.join('  ');
 }
 
 // ─────────────── PAWS ───────────────
@@ -1824,7 +2023,7 @@ function genPromoLink() {
   }));
 
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(picked))));
-  const link = window.location.href.split('#')[0] + '#promo=' + encoded;
+  const link = 'https://johnthepm.com/promocat/#promo=' + encoded;
 
   const box = document.getElementById('promo-link-box');
   document.getElementById('promo-link-text').textContent = link;
@@ -1955,6 +2154,37 @@ function hoverStars(trackIdx, stars) {
 }
 
 // Add sort by rating
+
+// ─────────────── FILTER DROPDOWNS ───────────────
+function toggleFilter(name) {
+  const dd = document.getElementById('fd-' + name);
+  const ft = document.getElementById('ft-' + name);
+  const isOpen = dd.classList.contains('open');
+  // Close all first
+  closeFilters();
+  if (!isOpen) {
+    dd.classList.add('open');
+    ft.classList.add('active');
+  }
+}
+
+function closeFilters() {
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-toggle').forEach(t => t.classList.remove('active'));
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.filter-group')) closeFilters();
+});
+
+// Update toggle dot when filter is active
+function updateFilterDots() {
+  document.getElementById('ft-cat').classList.toggle('has-filter', activeCat !== 'all');
+  document.getElementById('ft-avail').classList.toggle('has-filter', activeAvail !== 'all');
+  document.getElementById('ft-genre').classList.toggle('has-filter', activeGenre !== 'all');
+}
+
 // ─────────────── NOTIFICATION ───────────────
 let notifT;
 function notify(icon, msg) {
