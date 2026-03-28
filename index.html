@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐱 CatAmp</title>
+<title>🐱 PromoCat v1.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Righteous&display=swap');
 
@@ -47,7 +47,6 @@
   --thumb-border: #884400;
   --thumb-sh-hi: #ffcc44;
   --thumb-sh-lo: #441100;
-  --vbar-grad: linear-gradient(to top,#00ff33,#88ff00,#ffcc00,#ff4400);
   --slbl-color: #884422;
 }
 
@@ -71,7 +70,7 @@ body {
 /* ── SHELL ── */
 #shell { width: 100%; max-width: 480px; display: flex; flex-direction: column; }
 @media (min-width: 600px) { #shell { width: 520px; max-width: 520px; } }
-@media (min-width: 900px) { #shell { width: 640px; max-width: 640px; } body { padding: 50px 40px 60px; } }
+@media (min-width: 900px) { #shell { width: 832px; max-width: 832px; } body { padding: 50px 40px 60px; } }
 
 /* ── TAB BAR ── */
 .tab-bar { display: flex; align-items: flex-end; gap: 3px; padding: 0 4px; position: relative; z-index: 2; }
@@ -110,7 +109,7 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 5px; cursor: move; user-select: none; overflow: hidden; position: relative;
 }
-@media (min-width: 900px) { .titlebar { height: 28px; } .titlebar-text { font-size: 9px !important; } .wbtn { width:18px !important; height:15px !important; font-size:8px !important; }
+@media (min-width: 900px) { .titlebar { height: 36px; } .titlebar-text { font-size: 11px !important; } .wbtn { width:22px !important; height:18px !important; font-size:10px !important; }
 
 }
 .titlebar::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:rgba(255,220,120,.6); }
@@ -136,7 +135,7 @@ body {
 
 /* ── PLAYER BODY ── */
 .player-body { padding: 7px; }
-@media (min-width: 900px) { .player-body { padding: 14px; } }
+@media (min-width: 900px) { .player-body { padding: 18px; } }
 
 .cat-deco { display:flex; justify-content:center; align-items:center; gap:10px; padding: 4px 0 3px; }
 .promocat-text {
@@ -144,14 +143,14 @@ body {
   font-size: 22px;
   color: var(--cat-orange);
 }
-@media (min-width: 900px) { .promocat-text { font-size: 42px; letter-spacing: 2px; }
+@media (min-width: 900px) { .promocat-text { font-size: 54px; letter-spacing: 3px; }
   text-shadow: 0 0 10px rgba(255,140,66,.6), 1px 1px 0 #441100;
   letter-spacing: 1px;
   line-height: 1;
   white-space: nowrap;
 }
 .cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); }
-@media (min-width: 900px) { .cat-svg { width:100px; height:76px; } }
+@media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
 .cat-svg:hover { animation: wiggle .5s ease-in-out infinite; }
 @keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
 
@@ -163,11 +162,11 @@ body {
   padding: 6px 8px; margin-bottom: 6px;
   position: relative; overflow: hidden; height: 54px;
 }
-@media (min-width: 900px) { .lcd { height: 80px; padding: 10px 14px; margin-bottom: 10px; }
-  .lcd-title { font-size: 11px !important; height: 20px !important; }
-  .lcd-meta { font-size: 20px !important; margin-top: 4px !important; }
-  .lcd-time { font-size: 20px !important; margin-top: 4px !important; }
-  .lcd-st { font-size: 9px !important; }
+@media (min-width: 900px) { .lcd { height: 100px; padding: 12px 18px; margin-bottom: 12px; }
+  .lcd-title { font-size: 14px !important; height: 26px !important; }
+  .lcd-meta { font-size: 26px !important; margin-top: 5px !important; }
+  .lcd-time { font-size: 26px !important; margin-top: 5px !important; }
+  .lcd-st { font-size: 11px !important; }
 }
 .lcd::before {
   content:''; position:absolute; inset:0;
@@ -202,20 +201,23 @@ body {
 .scanlines { position:absolute; inset:0; pointer-events:none; z-index:5;
   background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.13) 3px,rgba(0,0,0,.13) 4px); }
 
-/* VISUALISER */
+/* VISUALISER — canvas EQ */
 .vis {
-  height:28px; background:var(--vis-bg);
+  height: 60px;
+  background: var(--vis-bg);
+  border: 1px solid #0a1a0a;
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,.9), inset -1px -1px 2px rgba(0,0,0,.5);
+  margin-bottom: 6px;
+  display: block;
+  position: relative;
 }
-@media (min-width: 900px) { .vis { height: 52px; margin-bottom: 10px; }
-  border:1px solid #0a1a0a; box-shadow:inset 1px 1px 3px rgba(0,0,0,.9);
-  margin-bottom:6px; display:flex; align-items:flex-end;
-  padding:2px 3px; gap:1px; overflow:hidden;
+@media (min-width: 900px) {
+  .vis { height: 104px; margin-bottom: 12px; }
 }
-.vbar {
-  flex:1; min-width:3px; height:2px; max-height:100%;
-  background:var(--vbar-grad);
-  border-radius:1px 1px 0 0;
-  align-self:flex-end;
+#eq-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* SEEK */
@@ -224,8 +226,8 @@ body {
   border-bottom-color:var(--track-border-hi); border-right-color:var(--track-border-hi);
   height:8px; position:relative; cursor:pointer; margin-bottom:6px;
 }
-@media (min-width: 900px) { .seek { height: 14px; margin-bottom: 10px; }
-  .seek-thumb { width:12px !important; height:22px !important; top:-4px !important; } }
+@media (min-width: 900px) { .seek { height: 18px; margin-bottom: 12px; }
+  .seek-thumb { width:16px !important; height:28px !important; top:-5px !important; } }
 .seek-fill {
   height:100%; width:0%;
   background:var(--fill-grad);
@@ -240,10 +242,10 @@ body {
 
 /* SLIDERS */
 .sliders { display:flex; gap:6px; margin-bottom:6px; }
-@media (min-width: 900px) { .sliders { gap:12px; margin-bottom:10px; }
-  .slbl { font-size:7px !important; margin-bottom:4px !important; }
-  .strk { height:14px; }
-  .sthumb { width:12px !important; height:22px !important; top:-4px !important; } }
+@media (min-width: 900px) { .sliders { gap:16px; margin-bottom:12px; }
+  .slbl { font-size:9px !important; margin-bottom:5px !important; }
+  .strk { height:18px; }
+  .sthumb { width:16px !important; height:28px !important; top:-5px !important; } }
 .sg { flex:1; }
 .slbl { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--slbl-color); margin-bottom:2px; }
 .strk {
@@ -270,24 +272,24 @@ body {
 .tbtn:hover { background:linear-gradient(180deg,var(--border-lo),var(--vis-bg) 50%,var(--border-lo)); border-top-color:var(--cat-hi); border-left-color:var(--cat-hi); }
 .tbtn:active { border-top:1px solid var(--btn-sh); border-left:1px solid var(--btn-sh); border-bottom:1px solid var(--btn-hi); border-right:1px solid var(--btn-hi); transform:translateY(1px); }
 .tbtn svg { fill:#cc8833; filter:drop-shadow(0 0 2px rgba(255,140,50,.4)); display:block; }
-@media (min-width:900px) { .transport .tbtn svg { width:22px; height:22px; } }
+@media (min-width:900px) { .transport .tbtn svg { width:28px; height:28px; } }
 .tbtn:hover svg { fill:var(--cat-hi); filter:drop-shadow(0 0 4px rgba(255,180,80,.8)); }
 .t-prev,.t-next { width:28px; height:22px; }
 .t-play { width:32px; height:22px; }
 .t-pause,.t-stop { width:28px; height:22px; }
 .t-eject { width:22px; height:22px; margin-left:auto; }
 @media (min-width: 900px) {
-  .t-prev,.t-next { width:54px; height:40px; }
-  .t-play { width:62px; height:40px; }
-  .t-pause,.t-stop { width:54px; height:40px; }
-  .t-eject { width:42px; height:40px; }
-  .transport { gap:6px; margin-bottom:10px; }
+  .t-prev,.t-next { width:70px; height:52px; }
+  .t-play { width:80px; height:52px; }
+  .t-pause,.t-stop { width:70px; height:52px; }
+  .t-eject { width:54px; height:52px; }
+  .transport { gap:8px; margin-bottom:12px; }
 }
 
 /* MODE BTNS */
 .modes { display:flex; gap:3px; margin-bottom:5px; }
-@media (min-width: 900px) { .modes { gap:6px; margin-bottom:10px; }
-  .mbtn { font-size:8px !important; padding:6px 10px !important; } }
+@media (min-width: 900px) { .modes { gap:8px; margin-bottom:12px; }
+  .mbtn { font-size:10px !important; padding:8px 14px !important; } }
 .mbtn {
   font-family:'Press Start 2P',monospace; font-size:5px; color:var(--mbtn-color);
   background:var(--mbtn-bg);
@@ -321,15 +323,17 @@ body {
 .pl-count { font-family:'Press Start 2P',monospace; font-size:6px; color:#1a4422; }
 
 .pl-list { background:var(--pl-list-bg); min-height:80px; max-height:200px; overflow-y:auto; }
-@media (min-width: 900px) { .pl-list { max-height:320px; }
-  .pl-title { font-size:22px !important; }
-  .pl-artist { font-size:16px !important; }
-  .pl-num { font-size:8px !important; }
-  .pl-badge { font-size:7px !important; padding:3px 6px !important; }
-  .pl-bar-title, .pl-count { font-size:8px !important; }
-  .pl-bar { padding: 6px 12px; }
-  .pl-foot { padding: 6px 12px; }
-  .pl-item { padding: 6px 12px; gap:10px; } }
+@media (min-width: 900px) { .pl-list { max-height:420px; }
+  .pl-title { font-size:28px !important; }
+  .pl-artist { font-size:20px !important; }
+  .pl-num { font-size:10px !important; min-width:28px !important; }
+  .pl-badge { font-size:8px !important; padding:4px 8px !important; }
+  .avail-badge { font-size:8px !important; padding:4px 8px !important; }
+  .pl-bar-title, .pl-count { font-size:10px !important; }
+  .pl-bar { padding: 8px 16px; }
+  .pl-foot { padding: 8px 16px; }
+  .pl-item { padding: 8px 16px; gap:12px; }
+  .pl-buy, .pl-wav, .pl-mp3, .pl-email { font-size:7px !important; padding:4px 8px !important; } }
 .pl-list::-webkit-scrollbar { width:7px; }
 .pl-list::-webkit-scrollbar-track { background:#0a1a0a; }
 .pl-list::-webkit-scrollbar-thumb { background:#226622; border:1px solid #0a1a0a; }
@@ -446,10 +450,10 @@ body {
   .pl-wav, .pl-mp3 { font-size:6px !important; padding:3px 7px !important; }
 }
 @media (min-width:900px) {
-  .pl-controls { padding:6px 12px; gap:6px; }
-  .cat-btn { font-size:6px !important; padding:4px 7px !important; }
-  .sort-btn { font-size:6px !important; padding:4px 7px !important; }
-  .pl-buy { font-size:6px !important; padding:3px 7px !important; }
+  .pl-controls { padding:8px 16px; gap:8px; }
+  .cat-btn { font-size:8px !important; padding:5px 10px !important; }
+  .sort-btn { font-size:8px !important; padding:5px 10px !important; }
+  .pl-buy { font-size:7px !important; padding:4px 8px !important; }
 }
 
 
@@ -458,7 +462,7 @@ body {
   transition: background-color .4s ease, border-color .3s ease, color .3s ease, box-shadow .4s ease, text-shadow .3s ease;
 }
 /* Don't transition transforms/positions */
-.seek-thumb, .sthumb, .seek-fill, .sfill, .vbar { transition: none !important; }
+.seek-thumb, .sthumb, .seek-fill, .sfill { transition: none !important; }
 
 .theme-toast {
   position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
@@ -488,7 +492,7 @@ body {
   box-shadow: 0 0 10px rgba(255,200,80,.3);
 }
 @media (min-width:900px) {
-  .mbtn.mood-btn { font-size: 10px !important; padding: 8px 18px !important; }
+  .mbtn.mood-btn { font-size: 13px !important; padding: 10px 24px !important; }
 }
 
 
@@ -718,6 +722,29 @@ body {
   color: var(--cat-orange); margin-bottom: 4px; display: block;
 }
 
+
+/* ── STAR RATINGS ── */
+.star-rating {
+  display: inline-flex;
+  gap: 1px;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.star {
+  font-size: 11px;
+  color: var(--border-lo);
+  transition: color .1s, transform .1s;
+  line-height: 1;
+  user-select: none;
+}
+.star.lit  { color: var(--border-hi); text-shadow: 0 0 5px rgba(255,200,80,.7); }
+.star.hover-lit { color: var(--cat-hi); }
+.star:hover { transform: scale(1.25); }
+@media (min-width:900px) {
+  .star { font-size: 15px !important; gap: 2px; }
+}
+
 /* ── NOTIFICATION ── */
 .notif {
   position:fixed; bottom:20px; right:20px;
@@ -749,7 +776,7 @@ body {
 
     <!-- TITLE BAR -->
     <div class="titlebar">
-      <span class="titlebar-text">🐱 CatAmp v1.0 — Purrfect Tunes</span>
+      <span class="titlebar-text">🐱 PromoCat v1.0 — Purrfect Tunes</span>
       <div class="wbtns">
         <div class="wbtn">_</div>
         <div class="wbtn">▲</div>
@@ -816,7 +843,7 @@ body {
         </div>
 
         <!-- Visualiser -->
-        <div class="vis" id="vis"></div>
+        <div class="vis"><canvas id="eq-canvas"></canvas></div>
 
         <!-- Seek -->
         <div class="seek" id="seek" onclick="seekClick(event)">
@@ -893,6 +920,7 @@ body {
             <button class="sort-btn"    data-sort="artist"     onclick="setSort('artist')">ARTIST</button>
             <button class="sort-btn"    data-sort="album"      onclick="setSort('album')">ALBUM</button>
             <button class="sort-btn"    data-sort="avail"      onclick="setSort('avail')">AVAIL</button>
+            <button class="sort-btn"    data-sort="rating"     onclick="setSort('rating')">★ RATING</button>
           </div>
         </div>
         <!-- Availability filter row -->
@@ -1206,24 +1234,126 @@ let doRepeat = false;
 let volume = 0.8;
 
 // ─────────────── VISUALISER ───────────────
-const visEl = document.getElementById('vis');
-const N = 52;
-for (let i = 0; i < N; i++) {
-  const b = document.createElement('div');
-  b.className = 'vbar';
-  visEl.appendChild(b);
+// ─────────────── CLASSIC EQ VISUALIZER ───────────────
+const eqCanvas  = document.getElementById('eq-canvas');
+const eqCtx     = eqCanvas.getContext('2d');
+const EQ_BANDS  = 28;           // number of frequency bars
+const BAR_GAP   = 2;            // px gap between bars
+
+// Per-band state
+const eqHeights = new Float32Array(EQ_BANDS);   // current bar height (0-1)
+const eqPeaks   = new Float32Array(EQ_BANDS);   // peak dot position (0-1)
+const eqPeakV   = new Float32Array(EQ_BANDS);   // peak velocity (fall speed)
+
+// Smooth targets — each band has its own frequency personality
+const EQ_FREQS  = []; // relative frequency weight per band (bell curve + random offset)
+for (let i = 0; i < EQ_BANDS; i++) {
+  // Simulate a typical music spectrum shape: more energy in mids
+  const pos  = i / (EQ_BANDS - 1);
+  const bell = Math.exp(-Math.pow((pos - 0.35) * 2.2, 2)); // peak around low-mids
+  EQ_FREQS.push(bell * 0.7 + 0.3 + (Math.random() * 0.15));
 }
 
-setInterval(() => {
-  const bars = visEl.children;
-  const c = N / 2;
-  for (let i = 0; i < N; i++) {
-    const dist = Math.abs(i - c);
-    const base = isPlaying ? Math.random() * 22 + 2 : 2;
-    const h = base * Math.max(0, 1 - dist / (N * 0.65));
-    bars[i].style.height = h + 'px';
+function resizeEQ() {
+  eqCanvas.width  = eqCanvas.offsetWidth;
+  eqCanvas.height = eqCanvas.offsetHeight;
+}
+
+window.addEventListener('resize', resizeEQ);
+resizeEQ();
+
+function drawEQ() {
+  const W  = eqCanvas.width;
+  const H  = eqCanvas.height;
+  const bw = (W - BAR_GAP * (EQ_BANDS + 1)) / EQ_BANDS; // bar width
+
+  eqCtx.clearRect(0, 0, W, H);
+
+  // Dark background grid lines
+  eqCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+  eqCtx.lineWidth   = 1;
+  for (let y = 0.25; y < 1; y += 0.25) {
+    eqCtx.beginPath();
+    eqCtx.moveTo(0, H * y);
+    eqCtx.lineTo(W, H * y);
+    eqCtx.stroke();
   }
-}, 75);
+
+  // Read CSS vars for colours
+  const style   = getComputedStyle(document.documentElement);
+  const colLow  = style.getPropertyValue('--lcd-green').trim()  || '#00ff44';
+  const colMid  = style.getPropertyValue('--cat-hi').trim()     || '#ffb347';
+  const colHigh = style.getPropertyValue('--cat-orange').trim() || '#ff4400';
+
+  for (let i = 0; i < EQ_BANDS; i++) {
+    const x   = BAR_GAP + i * (bw + BAR_GAP);
+    const barH = Math.max(2, eqHeights[i] * (H - 4));
+    const y   = H - barH;
+
+    // 3-zone gradient per bar: green base → yellow mid → orange/red top
+    const grad = eqCtx.createLinearGradient(0, H, 0, 0);
+    grad.addColorStop(0,    colLow);
+    grad.addColorStop(0.55, colMid);
+    grad.addColorStop(1,    colHigh);
+
+    // Bar body
+    eqCtx.fillStyle = grad;
+    eqCtx.fillRect(x, y, bw, barH);
+
+    // Bright top edge on bar
+    eqCtx.fillStyle = 'rgba(255,255,255,0.35)';
+    eqCtx.fillRect(x, y, bw, 1);
+
+    // Peak dot (2px tall, sits above the bar with a gap)
+    const peakY = H - eqPeaks[i] * (H - 4) - 3;
+    if (eqPeaks[i] > eqHeights[i] + 0.02) {
+      eqCtx.fillStyle = colMid;
+      eqCtx.shadowColor = colMid;
+      eqCtx.shadowBlur  = 4;
+      eqCtx.fillRect(x, peakY, bw, 2);
+      eqCtx.shadowBlur  = 0;
+    }
+  }
+}
+
+function tickEQ() {
+  if (isPlaying) {
+    for (let i = 0; i < EQ_BANDS; i++) {
+      // Target: randomised per band with frequency weighting + attack randomness
+      const freq   = EQ_FREQS[i];
+      const target = (Math.random() * 0.7 + 0.05) * freq;
+
+      // Fast attack, slower decay
+      if (target > eqHeights[i]) {
+        eqHeights[i] += (target - eqHeights[i]) * 0.55;  // attack
+      } else {
+        eqHeights[i] -= 0.04 + Math.random() * 0.02;      // decay
+        if (eqHeights[i] < 0) eqHeights[i] = 0;
+      }
+
+      // Peak: jump up instantly, fall slowly
+      if (eqHeights[i] > eqPeaks[i]) {
+        eqPeaks[i]  = eqHeights[i];
+        eqPeakV[i]  = 0;
+      } else {
+        eqPeakV[i] += 0.003;           // gravity
+        eqPeaks[i] -= eqPeakV[i];
+        if (eqPeaks[i] < 0) { eqPeaks[i] = 0; eqPeakV[i] = 0; }
+      }
+    }
+  } else {
+    // Idle: all bars fall to zero smoothly
+    for (let i = 0; i < EQ_BANDS; i++) {
+      eqHeights[i] = Math.max(0, eqHeights[i] - 0.03);
+      eqPeakV[i]  += 0.004;
+      eqPeaks[i]   = Math.max(0, eqPeaks[i] - eqPeakV[i]);
+    }
+  }
+  drawEQ();
+  requestAnimationFrame(tickEQ);
+}
+
+requestAnimationFrame(tickEQ);
 
 // ─────────────── AUDIO URL CHECK ───────────────
 function checkAudioUrl() {
@@ -1258,7 +1388,8 @@ function addTrack() {
     avail:    document.querySelector('input[name="avail"]:checked').value,
     email:    document.getElementById('f-email').value.trim(),
     wavLink:  document.getElementById('f-wav').value.trim(),
-    mp3Link:  document.getElementById('f-mp3').value.trim()
+    mp3Link:  document.getElementById('f-mp3').value.trim(),
+    rating:   0
   };
   playlist.push(t);
   renderPlaylist();
@@ -1334,6 +1465,8 @@ function renderPlaylist() {
     filtered.sort((a, b) => a.t.album.localeCompare(b.t.album));
   } else if (activeSort === 'avail') {
     filtered.sort((a, b) => (availOrder[a.t.avail||'undecided']||99) - (availOrder[b.t.avail||'undecided']||99));
+  } else if (activeSort === 'rating') {
+    filtered.sort((a, b) => (b.t.rating||0) - (a.t.rating||0));
   }
 
   if (!filtered.length) {
@@ -1347,6 +1480,12 @@ function renderPlaylist() {
       <div class="pl-info">
         <div class="pl-title">${esc(t.title)}</div>
         <div class="pl-artist">${esc(t.artist)}${t.album?' · '+esc(t.album):''}${t.year?' ('+esc(t.year)+')':''}</div>
+      </div>
+      <div class="star-rating" onclick="event.stopPropagation()"
+           onmouseleave="hoverStars(${origIdx},0)">
+        ${[1,2,3,4,5].map(s => `<span class="star${(t.rating||0)>=s?' lit':''}"
+          onclick="setRating(${origIdx},${s})"
+          onmouseenter="hoverStars(${origIdx},${s})">★</span>`).join('')}
       </div>
       <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
       <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
@@ -1562,8 +1701,6 @@ function applyTheme(th) {
   r.setProperty('--thumb-border', th.borderLo);
   r.setProperty('--thumb-sh-hi',  th.hi);
   r.setProperty('--thumb-sh-lo',  th.btnSh);
-  // vbar gradient: lcdGreen bottom → hi → orange → warm accent top
-  r.setProperty('--vbar-grad', `linear-gradient(to top,${th.lcdGreen},${th.hi},${th.orange},${th.borderHi})`);
   // slider label color
   r.setProperty('--slbl-color', th.orange);
 
@@ -1788,6 +1925,36 @@ document.getElementById('tab-promo').addEventListener('click', () => {
   loadTemplate();
 });
 
+
+// ─────────────── STAR RATINGS ───────────────
+function setRating(trackIdx, stars) {
+  playlist[trackIdx].rating = stars;
+  renderPlaylist();
+  notify('⭐', stars + ' star' + (stars !== 1 ? 's' : '') + ' — ' + playlist[trackIdx].title);
+}
+
+function hoverStars(trackIdx, stars) {
+  // Highlight stars up to hovered position
+  const items = document.querySelectorAll('.pl-item');
+  items.forEach(item => {
+    const starEls = item.querySelectorAll('.star');
+    if (!starEls.length) return;
+    const onclick = starEls[0].getAttribute('onclick') || '';
+    const match   = onclick.match(/setRating\((\d+),/);
+    if (!match || parseInt(match[1]) !== trackIdx) return;
+    starEls.forEach((el, i) => {
+      const rating = playlist[trackIdx].rating || 0;
+      if (stars === 0) {
+        // restore actual rating
+        el.className = 'star' + (rating >= i + 1 ? ' lit' : '');
+      } else {
+        el.className = 'star' + (stars >= i + 1 ? ' hover-lit' : '');
+      }
+    });
+  });
+}
+
+// Add sort by rating
 // ─────────────── NOTIFICATION ───────────────
 let notifT;
 function notify(icon, msg) {
