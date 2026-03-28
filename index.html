@@ -426,6 +426,25 @@ body {
   transition:all .15s; display:inline-block; line-height:1.6;
 }
 .pl-email:hover { background:rgba(0,100,160,.65); color:#ccf0ff; box-shadow:0 0 6px rgba(0,180,255,.3); }
+.pl-wav {
+  font-family:'Press Start 2P',monospace; font-size:5px;
+  color:#aaffcc; background:rgba(0,80,40,.45);
+  border:1px solid #006633; padding:2px 5px;
+  cursor:pointer; text-decoration:none; white-space:nowrap;
+  transition:all .15s; display:inline-block; line-height:1.6;
+}
+.pl-wav:hover { background:rgba(0,120,60,.65); color:#ccffdd; box-shadow:0 0 6px rgba(0,255,100,.25); }
+.pl-mp3 {
+  font-family:'Press Start 2P',monospace; font-size:5px;
+  color:#ffaadd; background:rgba(100,0,60,.45);
+  border:1px solid #880044; padding:2px 5px;
+  cursor:pointer; text-decoration:none; white-space:nowrap;
+  transition:all .15s; display:inline-block; line-height:1.6;
+}
+.pl-mp3:hover { background:rgba(150,0,80,.65); color:#ffccee; box-shadow:0 0 6px rgba(255,0,120,.25); }
+@media (min-width:900px) {
+  .pl-wav, .pl-mp3 { font-size:6px !important; padding:3px 7px !important; }
+}
 @media (min-width:900px) {
   .pl-controls { padding:6px 12px; gap:6px; }
   .cat-btn { font-size:6px !important; padding:4px 7px !important; }
@@ -540,17 +559,14 @@ body {
 .rlbl input:checked + .rcust::after { content:''; position:absolute; top:2px; left:2px; width:4px; height:4px; background:var(--cat-orange); box-shadow:0 0 4px rgba(255,140,66,.8); }
 .rlbl input:checked ~ .rtxt { color:var(--cat-orange); text-shadow:0 0 4px rgba(255,140,66,.5); }
 
-.dropzone {
-  border:2px dashed #441a00; background:#080502;
-  padding:18px; text-align:center; cursor:pointer;
-  transition:all .2s; position:relative;
+.audio-url-status {
+  font-family:'VT323',monospace; font-size:14px;
+  margin-top:5px; min-height:18px;
+  display:flex; align-items:center; gap:6px;
 }
-.dropzone:hover,.dropzone.over { border-color:#ff8800; background:#0f0703; box-shadow:0 0 12px rgba(255,136,0,.1) inset; }
-.dropzone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-.dz-icon { font-size:32px; margin-bottom:6px; display:block; }
-.dz-text { font-family:'Press Start 2P',monospace; font-size:7px; color:#664422; line-height:2; }
-.dz-sub { font-family:'VT323',monospace; font-size:14px; color:#441a00; margin-top:4px; display:block; }
-.dz-name { font-family:'VT323',monospace; font-size:15px; color:var(--cat-orange); text-shadow:0 0 5px rgba(255,140,66,.5); margin-top:6px; display:none; word-break:break-all; }
+.audio-url-status.ok    { color:#44ff88; }
+.audio-url-status.err   { color:#ff5544; }
+.audio-url-status.checking { color:var(--cat-orange); }
 
 .sub-btn {
   width:100%; padding:9px; margin-top:10px;
@@ -922,14 +938,11 @@ body {
         <div class="upload-title">🎵 ADD TRACK TO CATAMP</div>
 
         <div class="frow">
-          <label class="flbl">🎧 AUDIO FILE</label>
-          <div class="dropzone" id="dropzone">
-            <input type="file" id="file-input" accept="audio/*" onchange="fileChosen(event)">
-            <span class="dz-icon">🎵</span>
-            <div class="dz-text">DROP AUDIO FILE HERE</div>
-            <span class="dz-sub">or click to browse · MP3 FLAC WAV OGG AAC</span>
-            <div class="dz-name" id="dz-name"></div>
-          </div>
+          <label class="flbl" for="f-audio-url">🎧 AUDIO STREAM LINK</label>
+          <input class="finput" type="url" id="f-audio-url"
+                 placeholder="https://... direct link to audio file"
+                 oninput="checkAudioUrl()">
+          <div class="audio-url-status" id="audio-url-status"></div>
         </div>
 
         <div class="frow">
@@ -975,6 +988,14 @@ body {
         <div class="frow">
           <label class="flbl" for="f-email">✉️ CONTACT EMAIL <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
           <input class="finput" type="email" id="f-email" placeholder="pplprsnproject@gmail.com">
+        </div>
+        <div class="frow">
+          <label class="flbl" for="f-wav">🎵 WAV DOWNLOAD LINK <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
+          <input class="finput" type="url" id="f-wav" placeholder="https://... link to WAV file">
+        </div>
+        <div class="frow">
+          <label class="flbl" for="f-mp3">🎵 MP3 DOWNLOAD LINK <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
+          <input class="finput" type="url" id="f-mp3" placeholder="https://... link to MP3 file">
         </div>
         <div class="frow">
           <label class="flbl">🔓 STATUS</label>
@@ -1204,30 +1225,30 @@ setInterval(() => {
   }
 }, 75);
 
-// ─────────────── FILE DROP ───────────────
-const dz = document.getElementById('dropzone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('over'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-
-function fileChosen(e) { const f = e.target.files[0]; if (f) handleFile(f); }
-
-function handleFile(file) {
-  const nm = document.getElementById('dz-name');
-  nm.textContent = '🎵 ' + file.name;
-  nm.style.display = 'block';
-  const ti = document.getElementById('f-title');
-  if (!ti.value) ti.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-  dz._url = URL.createObjectURL(file);
-  dz._name = file.name;
+// ─────────────── AUDIO URL CHECK ───────────────
+function checkAudioUrl() {
+  const url = document.getElementById('f-audio-url').value.trim();
+  const st  = document.getElementById('audio-url-status');
+  if (!url) { st.textContent = ''; st.className = 'audio-url-status'; return; }
+  // Basic format check
+  const ext = url.split('?')[0].split('.').pop().toLowerCase();
+  const validExts = ['mp3','wav','flac','ogg','aac','m4a','opus'];
+  if (validExts.includes(ext)) {
+    st.textContent = '✓ Looks good! (' + ext.toUpperCase() + ')';
+    st.className = 'audio-url-status ok';
+  } else {
+    st.textContent = '⚠ Make sure this is a direct audio file URL';
+    st.className = 'audio-url-status checking';
+  }
 }
 
 // ─────────────── ADD TRACK ───────────────
 function addTrack() {
-  if (!dz._url) { notify('😾', 'Select an audio file first!'); return; }
+  const audioUrl = document.getElementById('f-audio-url').value.trim();
+  if (!audioUrl) { notify('😾', 'Enter an audio stream link first!'); return; }
   const t = {
-    url:      dz._url,
-    title:    document.getElementById('f-title').value.trim()  || (dz._name||'').replace(/\.[^/.]+$/, '') || 'Unknown',
+    url:      audioUrl,
+    title:    document.getElementById('f-title').value.trim() || 'Unknown',
     artist:   document.getElementById('f-artist').value.trim() || 'Unknown Artist',
     album:    document.getElementById('f-album').value.trim()  || 'Unknown Album',
     year:     document.getElementById('f-year').value.trim(),
@@ -1235,7 +1256,9 @@ function addTrack() {
     category: document.querySelector('input[name="category"]:checked').value,
     buyLink:  document.getElementById('f-buy').value.trim(),
     avail:    document.querySelector('input[name="avail"]:checked').value,
-    email:    document.getElementById('f-email').value.trim()
+    email:    document.getElementById('f-email').value.trim(),
+    wavLink:  document.getElementById('f-wav').value.trim(),
+    mp3Link:  document.getElementById('f-mp3').value.trim()
   };
   playlist.push(t);
   renderPlaylist();
@@ -1251,9 +1274,11 @@ function addTrack() {
   document.querySelector('input[name="avail"][value="available"]').checked = true;
   document.getElementById('f-buy').value = '';
   document.getElementById('f-email').value = '';
-  document.getElementById('file-input').value = '';
-  document.getElementById('dz-name').style.display = 'none';
-  delete dz._url; delete dz._name;
+  document.getElementById('f-wav').value = '';
+  document.getElementById('f-mp3').value = '';
+  document.getElementById('f-audio-url').value = '';
+  document.getElementById('audio-url-status').textContent = '';
+  document.getElementById('audio-url-status').className = 'audio-url-status';
 
   if (playlist.length === 1) loadTrack(0);
   setTimeout(() => switchTab('player'), 700);
@@ -1326,6 +1351,8 @@ function renderPlaylist() {
       <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
       <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
       ${t.buyLink ? `<a class="pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
+      ${t.wavLink ? `<a class="pl-wav" href="${esc(t.wavLink)}" target="_blank" download onclick="event.stopPropagation()">⬇ WAV</a>` : ''}
+      ${t.mp3Link ? `<a class="pl-mp3" href="${esc(t.mp3Link)}" target="_blank" download onclick="event.stopPropagation()">⬇ MP3</a>` : ''}
       ${t.email ? `<a class="pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
       <button class="pl-del" onclick="delTrack(event,${origIdx})">✕</button>
     </div>`).join('');
@@ -1654,7 +1681,9 @@ function genPromoLink() {
     avail:  playlist[i].avail,
     status: playlist[i].status,
     buyLink: playlist[i].buyLink,
-    email:  playlist[i].email
+    email:   playlist[i].email,
+    wavLink: playlist[i].wavLink,
+    mp3Link: playlist[i].mp3Link
   }));
 
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(picked))));
