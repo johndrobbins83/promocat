@@ -4,4 +4,4 @@ compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
 binding = "PROMOCAT_KV"
-id = "REPLACE_WITH_YOUR_KV_ID"
+id = "581cf8391dc940e99d825263caf2c269"
