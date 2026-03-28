@@ -149,10 +149,23 @@ body {
   line-height: 1;
   white-space: nowrap;
 }
-.cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); }
+.cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); transition: filter .3s; }
+.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); }
 @media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
 .cat-svg:hover { animation: wiggle .5s ease-in-out infinite; }
 @keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
+
+.cat-svg.bobbing {
+  animation: cat-bob var(--bob-dur, 0.43s) ease-in-out infinite !important;
+  transform-origin: center bottom;
+}
+@keyframes cat-bob {
+  0%   { transform: translateY(0)    rotate(0deg)   scaleX(1); }
+  25%  { transform: translateY(-4px) rotate(-2deg)  scaleX(1.03); }
+  50%  { transform: translateY(-6px) rotate(0deg)   scaleX(1); }
+  75%  { transform: translateY(-4px) rotate(2deg)   scaleX(1.03); }
+  100% { transform: translateY(0)    rotate(0deg)   scaleX(1); }
+}
 
 /* LCD */
 .lcd {
@@ -194,6 +207,19 @@ body {
   position:relative; z-index:1; margin-top:3px; letter-spacing:1px;
 }
 .lcd-st { display:none; }
+.lcd-bpm-display {
+  font-family:'Press Start 2P',monospace; font-size:8px;
+  color: var(--cat-orange); opacity:.85;
+  text-shadow: 0 0 6px rgba(255,140,66,.7);
+  position:relative; z-index:1; letter-spacing:.5px;
+  animation: bpm-pulse var(--bob-dur, 0.5s) ease-in-out infinite;
+}
+@keyframes bpm-pulse {
+  0%,100% { opacity:.7; }
+  50%     { opacity:1; text-shadow:0 0 10px var(--cat-orange), 0 0 4px #fff; }
+}
+@media (min-width:900px) { .lcd-bpm-display { font-size:13px !important; } }
+
 .lcd-mode {
   font-family:'Press Start 2P',monospace; font-size:5px;
   color: var(--lcd-green); opacity:.7;
@@ -201,7 +227,20 @@ body {
   letter-spacing:.5px; height:10px; line-height:1;
   text-shadow: 0 0 4px rgba(51,255,102,.6);
 }
-@media (min-width:900px) { .lcd-mode { font-size:8px !important; height:14px !important; margin-top:4px !important; } }
+@media (min-width:900px) { .lcd-bpm-display {
+  font-family:'Press Start 2P',monospace; font-size:8px;
+  color: var(--cat-orange); opacity:.85;
+  text-shadow: 0 0 6px rgba(255,140,66,.7);
+  position:relative; z-index:1; letter-spacing:.5px;
+  animation: bpm-pulse var(--bob-dur, 0.5s) ease-in-out infinite;
+}
+@keyframes bpm-pulse {
+  0%,100% { opacity:.7; }
+  50%     { opacity:1; text-shadow:0 0 10px var(--cat-orange), 0 0 4px #fff; }
+}
+@media (min-width:900px) { .lcd-bpm-display { font-size:13px !important; } }
+
+.lcd-mode { font-size:8px !important; height:14px !important; margin-top:4px !important; } }
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
 
 /* SCANLINES */
@@ -341,8 +380,8 @@ body {
   .pl-title { font-size:28px !important; }
   .pl-artist { font-size:20px !important; }
   .pl-num { font-size:10px !important; min-width:28px !important; }
-  .pl-badge { font-size:8px !important; padding:4px 8px !important; }
-  .avail-badge { font-size:8px !important; padding:4px 8px !important; }
+  .pl-badge { font-size:7px !important; padding:3px 5px !important; }
+  .avail-badge { font-size:7px !important; padding:3px 5px !important; }
   .pl-bar-title, .pl-count { font-size:10px !important; }
   .pl-bar { padding: 8px 16px; }
   .pl-foot { padding: 8px 16px; }
@@ -359,6 +398,8 @@ body {
 .pl-item:hover { background:rgba(34,100,34,.2); }
 .pl-item.cur { background:rgba(34,150,34,.22); border-left:2px solid #33ff66; padding-left:5px; }
 
+.pl-bpm { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--border-lo); margin-top:1px; letter-spacing:.3px; }
+@media (min-width:900px) { .pl-bpm { font-size:7px !important; margin-top:2px !important; } }
 .pl-num { font-family:'Press Start 2P',monospace; font-size:6px; color:#1a5522; min-width:18px; text-align:right; }
 .pl-num.cur { color:#33ff66; text-shadow:0 0 4px rgba(51,255,102,.8); }
 .pl-info { flex:1; overflow:hidden; }
@@ -366,7 +407,8 @@ body {
 .pl-item.cur .pl-title { color:#66ff88; text-shadow:0 0 4px rgba(102,255,136,.5); }
 .pl-artist { font-family:'VT323',monospace; font-size:12px; color:#1a5522; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-.pl-badge { font-family:'Press Start 2P',monospace; font-size:5px; padding:2px 4px; white-space:nowrap; }
+.pl-badge { font-family:'Press Start 2P',monospace; font-size:5px; padding:2px 4px; white-space:nowrap;
+  display:block; width:100%; text-align:center; }
 .pl-badge.released { background:rgba(34,100,34,.4); color:#44cc66; border:1px solid #226644; }
 .pl-badge.unreleased { background:rgba(200,80,0,.3); color:#ff8844; border:1px solid #884422; }
 
@@ -510,8 +552,29 @@ body {
 }
 
 
+
+/* Cat eye squint overlays — animated eyelids */
+#eyelid-l, #eyelid-r {
+  transform-origin: center top;
+  transition: none;
+}
+.cat-svg.squinting-mild #eyelid-l,
+.cat-svg.squinting-mild #eyelid-r    { animation: squint-mild var(--bob-dur, 0.5s) ease-in-out infinite; }
+.cat-svg.squinting-medium #eyelid-l,
+.cat-svg.squinting-medium #eyelid-r  { animation: squint-medium var(--bob-dur, 0.5s) ease-in-out infinite; }
+.cat-svg.squinting-hard #eyelid-l,
+.cat-svg.squinting-hard #eyelid-r    { animation: squint-hard var(--bob-dur, 0.5s) ease-in-out infinite; }
+.cat-svg.squinting-intense #eyelid-l,
+.cat-svg.squinting-intense #eyelid-r { animation: squint-intense var(--bob-dur, 0.5s) ease-in-out infinite; }
+
+@keyframes squint-mild    { 0%,100%{scaleY(0)} 50%{transform:scaleY(.35)} }
+@keyframes squint-medium  { 0%,100%{transform:scaleY(0)} 50%{transform:scaleY(.55)} }
+@keyframes squint-hard    { 0%,100%{transform:scaleY(0)} 50%{transform:scaleY(.75)} }
+@keyframes squint-intense { 0%,100%{transform:scaleY(0)} 50%{transform:scaleY(.95)} }
+
 /* ── AVAILABILITY BADGES ── */
-.avail-badge { font-family:'Press Start 2P',monospace; font-size:5px; padding:2px 4px; white-space:nowrap; border-radius:1px; }
+.avail-badge { font-family:'Press Start 2P',monospace; font-size:5px; padding:2px 4px; white-space:nowrap;
+  border-radius:1px; display:block; width:100%; text-align:center; }
 .avail-badge.available  { background:rgba(0,180,80,.25);  color:#44ff88; border:1px solid #00aa44; }
 .avail-badge.signed     { background:rgba(80,80,255,.25); color:#8888ff; border:1px solid #4444cc; }
 .avail-badge.freebie    { background:rgba(255,200,0,.2);  color:#ffdd44; border:1px solid #aa8800; }
@@ -891,16 +954,19 @@ body {
             <path d="M20,14 Q30,10 40,14" stroke="#2e2e2e" stroke-width="1.5" fill="none" opacity=".6"/>
             <path d="M22,11 Q30,7 38,11" stroke="#2e2e2e" stroke-width="1" fill="none" opacity=".4"/>
             <!-- Eyes outer -->
-            <ellipse cx="21" cy="22" rx="5" ry="6" fill="#1a1a1a"/>
-            <ellipse cx="39" cy="22" rx="5" ry="6" fill="#1a1a1a"/>
+            <ellipse id="eye-l-outer" cx="21" cy="22" rx="5" ry="6" fill="#1a1a1a"/>
+            <ellipse id="eye-r-outer" cx="39" cy="22" rx="5" ry="6" fill="#1a1a1a"/>
             <!-- Pupils -->
-            <ellipse cx="21" cy="22" rx="3" ry="5.5" fill="#111111"/>
-            <ellipse cx="39" cy="22" rx="3" ry="5.5" fill="#111111"/>
+            <ellipse id="eye-l-pupil" cx="21" cy="22" rx="3" ry="5.5" fill="#111111"/>
+            <ellipse id="eye-r-pupil" cx="39" cy="22" rx="3" ry="5.5" fill="#111111"/>
             <!-- Eye shine -->
-            <circle cx="23" cy="20" r="1.5" fill="#dddddd" opacity=".9"/>
-            <circle cx="41" cy="20" r="1.5" fill="#dddddd" opacity=".9"/>
+            <circle id="shine-l" cx="23" cy="20" r="1.5" fill="#dddddd" opacity=".9"/>
+            <circle id="shine-r" cx="41" cy="20" r="1.5" fill="#dddddd" opacity=".9"/>
             <circle cx="22" cy="21" r=".7" fill="white" opacity=".7"/>
             <circle cx="40" cy="21" r=".7" fill="white" opacity=".7"/>
+            <!-- Eyelids (squint overlays — animated by JS class + CSS) -->
+            <rect id="eyelid-l" x="16" y="16" width="10" height="6" rx="1" fill="#4a4a4a" style="transform-origin:16px 16px;transform:scaleY(0);"/>
+            <rect id="eyelid-r" x="34" y="16" width="10" height="6" rx="1" fill="#4a4a4a" style="transform-origin:34px 16px;transform:scaleY(0);"/>
             <!-- Nose -->
             <polygon points="30,29 27.5,32 32.5,32" fill="#cc7799"/>
             <!-- Mouth -->
@@ -926,7 +992,10 @@ body {
             &nbsp;&nbsp;
             <span style="opacity:.5;">ALBUM:</span> <span id="lcd-album">—</span>
           </div>
-          <div class="lcd-time" id="lcd-time">0:00 / 0:00</div>
+          <div style="display:flex;align-items:baseline;gap:12px;position:relative;z-index:1;">
+            <div class="lcd-time" id="lcd-time">0:00 / 0:00</div>
+            <div class="lcd-bpm-display" id="lcd-bpm"></div>
+          </div>
           <div class="lcd-mode" id="lcd-mode"></div>
         </div>
 
@@ -1108,6 +1177,10 @@ body {
         <div class="frow">
           <label class="flbl" for="f-year">📅 YEAR</label>
           <input class="finput" type="text" id="f-year" placeholder="e.g. 2024" maxlength="4">
+        </div>
+        <div class="frow">
+          <label class="flbl" for="f-bpm">🥁 BPM <span style="color:#553311;font-size:5px;">(OPTIONAL — CAT BOBS TO THE BEAT)</span></label>
+          <input class="finput" type="number" id="f-bpm" placeholder="e.g. 140" min="40" max="300">
         </div>
         <div class="frow">
           <label class="flbl" for="f-genre">🎛️ GENRE</label>
@@ -1552,6 +1625,7 @@ function addTrack() {
     artist:   document.getElementById('f-artist').value.trim() || 'Unknown Artist',
     album:    document.getElementById('f-album').value.trim()  || 'Unknown Album',
     year:     document.getElementById('f-year').value.trim(),
+    bpm:      parseInt(document.getElementById('f-bpm').value) || 0,
     status:   document.querySelector('input[name="status"]:checked').value,
     genre:    document.getElementById('f-genre').value,
     category: document.querySelector('input[name="category"]:checked').value,
@@ -1571,6 +1645,7 @@ function addTrack() {
   document.getElementById('f-artist').value = '';
   document.getElementById('f-album').value = '';
   document.getElementById('f-year').value = '';
+  document.getElementById('f-bpm').value = '';
   document.querySelector('input[name="status"][value="released"]').checked = true;
   document.getElementById('f-genre').value = '';
   document.querySelector('input[name="category"][value="dj"]').checked = true;
@@ -1666,6 +1741,7 @@ function renderPlaylist() {
       <div class="pl-info">
         <div class="pl-title">${esc(t.title)}</div>
         <div class="pl-artist">${esc(t.artist)}${t.album?' · '+esc(t.album):''}${t.year?' ('+esc(t.year)+')':''}${t.genre?' — '+esc(t.genre.replace(/-/g,' ')):''}</div>
+        ${t.bpm ? `<div class="pl-bpm">🥁 ${t.bpm} BPM</div>` : ''}
       </div>
       <div class="star-rating" onclick="event.stopPropagation()"
            onmouseleave="hoverStars(${origIdx},0)">
@@ -1673,8 +1749,10 @@ function renderPlaylist() {
           onclick="setRating(${origIdx},${s})"
           onmouseenter="hoverStars(${origIdx},${s})">★</span>`).join('')}
       </div>
-      <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
-      <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:52px;">
+        <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
+        <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
+      </div>
       ${t.buyLink ? `<a class="pl-btn pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
       ${(t.wavLink||t.mp3Link) ? `<div class="pl-btn pl-dl" onclick="event.stopPropagation()">⬇ DL<div class="pl-dl-menu">${t.wavLink?`<a class="pl-dl-opt" href="${esc(t.wavLink)}" target="_blank" download>WAV</a>`:''}${t.mp3Link?`<a class="pl-dl-opt" href="${esc(t.mp3Link)}" target="_blank" download>MP3</a>`:''}</div></div>` : ''}
       ${t.email ? `<a class="pl-btn pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
@@ -1703,6 +1781,32 @@ function loadTrack(i) {
   document.getElementById('lcd-title').classList.toggle('scrolling', t.title.length > 22);
   document.getElementById('lcd-artist').textContent = t.artist.toUpperCase();
   document.getElementById('lcd-album').textContent = t.album.toUpperCase();
+
+  // BPM — set cat bob tempo + squint intensity
+  const bpm = t.bpm || 0;
+  const catSvg = document.querySelector('.cat-svg');
+  // Remove all squint classes first
+  catSvg.classList.remove('squinting-mild','squinting-medium','squinting-hard','squinting-intense');
+
+  if (bpm >= 40 && bpm <= 300) {
+    const dur = (60 / bpm).toFixed(3) + 's';
+    catSvg.style.setProperty('--bob-dur', dur);
+    document.getElementById('lcd-bpm').textContent = bpm + ' BPM';
+
+    // Squint level based on BPM range
+    // 40–89:   mild  (chilled, half-lidded groove)
+    // 90–129:  medium (mid-tempo head-nod)
+    // 130–159: hard  (energetic, squinting hard)
+    // 160+:    intense (fully squinting, going nuts)
+    if      (bpm >= 160) catSvg.classList.add('squinting-intense');
+    else if (bpm >= 130) catSvg.classList.add('squinting-hard');
+    else if (bpm >= 90)  catSvg.classList.add('squinting-medium');
+    else                 catSvg.classList.add('squinting-mild');
+  } else {
+    catSvg.style.setProperty('--bob-dur', '0.5s');
+    document.getElementById('lcd-bpm').textContent = '';
+  }
+
   renderPlaylist();
   if (isPlaying) audio.play().catch(()=>{});
 }
@@ -1724,6 +1828,7 @@ function stopTrack() {
   audio.pause(); audio.currentTime = 0;
   isPlaying = false; setSt('■ STOP', false);
   setSeek(0);
+  document.querySelector('.cat-svg').classList.remove('bobbing','squinting-mild','squinting-medium','squinting-hard','squinting-intense');
   document.getElementById('lcd-time').textContent = '0:00 / 0:00';
 }
 
@@ -1762,8 +1867,14 @@ audio.addEventListener('timeupdate', () => {
   }
 });
 audio.addEventListener('ended', () => { if (doRepeat) { audio.currentTime=0; audio.play().catch(()=>{}); } else nextTrack(); });
-audio.addEventListener('play',  () => { isPlaying=true;  setSt('▶ PLAY',  true);  });
-audio.addEventListener('pause', () => { if(!audio.ended) { isPlaying=false; setSt('⏸ PAUSE', false); } });
+audio.addEventListener('play',  () => {
+  isPlaying=true; setSt('▶ PLAY', true);
+  document.querySelector('.cat-svg').classList.add('bobbing');
+});
+audio.addEventListener('pause', () => {
+  if (!audio.ended) { isPlaying=false; setSt('⏸ PAUSE', false); }
+  document.querySelector('.cat-svg').classList.remove('bobbing','squinting-mild','squinting-medium','squinting-hard','squinting-intense');
+});
 
 function fmt(s) { const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+String(sec).padStart(2,'0'); }
 
