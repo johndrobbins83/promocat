@@ -3997,16 +3997,17 @@ function addContact() {
   document.getElementById('c-name').value = '';
   document.getElementById('c-email').value = '';
   renderContacts();
+  scheduleSyncToCloud();
   notify('📧', (name || email) + ' added!');
 }
 
 function removeContact(i) {
   contacts.splice(i, 1);
-  // Rebuild selectedContacts with shifted indices
   const newSel = new Set();
   selectedContacts.forEach(idx => { if (idx < i) newSel.add(idx); else if (idx > i) newSel.add(idx - 1); });
   selectedContacts = newSel;
   renderContacts();
+  scheduleSyncToCloud();
 }
 
 function toggleContactSelect(i) {
@@ -4486,6 +4487,7 @@ function blankProfile() {
 const CACHE_PLAYLIST = () => 'promocat_playlist_' + (currentUser?.username || '_');
 const CACHE_PROFILES = () => 'promocat_profiles_' + (currentUser?.username || '_');
 const CACHE_PROMO_PL = () => 'promocat_promopl_'  + (currentUser?.username || '_');
+const CACHE_CONTACTS = () => 'promocat_contacts_' + (currentUser?.username || '_');
 
 // Called once after login — pulls everything from the Worker
 async function loadUserData() {
@@ -4550,11 +4552,23 @@ async function loadCloudPlaylist() {
         promoPlaylists = data.promoPlaylists;
         localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
       }
+      if (Array.isArray(data.contacts)) {
+        contacts = data.contacts;
+        localStorage.setItem(CACHE_CONTACTS(), JSON.stringify(contacts));
+        // Restore selected state — select all by default
+        selectedContacts = new Set(contacts.map((_, i) => i));
+        renderContacts();
+      }
     } else throw new Error('bad response');
   } catch(e) {
     // Offline: restore from cache
     try { playlist = JSON.parse(localStorage.getItem(CACHE_PLAYLIST()) || '[]'); } catch(e2) {}
     try { promoPlaylists = JSON.parse(localStorage.getItem(CACHE_PROMO_PL()) || '[]'); } catch(e2) {}
+    try {
+      contacts = JSON.parse(localStorage.getItem(CACHE_CONTACTS()) || '[]');
+      selectedContacts = new Set(contacts.map((_, i) => i));
+      renderContacts();
+    } catch(e2) {}
   }
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
@@ -4571,8 +4585,9 @@ async function syncPlaylistToCloud() {
   if (!currentUser) return;
   localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
   localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
+  localStorage.setItem(CACHE_CONTACTS(), JSON.stringify(contacts));
   try {
-    await api('PUT', '/playlist', { playlist, promoPlaylists });
+    await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
   } catch(e) {
     // Silently cached — will retry next save
   }
