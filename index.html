@@ -258,7 +258,7 @@ body {
 @keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
 
 .cat-svg.bobbing {
-  animation: cat-bob var(--bob-dur, 0.43s) ease-in-out infinite;
+  animation: cat-bob var(--bob-dur, 0.5s) ease-in-out infinite !important;
   transform-origin: center bottom;
 }
 @keyframes cat-bob {
@@ -1144,21 +1144,9 @@ body.rave-mode .lcd-time {
   100% { color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
 }
 
-/* Cat SVG rave strobe glow */
-body.rave-mode .cat-svg {
-  animation: cat-bob var(--bob-dur, 0.43s) ease-in-out infinite, rave-cat-glow var(--rave-dur, 0.43s) steps(1) infinite !important;
-}
+/* Cat SVG rave strobe glow — handled by JS raveApplyColor, not CSS animation */
 body.rave-mode .cat-svg:not(.bobbing) {
-  animation: rave-cat-glow var(--rave-dur, 0.43s) steps(1) infinite !important;
-}
-@keyframes rave-cat-glow {
-  0%   { filter: drop-shadow(0 0 10px #ff00ff) drop-shadow(0 0 20px #ff00ff); }
-  16%  { filter: drop-shadow(0 0 10px #00ffff) drop-shadow(0 0 20px #00ffff); }
-  33%  { filter: drop-shadow(0 0 10px #ffff00) drop-shadow(0 0 20px #ffff00); }
-  50%  { filter: drop-shadow(0 0 10px #00ff66) drop-shadow(0 0 20px #00ff66); }
-  66%  { filter: drop-shadow(0 0 10px #ff6600) drop-shadow(0 0 20px #ff6600); }
-  83%  { filter: drop-shadow(0 0 10px #ff0066) drop-shadow(0 0 20px #ff0066); }
-  100% { filter: drop-shadow(0 0 10px #ff00ff) drop-shadow(0 0 20px #ff00ff); }
+  /* glow applied inline by JS */
 }
 
 /* EQ bars rave strobe */
@@ -3295,6 +3283,7 @@ function loadTrack(i) {
   if (bpm >= 40 && bpm <= 300) {
     const dur = (60 / bpm).toFixed(3) + 's';
     catSvg.style.setProperty('--bob-dur', dur);
+    document.documentElement.style.setProperty('--bob-dur', dur);
     document.getElementById('lcd-bpm').textContent = bpm + ' BPM';
     const t_val = Math.min(1, Math.max(0, (bpm - 40) / 260));
     const squintScale = (0.05 + t_val * 0.85).toFixed(2);
@@ -3302,6 +3291,7 @@ function loadTrack(i) {
     setCatMouth(bpm);
   } else {
     catSvg.style.setProperty('--bob-dur', '0.5s');
+    document.documentElement.style.setProperty('--bob-dur', '0.5s');
     document.getElementById('lcd-bpm').textContent = '';
     setEyeSquint(0);
     setCatMouth(0);
@@ -3509,9 +3499,9 @@ function raveApplyColor(c) {
     });
   });
 
-  // Cat glow
-  const cat = document.querySelector('.cat-svg');
-  if (cat) cat.style.filter = `drop-shadow(0 0 12px ${c.main}) drop-shadow(0 0 24px ${c.alt})`;
+  // Cat glow — apply to the wrapper span so it doesn't conflict with .cat-svg.bobbing filter
+  const catWrap = document.querySelector('.cat-svg-wrap');
+  if (catWrap) catWrap.style.filter = `drop-shadow(0 0 12px ${c.main}) drop-shadow(0 0 24px ${c.alt})`;
 
   // Seek + slider fills
   ['.seek-fill','.sfill'].forEach(sel => {
@@ -3544,6 +3534,8 @@ function raveClearInlineStyles() {
       el.style.color = ''; el.style.textShadow = ''; el.style.background = ''; el.style.filter = '';
     });
   });
+  const catWrap = document.querySelector('.cat-svg-wrap');
+  if (catWrap) catWrap.style.filter = '';
   const cat = document.querySelector('.cat-svg');
   if (cat) cat.style.filter = '';
   document.documentElement.style.removeProperty('--rave-eq-lo');
