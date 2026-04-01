@@ -2,8 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐱 PromoCat v1.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PromoCat v1.0</title>
+
+<!-- Favicon — cat emoji as SVG data URI -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+
+<!-- OG / Social sharing -->
+<meta property="og:title"       content="PromoCat — Purrfect Tunes">
+<meta property="og:description" content="A retro music player and promo toolkit for artists. Share tracks, build promo playlists, and send to your email list.">
+<meta property="og:type"        content="website">
+<meta property="og:image"       content="https://promocat.johndrobbins83.workers.dev/og-image">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="PromoCat — Purrfect Tunes">
+<meta name="twitter:description" content="Retro music player and promo toolkit for artists.">
+<meta name="twitter:image"       content="https://promocat.johndrobbins83.workers.dev/og-image">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Righteous&display=swap');
 
@@ -55,10 +70,11 @@
 body {
   background: #0d0802;
   min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height — fixes mobile browser chrome */
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 44px 20px 40px;
+  padding: 0;          /* no padding on mobile — shell goes edge to edge */
   font-family: 'VT323', monospace;
   background-image:
     radial-gradient(ellipse at 20% 20%, rgba(255,140,66,.07) 0%, transparent 50%),
@@ -68,9 +84,22 @@ body {
 }
 
 /* ── SHELL ── */
-#shell { width: 100%; max-width: 480px; display: flex; flex-direction: column; }
-@media (min-width: 600px) { #shell { width: 520px; max-width: 520px; } }
-@media (min-width: 900px) { #shell { width: 832px; max-width: 832px; } body { padding: 50px 40px 60px; } }
+#shell {
+  width: 100%;
+  max-width: 100%;   /* full width on mobile */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+@media (min-width: 600px) {
+  body  { padding: 24px 16px; align-items: flex-start; }
+  #shell { max-width: 560px; min-height: auto; }
+}
+@media (min-width: 900px) {
+  body  { padding: 50px 40px 60px; }
+  #shell { width: 832px; max-width: 832px; min-height: auto; }
+}
 
 /* ── TAB BAR ── */
 .tab-bar {
@@ -208,7 +237,7 @@ body {
 .tab-panel.active { display: block; }
 
 /* ── PLAYER BODY ── */
-.player-body { padding: 7px; }
+.player-body { padding: 10px; }
 @media (min-width: 900px) { .player-body { padding: 18px; } }
 
 
@@ -348,72 +377,46 @@ body {
 .seek {
   background:var(--track-bg); border:1px solid var(--track-border-lo);
   border-bottom-color:var(--track-border-hi); border-right-color:var(--track-border-hi);
-  height:8px; position:relative; cursor:pointer; margin-bottom:6px;
+  height:14px; position:relative; cursor:pointer; margin-bottom:8px;
 }
 @media (min-width: 900px) { .seek { height: 18px; margin-bottom: 12px; }
   .seek-thumb { width:16px !important; height:28px !important; top:-5px !important; } }
 .seek-fill {
   height:100%; width:0%;
   background:var(--fill-grad);
-  box-shadow:0 0 4px rgba(255,136,0,.5); transition:width .4s linear;
+  box-shadow:0 0 4px rgba(255,136,0,.5);
 }
 .seek-thumb {
-  position:absolute; top:-3px; left:0%;
-  width:8px; height:14px; transform:translateX(-50%); z-index:10; cursor:grab;
+  position:absolute; top:-4px; left:0%;
+  width:12px; height:22px; transform:translateX(-50%); z-index:10; cursor:grab;
   background:var(--thumb-grad);
   border:1px solid var(--thumb-border); box-shadow:1px 1px 0 var(--thumb-sh-hi),-1px -1px 0 var(--thumb-sh-lo);
 }
 
 /* SLIDERS */
-.sliders { display:flex; gap:6px; margin-bottom:6px; }
+.sliders { display:flex; gap:6px; margin-bottom:8px; }
 @media (min-width: 900px) { .sliders { gap:16px; margin-bottom:12px; }
   .slbl { font-size:9px !important; margin-bottom:5px !important; }
   .strk { height:18px; }
   .sthumb { width:16px !important; height:28px !important; top:-5px !important; } }
 .sg { flex:1; }
-.slbl { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--slbl-color); margin-bottom:2px; }
+.slbl { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--slbl-color); margin-bottom:3px; }
 .strk {
   background:var(--track-bg); border:1px solid var(--track-border-lo);
   border-bottom-color:var(--track-border-hi); border-right-color:var(--track-border-hi);
-  height:8px; position:relative; cursor:pointer;
+  height:14px; position:relative; cursor:pointer;
 }
 .sfill { height:100%; background:var(--fill-grad); }
 .sthumb {
-  position:absolute; top:-3px; transform:translateX(-50%); z-index:10; cursor:grab;
-  width:8px; height:14px;
+  position:absolute; top:-4px; transform:translateX(-50%); z-index:10; cursor:grab;
+  width:12px; height:22px;
   background:var(--thumb-grad);
   border:1px solid var(--thumb-border); box-shadow:1px 1px 0 var(--thumb-sh-hi),-1px -1px 0 var(--thumb-sh-lo);
 }
 
-/* TRANSPORT */
-.transport { display:flex; gap:3px; margin-bottom:6px; align-items:center; }
-.tbtn {
-  background:linear-gradient(180deg,var(--btn-bg) 0%,var(--vis-bg) 50%,var(--btn-bg) 100%);
-  border-top:1px solid var(--btn-hi); border-left:1px solid var(--btn-hi);
-  border-bottom:1px solid var(--btn-sh); border-right:1px solid var(--btn-sh);
-  cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .1s;
-}
-.tbtn:hover { background:linear-gradient(180deg,var(--border-lo),var(--vis-bg) 50%,var(--border-lo)); border-top-color:var(--cat-hi); border-left-color:var(--cat-hi); }
-.tbtn:active { border-top:1px solid var(--btn-sh); border-left:1px solid var(--btn-sh); border-bottom:1px solid var(--btn-hi); border-right:1px solid var(--btn-hi); transform:translateY(1px); }
-.tbtn svg { fill:#cc8833; filter:drop-shadow(0 0 2px rgba(255,140,50,.4)); display:block; }
-@media (min-width:900px) { .transport .tbtn svg { width:28px; height:28px; } }
-.tbtn:hover svg { fill:var(--cat-hi); filter:drop-shadow(0 0 4px rgba(255,180,80,.8)); }
-.t-prev,.t-next { width:28px; height:22px; }
-.t-play { width:32px; height:22px; }
-.t-pause,.t-stop { width:28px; height:22px; }
-.t-eject { width:22px; height:22px; margin-left:auto; display:none; }
-.admin-unlocked .t-eject { display:flex; }
-@media (min-width: 900px) {
-  .t-prev,.t-next { width:70px; height:52px; }
-  .t-play { width:80px; height:52px; }
-  .t-pause,.t-stop { width:70px; height:52px; }
-  .admin-unlocked .t-eject { width:54px; height:52px; }
-  .transport { gap:8px; margin-bottom:12px; }
-}
-
 /* MODE BTNS */
-.modes { display:flex; gap:3px; margin-bottom:5px; }
-@media (min-width: 900px) { .modes { gap:8px; margin-bottom:12px; }
+.modes { display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap; }
+@media (min-width: 900px) { .modes { gap:8px; margin-bottom:12px; flex-wrap:nowrap; }
   .mbtn { font-size:10px !important; padding:8px 14px !important; } }
 .mbtn {
   font-family:'Press Start 2P',monospace; font-size:5px; color:var(--mbtn-color);
@@ -453,7 +456,7 @@ body {
 .pl-bar-title { font-family:'Press Start 2P',monospace; font-size:6px; color:#884422; letter-spacing:.5px; }
 .pl-count { font-family:'Press Start 2P',monospace; font-size:6px; color:#1a4422; }
 
-.pl-list { background:var(--pl-list-bg); min-height:80px; max-height:200px; overflow-y:auto; }
+.pl-list { background:var(--pl-list-bg); min-height:80px; max-height:calc(100dvh - 520px); min-height:120px; overflow-y:auto; }
 @media (min-width: 900px) { .pl-list { max-height:420px; }
   .pl-title { font-size:28px !important; }
   .pl-artist { font-size:20px !important; }
@@ -600,9 +603,12 @@ body {
   color:var(--lcd-green); background:rgba(0,60,20,.4);
   border:1px solid #1a4d22; padding:2px 6px; cursor:pointer;
   white-space:nowrap; letter-spacing:.3px;
-  transition:background .1s,color .1s;
+  transition:background .1s,color .1s,opacity .3s;
 }
 .pl-bar-btn:hover { background:rgba(0,120,40,.5); color:#88ffcc; }
+#refresh-btn { font-size:10px; padding:1px 5px; letter-spacing:0; }
+#refresh-btn:hover { animation: spin 0.6s linear; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ── PROMO SEND BUTTON on tracks ── */
 .pl-promo-add {
@@ -1708,40 +1714,24 @@ body.rave-mode .lcd-art img {
 }
 
 /* ── NOTIFICATION BELL ── */
-.notif-bell-wrap {
-  position: fixed; top: 10px; right: 16px; z-index: 9990;
-  display: none;
-}
-.notif-bell-wrap.show { display: block; }
-.notif-bell {
-  width: 36px; height: 36px;
-  background: var(--win-bg);
-  border: 1px solid var(--border-lo);
-  border-radius: 0;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  position: relative;
-  transition: border-color .2s;
-  box-shadow: 0 0 10px rgba(0,0,0,.5);
-}
-.notif-bell:hover { border-color: var(--cat-orange); }
+/* old notif-bell-wrap removed — bell is now a wbtn in the titlebar */
 .notif-bell-badge {
-  position: absolute; top: -5px; right: -5px;
-  min-width: 16px; height: 16px;
+  position: absolute; top: -4px; right: -4px;
+  min-width: 14px; height: 14px;
   background: #ff3333;
   border: 1px solid #ff6666;
   color: #fff;
   font-family: 'Press Start 2P', monospace;
-  font-size: 5px;
+  font-size: 4px;
   display: none; align-items: center; justify-content: center;
-  padding: 0 3px;
+  padding: 0 2px;
   box-shadow: 0 0 6px rgba(255,50,50,.7);
+  pointer-events: none;
 }
 .notif-bell-badge.show { display: flex; }
 
 .notif-panel {
-  position: fixed; top: 50px; right: 16px; z-index: 9991;
+  position: fixed; top: 80px; right: 16px; z-index: 9991;
   width: 300px; max-height: 420px;
   background: var(--win-bg);
   border: 2px solid var(--border-lo);
@@ -1832,8 +1822,12 @@ body.rave-mode .lcd-art img {
 
     <!-- TITLE BAR -->
     <div class="titlebar">
-      <span class="titlebar-text" id="titlebar-text">🐱 PromoCat v1.0 — Purrfect Tunes</span>
+      <span class="titlebar-text" id="titlebar-text">PromoCat v1.0 — Purrfect Tunes</span>
       <div class="wbtns">
+        <div class="wbtn" id="wbtn-bell" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;">
+          🔔
+          <div class="notif-bell-badge" id="notif-bell-badge"></div>
+        </div>
         <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">👤</div>
         <div class="wbtn" id="wbtn-settings" onclick="wbtnSettings()" title="Settings">⚙</div>
         <div class="wbtn" id="wbtn-close" onclick="wbtnClose()" title="Log Out / Login">×</div>
@@ -2046,6 +2040,7 @@ body.rave-mode .lcd-art img {
           <span class="pl-bar-title">🐾 PLAYLIST</span>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
           <button class="pl-bar-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
+          <button class="pl-bar-btn" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud" style="margin-left:4px;">↻</button>
         </div>
         <!-- FILTER BAR — compact dropdowns -->
         <div class="filter-bar">
@@ -2611,14 +2606,6 @@ Listen here: {link}
   </div><!-- /win-window -->
 </div><!-- /shell -->
 
-<!-- Notification Bell (admin only) -->
-<div class="notif-bell-wrap" id="notif-bell-wrap">
-  <div class="notif-bell" id="notif-bell" onclick="toggleNotifPanel()">
-    🔔
-    <div class="notif-bell-badge" id="notif-bell-badge">0</div>
-  </div>
-</div>
-
 <!-- Notification Panel -->
 <div class="notif-panel" id="notif-panel">
   <div class="notif-panel-hdr">
@@ -2734,7 +2721,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
   // Update titlebar to show logged-in user
   const tb = document.getElementById('titlebar-text');
-  if (tb) tb.textContent = '🐱 ' + username.toUpperCase() + ' — Purrfect Tunes';
+  if (tb) tb.textContent = username.toUpperCase() + ' — Purrfect Tunes';
   // Update wbtn tooltips
   const wClose = document.getElementById('wbtn-close');
   if (wClose) wClose.title = 'Log Out';
@@ -2752,7 +2739,8 @@ function applyUnlock(username, role, token) {
   loadUserData();
   // Show notification bell for admin, start polling
   if (role === 'admin') {
-    document.getElementById('notif-bell-wrap').classList.add('show');
+    const bellBtn = document.getElementById('wbtn-bell');
+    if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
     fetchNotifications();
     startNotifPolling();
   }
@@ -2765,7 +2753,7 @@ function logout() {
   document.body.classList.remove('admin-unlocked');
   document.getElementById('user-bar').classList.remove('show');
   const tb2 = document.getElementById('titlebar-text');
-  if (tb2) tb2.textContent = '🐱 PromoCat v1.0 — Purrfect Tunes';
+  if (tb2) tb2.textContent = 'PromoCat v1.0 — Purrfect Tunes';
   const wClose2 = document.getElementById('wbtn-close');
   if (wClose2) wClose2.title = 'Login';
   const pill = document.getElementById('tab-user-pill');
@@ -2780,7 +2768,8 @@ function logout() {
   artistProfiles = [];
   renderRoster();
   switchTab('player');
-  document.getElementById('notif-bell-wrap').classList.remove('show');
+  const bellBtn = document.getElementById('wbtn-bell');
+  if (bellBtn) { bellBtn.style.opacity = '0.25'; bellBtn.style.pointerEvents = 'none'; }
   document.getElementById('notif-panel').classList.remove('open');
   stopNotifPolling();
   notify('👋', 'Logged out');
@@ -3226,7 +3215,8 @@ function addTrack() {
   };
   playlist.push(t);
   renderPlaylist();
-  savePlaylist();
+  // Immediate sync — don't debounce track adds
+  syncPlaylistToCloud();
   notify('🐾', '"' + t.title + '" added!');
 
   // reset form
@@ -3284,10 +3274,12 @@ async function fetchNotifications() {
 
 function updateBellBadge(count) {
   const badge = document.getElementById('notif-bell-badge');
+  if (!badge) return;
   if (count > 0) {
     badge.textContent = count > 99 ? '99+' : String(count);
     badge.classList.add('show');
-    document.getElementById('notif-bell').style.animation = count > 0 ? 'bell-shake 0.5s ease' : '';
+    const bell = document.getElementById('wbtn-bell');
+    if (bell) { bell.style.animation = 'none'; void bell.offsetWidth; bell.style.animation = 'bell-shake 0.5s ease'; }
   } else {
     badge.classList.remove('show');
   }
@@ -3308,7 +3300,7 @@ function toggleNotifPanel() {
 document.addEventListener('click', e => {
   if (_notifPanelOpen &&
       !e.target.closest('#notif-panel') &&
-      !e.target.closest('#notif-bell')) {
+      !e.target.closest('#wbtn-bell')) {
     _notifPanelOpen = false;
     document.getElementById('notif-panel').classList.remove('open');
   }
@@ -4952,16 +4944,18 @@ async function loadCloudPlaylist() {
     const { ok, data } = await api('GET', '/playlist', null);
     if (ok) {
       if (Array.isArray(data.playlist) && data.playlist.length) {
+        // Always take cloud as source of truth — merge by preserving current playback position
         playlist = data.playlist;
         localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
       } else {
-        // Cloud empty — try restoring from local cache (first-time sync)
+        // Cloud empty — push local cache up to cloud (first-time sync)
         const cached = localStorage.getItem(CACHE_PLAYLIST());
         if (cached) {
-          playlist = JSON.parse(cached);
-          // Push local cache up to cloud
-          await api('PUT', '/playlist', { playlist, promoPlaylists });
-          notify('☁️', 'Local tracks synced to cloud!');
+          try {
+            playlist = JSON.parse(cached);
+            await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+            notify('☁️', 'Local tracks synced to cloud!');
+          } catch(e2) {}
         }
       }
       if (Array.isArray(data.promoPlaylists)) {
@@ -4971,7 +4965,6 @@ async function loadCloudPlaylist() {
       if (Array.isArray(data.contacts)) {
         contacts = data.contacts;
         localStorage.setItem(CACHE_CONTACTS(), JSON.stringify(contacts));
-        // Restore selected state — select all by default
         selectedContacts = new Set(contacts.map((_, i) => i));
         renderContacts();
       }
@@ -4986,15 +4979,33 @@ async function loadCloudPlaylist() {
       renderContacts();
     } catch(e2) {}
   }
+  // Load first track only if nothing is playing yet
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
+}
+
+// Manual refresh — pulls fresh data from cloud right now
+async function refreshFromCloud() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; }
+  try {
+    await loadCloudPlaylist();
+    await loadUserProfiles();
+    notify('🔄', 'Refreshed!');
+  } catch(e) {
+    notify('😾', 'Refresh failed');
+  } finally {
+    if (btn) {
+      setTimeout(() => { btn.style.opacity = ''; btn.style.pointerEvents = ''; }, 1000);
+    }
+  }
 }
 
 // Debounced cloud save — batches rapid changes (ratings, add track, etc.)
 let _syncTimer = null;
 function scheduleSyncToCloud() {
   clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(syncPlaylistToCloud, 1500);
+  _syncTimer = setTimeout(syncPlaylistToCloud, 800);
 }
 
 async function syncPlaylistToCloud() {
