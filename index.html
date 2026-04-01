@@ -176,30 +176,32 @@ body {
 }
 
 .titlebar {
-  height: 22px;
+  height: 32px;
   background: var(--title-grad);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 5px; cursor: move; user-select: none; overflow: hidden; position: relative;
+  padding: 0 8px; cursor: move; user-select: none; overflow: hidden; position: relative;
 }
-@media (min-width: 900px) { .titlebar { height: 36px; } .titlebar-text { font-size: 11px !important; } .wbtn { width:22px !important; height:18px !important; font-size:10px !important; }
-
-}
+@media (min-width: 900px) { .titlebar { height: 44px; } .titlebar-text { font-size: 12px !important; } .wbtn { width:30px !important; height:24px !important; font-size:12px !important; } .wbtns { gap: 4px !important; } }
 .titlebar::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:rgba(255,220,120,.6); }
 .titlebar-text {
-  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
   color: #fff8e0; text-shadow: 1px 1px 0 rgba(0,0,0,.8); letter-spacing: .5px;
 }
-.wbtns { display: flex; gap: 2px; }
+.wbtns { display: flex; gap: 3px; }
 .wbtn {
-  width:14px; height:12px;
+  width:22px; height:18px;
   background: var(--wbtn-bg);
   border-top:1px solid var(--wbtn-border-hi); border-left:1px solid var(--wbtn-border-hi);
   border-bottom:1px solid var(--wbtn-border-lo); border-right:1px solid var(--wbtn-border-lo);
   cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-size:7px; color:var(--wbtn-color);
+  font-size:9px; color:var(--wbtn-color);
   font-family:'Press Start 2P',monospace; text-shadow:1px 1px 0 rgba(0,0,0,.9);
+  transition: background .1s, color .1s;
 }
 .wbtn:hover { background: linear-gradient(135deg,var(--cat-hi),var(--border-lo)); }
+#wbtn-profile:hover { background: linear-gradient(135deg,#44aa44,#224422) !important; color: #aaffaa !important; }
+#wbtn-settings:hover { background: linear-gradient(135deg,#aaaa22,#444422) !important; color: #ffffaa !important; }
+#wbtn-close:hover { background: linear-gradient(135deg,#aa2222,#441111) !important; color: #ffaaaa !important; }
 
 /* ── PANELS ── */
 .tab-panel { display: none; }
@@ -1715,16 +1717,11 @@ body.rave-mode .lcd-art img {
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <div class="tab active" id="tab-player" onclick="switchTab('player')">🎧 PLAYER</div>
+    <div class="tab active" id="tab-player" onclick="switchTab('player')">PLAYER</div>
     <div class="tab" id="tab-artist" onclick="switchTab('artist')">😺 ARTIST</div>
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">🔒 ADD TRACK</div>
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">📧 PROMO</div>
     <div class="tab" id="tab-settings" onclick="switchTab('settings')" style="display:none">⚙️ SETTINGS</div>
-    <button class="login-btn" id="login-btn" onclick="showLoginModal()">🔑 LOGIN</button>
-    <div class="tab-user-pill" id="tab-user-pill">
-      <span class="tab-user-name" id="tab-user-name">🐱 JOHNADMIN</span>
-      <button class="tab-user-logout" onclick="logout()">LOG OUT</button>
-    </div>
   </div>
 
   <!-- WINDOW -->
@@ -1732,11 +1729,11 @@ body.rave-mode .lcd-art img {
 
     <!-- TITLE BAR -->
     <div class="titlebar">
-      <span class="titlebar-text">🐱 PromoCat v1.0 — Purrfect Tunes</span>
+      <span class="titlebar-text" id="titlebar-text">🐱 PromoCat v1.0 — Purrfect Tunes</span>
       <div class="wbtns">
-        <div class="wbtn">_</div>
-        <div class="wbtn">▲</div>
-        <div class="wbtn">×</div>
+        <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">_</div>
+        <div class="wbtn" id="wbtn-settings" onclick="wbtnSettings()" title="Settings">▲</div>
+        <div class="wbtn" id="wbtn-close" onclick="wbtnClose()" title="Log Out / Login">×</div>
       </div>
     </div>
 
@@ -1832,6 +1829,37 @@ body.rave-mode .lcd-art img {
             <line x1="53" y1="30" x2="36" y2="31" stroke="#888888" stroke-width=".7" opacity=".75"/>
             <line x1="53" y1="33" x2="36" y2="32" stroke="#888888" stroke-width=".7" opacity=".65"/>
             <line x1="53" y1="27" x2="36" y2="30" stroke="#888888" stroke-width=".7" opacity=".55"/>
+
+            <!-- ── HEADPHONES ── -->
+            <!-- Headband arc over the top of head -->
+            <path d="M9,22 Q10,4 30,3 Q50,4 51,22"
+                  fill="none" stroke="#222222" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Headband highlight -->
+            <path d="M9,22 Q10,4 30,3 Q50,4 51,22"
+                  fill="none" stroke="#555555" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+
+            <!-- Left ear cup body -->
+            <rect x="2" y="12" width="11" height="14" rx="3.5" fill="#222222" stroke="#111111" stroke-width=".8"/>
+            <!-- Left ear cup padding (inner) -->
+            <rect x="3.5" y="13.5" width="8" height="11" rx="2.5" fill="#1a1a2e" stroke="none"/>
+            <!-- Left ear cup speaker dot -->
+            <circle cx="7.5" cy="19" r="2.5" fill="none" stroke="var(--cat-orange)" stroke-width=".8" opacity=".8"/>
+            <circle cx="7.5" cy="19" r="1" fill="var(--cat-orange)" opacity=".6"/>
+            <!-- Left cup accent line -->
+            <line x1="3.5" y1="17" x2="11.5" y2="17" stroke="#333" stroke-width=".5"/>
+
+            <!-- Right ear cup body -->
+            <rect x="47" y="12" width="11" height="14" rx="3.5" fill="#222222" stroke="#111111" stroke-width=".8"/>
+            <!-- Right ear cup padding (inner) -->
+            <rect x="48.5" y="13.5" width="8" height="11" rx="2.5" fill="#1a1a2e" stroke="none"/>
+            <!-- Right ear cup speaker dot -->
+            <circle cx="52.5" cy="19" r="2.5" fill="none" stroke="var(--cat-orange)" stroke-width=".8" opacity=".8"/>
+            <circle cx="52.5" cy="19" r="1" fill="var(--cat-orange)" opacity=".6"/>
+            <!-- Right cup accent line -->
+            <line x1="48.5" y1="17" x2="56.5" y2="17" stroke="#333" stroke-width=".5"/>
+
+            <!-- Cable drop from left cup -->
+            <path d="M7.5,26 Q7,37 10,40" fill="none" stroke="#333333" stroke-width="1" stroke-linecap="round" opacity=".7"/>
           </svg></span>
         </div>
 
@@ -2487,6 +2515,27 @@ Listen here: {link}
 <audio id="audio"></audio>
 
 <script>
+// ─────────────── TITLEBAR WINDOW BUTTONS ───────────────
+function wbtnProfile() {
+  if (!unlocked) { showLoginModal(); return; }
+  switchTab('artist');
+  notify('😺', 'Artist profiles');
+}
+
+function wbtnSettings() {
+  if (!unlocked) { showLoginModal(); return; }
+  switchTab('settings');
+  notify('⚙️', 'Settings');
+}
+
+function wbtnClose() {
+  if (unlocked) {
+    if (confirm('Log out of PromoCat?')) logout();
+  } else {
+    showLoginModal();
+  }
+}
+
 // ─────────────── TAB SWITCHING ───────────────
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2553,14 +2602,21 @@ function applyUnlock(username, role, token) {
   document.getElementById('tab-settings').style.display = 'block';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
-  // Show user pill in tab bar, hide login button
-  const pill = document.getElementById('tab-user-pill');
-  const pillName = document.getElementById('tab-user-name');
-  if (pill) { pill.classList.add('show'); }
-  if (pillName) pillName.textContent = '🐱 ' + username.toUpperCase();
+  // Update titlebar to show logged-in user
+  const tb = document.getElementById('titlebar-text');
+  if (tb) tb.textContent = '🐱 ' + username.toUpperCase() + ' — Purrfect Tunes';
+  // Update wbtn tooltips
+  const wClose = document.getElementById('wbtn-close');
+  if (wClose) wClose.title = 'Log Out';
+  const wProfile = document.getElementById('wbtn-profile');
+  if (wProfile) wProfile.title = 'Artist Profile';
+  // Hide legacy login btn / pill (may not exist anymore)
   const lb = document.getElementById('login-btn');
-  lb.textContent = '🐱 ' + username.toUpperCase();
-  lb.classList.add('logged-in');
+  if (lb) { lb.textContent = '🐱 ' + username.toUpperCase(); lb.classList.add('logged-in'); }
+  const pill = document.getElementById('tab-user-pill');
+  if (pill) pill.classList.add('show');
+  const pillName = document.getElementById('tab-user-name');
+  if (pillName) pillName.textContent = '🐱 ' + username.toUpperCase();
   document.querySelectorAll('.admin-only-section').forEach(s =>
     s.style.display = (role === 'admin') ? 'block' : 'none');
   loadUserData();
@@ -2572,11 +2628,14 @@ function logout() {
   localStorage.removeItem(SESSION_KEY);
   document.body.classList.remove('admin-unlocked');
   document.getElementById('user-bar').classList.remove('show');
+  const tb2 = document.getElementById('titlebar-text');
+  if (tb2) tb2.textContent = '🐱 PromoCat v1.0 — Purrfect Tunes';
+  const wClose2 = document.getElementById('wbtn-close');
+  if (wClose2) wClose2.title = 'Login';
   const pill = document.getElementById('tab-user-pill');
   if (pill) pill.classList.remove('show');
   const lb = document.getElementById('login-btn');
-  lb.textContent = '🔑 LOGIN';
-  lb.classList.remove('logged-in');
+  if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
   document.getElementById('tab-upload').textContent = '🔒 ADD TRACK';
   document.getElementById('tab-promo').style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
