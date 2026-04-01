@@ -2449,155 +2449,55 @@ function switchTab(name) {
 }
 
 // ═══════════════════════════════════════════════
-// SELF-CONTAINED AUTH SYSTEM (localStorage)
-// No server required. Admin seeded on first load.
+// API CONFIG
 // ═══════════════════════════════════════════════
-const AUTH_KEY    = 'promocat_users_v1';
-const INVITE_KEY  = 'promocat_invites_v1';
+const API_BASE = 'https://promocat.johndrobbins83.workers.dev';
 const SESSION_KEY = 'promocat_session';
-const ADMIN_USER  = 'johnadmin';
-// Password stored as a simple hash (not cryptographic, but not plaintext)
-function hashPass(p) {
-  let h = 0;
-  for (let i = 0; i < p.length; i++) { h = Math.imul(31, h) + p.charCodeAt(i) | 0; }
-  return 'ph_' + Math.abs(h).toString(36) + '_' + p.length;
-}
-
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || {}; } catch(e) { return {}; }
-}
-function saveUsers(u) { localStorage.setItem(AUTH_KEY, JSON.stringify(u)); }
-
-function getInvites() {
-  try { return JSON.parse(localStorage.getItem(INVITE_KEY)) || []; } catch(e) { return []; }
-}
-function saveInvites(v) { localStorage.setItem(INVITE_KEY, JSON.stringify(v)); }
-
-// Seed admin account on first load
-(function seedAdmin() {
-  const users = getUsers();
-  if (!users[ADMIN_USER]) {
-    users[ADMIN_USER] = { hash: hashPass('J3ffG0ldblum'), role: 'admin', created: Date.now() };
-    saveUsers(users);
-  }
-})();
 
 // ── AUTH STATE ──
 let unlocked    = false;
-let currentUser = null;   // { username, role }
+let currentUser = null;   // { username, role, token }
 
-// ── CORE AUTH FUNCTIONS ──
-function authLogin(username, password) {
-  const users = getUsers();
-  const u = users[username.toLowerCase()];
-  if (!u) return { ok: false, error: 'USER NOT FOUND' };
-  if (u.hash !== hashPass(password)) return { ok: false, error: 'WRONG PASSWORD' };
-  return { ok: true, role: u.role || 'user' };
-}
-
-function authRegister(username, password, inviteCode) {
-  const users = getUsers();
-  const key   = username.toLowerCase();
-  if (users[key]) return { ok: false, error: 'USERNAME TAKEN' };
-  const invites = getInvites();
-  const invIdx  = invites.findIndex(i => i.code === inviteCode && !i.used);
-  if (invIdx === -1) return { ok: false, error: 'INVALID OR USED INVITE CODE' };
-  // Mark invite used
-  invites[invIdx].used = true;
-  invites[invIdx].usedBy = key;
-  invites[invIdx].usedAt = Date.now();
-  saveInvites(invites);
-  users[key] = { hash: hashPass(password), role: 'user', created: Date.now() };
-  saveUsers(users);
-  return { ok: true };
-}
-
-// ── INVITE CODE MANAGEMENT ──
-function generateInviteCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'CAT-';
-  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
-
-function createInviteCode() {
-  const invites = getInvites();
-  const code = generateInviteCode();
-  invites.push({ code, created: Date.now(), used: false });
-  saveInvites(invites);
-  renderInviteCodes();
-  navigator.clipboard.writeText(code).then(() => notify('🎟️', 'Invite code copied: ' + code))
-    .catch(() => notify('🎟️', 'Code: ' + code));
-}
-
-function revokeInvite(code) {
-  const invites = getInvites().filter(i => i.code !== code);
-  saveInvites(invites);
-  renderInviteCodes();
-}
-
-function renderInviteCodes() {
-  const el = document.getElementById('invite-code-list');
-  if (!el) return;
-  const invites = getInvites();
-  if (!invites.length) {
-    el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>';
-    return;
-  }
-  el.innerHTML = invites.map(i => `
-    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-lo);">
-      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:1px;">${i.code}</span>
-      ${i.used
-        ? `<span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">USED BY ${(i.usedBy||'?').toUpperCase()}</span>`
-        : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🔗','Copied!'))" style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:2px 5px;cursor:pointer;">COPY</button>
-           <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">REVOKE</button>`
-      }
-    </div>`).join('');
-}
-
-function renderUserList() {
-  const el = document.getElementById('user-list');
-  if (!el) return;
-  const users = getUsers();
-  const entries = Object.entries(users);
-  if (!entries.length) { el.innerHTML = ''; return; }
-  el.innerHTML = entries.map(([uname, u]) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-lo);">
-      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:${u.role==='admin'?'var(--cat-orange)':'var(--lcd-green)'};flex:1;">${uname.toUpperCase()}</span>
-      <span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">${u.role||'user'}</span>
-      ${u.role !== 'admin' ? `<button onclick="deleteUser('${uname}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">✕</button>` : ''}
-    </div>`).join('');
-}
-
-function deleteUser(username) {
-  if (!confirm('Remove user ' + username + '?')) return;
-  const users = getUsers();
-  delete users[username];
-  saveUsers(users);
-  renderUserList();
-  notify('🗑️', username + ' removed');
+// ── API helper — wraps fetch with auth header + localStorage fallback ──
+async function api(method, path, body, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (currentUser?.token) headers['Authorization'] = 'Bearer ' + currentUser.token;
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
 }
 
 // ── LOCK SCREEN (upload tab) ──
-function checkPass() {
+async function checkPass() {
   const input = document.getElementById('lock-input');
   const errEl = document.getElementById('lock-err');
   const val   = input.value.trim();
   if (!val) { errEl.classList.add('show'); errEl.textContent = '😾 ENTER PASSWORD!'; return; }
   errEl.classList.remove('show');
   if (!currentUser) { showLoginModal(); return; }
-  const result = authLogin(currentUser.username, val);
-  if (result.ok) {
-    applyUnlock(currentUser.username, result.role);
-    input.value = '';
-  } else {
-    errEl.classList.add('show'); errEl.textContent = '😾 WRONG PASSWORD!';
+  // Re-verify by logging in again with stored username
+  try {
+    const { ok, data } = await api('POST', '/login', { username: currentUser.username, password: val });
+    if (ok) {
+      currentUser.token = data.token;
+      localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+      applyUnlock(currentUser.username, currentUser.role, data.token);
+      input.value = '';
+    } else {
+      errEl.classList.add('show'); errEl.textContent = '😾 WRONG PASSWORD!';
+    }
+  } catch(e) {
+    errEl.classList.add('show'); errEl.textContent = '😾 SERVER UNREACHABLE';
   }
 }
 
-function applyUnlock(username, role) {
+function applyUnlock(username, role, token) {
   unlocked = true;
-  currentUser = { username, role: role || 'user' };
+  currentUser = { username, role: role || 'user', token };
   document.body.classList.add('admin-unlocked');
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
@@ -2609,10 +2509,9 @@ function applyUnlock(username, role) {
   const lb = document.getElementById('login-btn');
   lb.textContent = '🐱 ' + username.toUpperCase();
   lb.classList.add('logged-in');
-  // Show invite/user management only for admin
-  const adminSections = document.querySelectorAll('.admin-only-section');
-  adminSections.forEach(s => s.style.display = (role === 'admin') ? 'block' : 'none');
-  loadUserProfiles();
+  document.querySelectorAll('.admin-only-section').forEach(s =>
+    s.style.display = (role === 'admin') ? 'block' : 'none');
+  loadUserData();
 }
 
 function logout() {
@@ -2660,19 +2559,24 @@ function setLoginMsg(msg, isErr) {
   else        { okEl.textContent  = msg; okEl.classList.add('show'); }
 }
 
-function doLogin() {
+async function doLogin() {
   const username = document.getElementById('l-username').value.trim().toLowerCase();
   const password = document.getElementById('l-password').value;
   if (!username || !password) { setLoginMsg('😾 ENTER USERNAME & PASSWORD', true); return; }
-  const result = authLogin(username, password);
-  if (!result.ok) { setLoginMsg('😾 ' + result.error, true); return; }
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ username, role: result.role }));
-  hideLoginModal();
-  applyUnlock(username, result.role);
-  notify('🐾', 'Welcome back, ' + username + '!');
+  setLoginMsg('⏳ SIGNING IN...', false);
+  try {
+    const { ok, data } = await api('POST', '/login', { username, password });
+    if (!ok) { setLoginMsg('😾 ' + (data.error || 'LOGIN FAILED').toUpperCase(), true); return; }
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ username: data.username, role: data.role, token: data.token }));
+    hideLoginModal();
+    applyUnlock(data.username, data.role, data.token);
+    notify('🐾', 'Welcome back, ' + data.username + '!');
+  } catch(e) {
+    setLoginMsg('😾 COULD NOT REACH SERVER', true);
+  }
 }
 
-function doRegister() {
+async function doRegister() {
   const username = document.getElementById('r-username').value.trim().toLowerCase();
   const password = document.getElementById('r-password').value;
   const password2= document.getElementById('r-password2').value;
@@ -2680,27 +2584,47 @@ function doRegister() {
   if (!username || !password) { setLoginMsg('😾 FILL IN ALL FIELDS', true); return; }
   if (password !== password2) { setLoginMsg('😾 PASSWORDS DO NOT MATCH', true); return; }
   if (!invite)                { setLoginMsg('😾 INVITE CODE REQUIRED', true); return; }
-  const result = authRegister(username, password, invite);
-  if (!result.ok) { setLoginMsg('😾 ' + result.error, true); return; }
-  setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
-  switchLoginTab('signin');
-  document.getElementById('l-username').value = username;
+  setLoginMsg('⏳ CREATING ACCOUNT...', false);
+  try {
+    const { ok, data } = await api('POST', '/register', { username, password, inviteCode: invite });
+    if (!ok) { setLoginMsg('😾 ' + (data.error || 'REGISTRATION FAILED').toUpperCase(), true); return; }
+    setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
+    switchLoginTab('signin');
+    document.getElementById('l-username').value = username;
+  } catch(e) {
+    setLoginMsg('😾 COULD NOT REACH SERVER', true);
+  }
 }
 
 // ── AUTO-LOGIN from stored session ──
-(function autoLogin() {
+(async function autoLogin() {
   const stored = localStorage.getItem(SESSION_KEY);
   if (!stored) return;
   try {
-    const { username, role } = JSON.parse(stored);
-    // Verify user still exists
-    const users = getUsers();
-    if (users[username]) {
-      applyUnlock(username, role);
+    const { username, role, token } = JSON.parse(stored);
+    if (!token) { localStorage.removeItem(SESSION_KEY); return; }
+    // Verify token is still valid
+    const { ok } = await api('GET', '/verify', null);
+    // We need to set currentUser before api() can send auth header
+    currentUser = { username, role, token };
+    const verify = await api('GET', '/verify', null);
+    if (verify.ok) {
+      applyUnlock(username, verify.data.role || role, token);
     } else {
+      currentUser = null;
       localStorage.removeItem(SESSION_KEY);
     }
-  } catch(e) { localStorage.removeItem(SESSION_KEY); }
+  } catch(e) {
+    // Server unreachable — restore from localStorage cache so app still works
+    try {
+      const { username, role, token } = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+      if (username) {
+        currentUser = { username, role, token };
+        applyUnlock(username, role, token);
+        notify('⚠️', 'Offline mode — changes cached locally');
+      }
+    } catch(e2) {}
+  }
 })();
 
 // ── Re-lock when switching to upload tab without session
@@ -2710,6 +2634,67 @@ document.getElementById('tab-upload').addEventListener('click', function() {
     document.getElementById('upload-form').style.display = 'none';
   }
 });
+
+// ═══════════════════════════════════════════════
+// INVITE CODES — managed via Worker API
+// ═══════════════════════════════════════════════
+async function createInviteCode() {
+  try {
+    const { ok, data } = await api('POST', '/invites', {});
+    if (!ok) { notify('😾', data.error || 'Could not create code'); return; }
+    await renderInviteCodes();
+    navigator.clipboard.writeText(data.code)
+      .then(() => notify('🎟️', 'Invite code copied: ' + data.code))
+      .catch(() => notify('🎟️', 'Code: ' + data.code));
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+async function revokeInvite(code) {
+  try {
+    await api('DELETE', '/invites/' + code, null);
+    await renderInviteCodes();
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+async function renderInviteCodes() {
+  const el = document.getElementById('invite-code-list');
+  if (!el) return;
+  el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">LOADING...</div>';
+  try {
+    const { ok, data } = await api('GET', '/invites', null);
+    if (!ok || !data.invites) { el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">ERROR LOADING CODES</div>'; return; }
+    const invites = data.invites;
+    if (!invites.length) {
+      el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>';
+      return;
+    }
+    el.innerHTML = invites.map(i => `
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-lo);">
+        <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:1px;">${i.code}</span>
+        ${i.used
+          ? `<span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">USED BY ${(i.usedBy||'?').toUpperCase()}</span>`
+          : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🔗','Copied!'))" style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:2px 5px;cursor:pointer;">COPY</button>
+             <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">REVOKE</button>`
+        }
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">SERVER UNREACHABLE</div>';
+  }
+}
+
+async function renderUserList() {
+  const el = document.getElementById('user-list');
+  if (!el) return;
+  try {
+    const { ok, data } = await api('GET', '/admin/users?secret=' + encodeURIComponent(window._adminSecret || ''), null);
+    if (!ok) { el.innerHTML = ''; return; }
+    el.innerHTML = (data.users || []).map(u => `
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-lo);">
+        <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:${u.role==='admin'?'var(--cat-orange)':'var(--lcd-green)'};flex:1;">${u.username.toUpperCase()}</span>
+        <span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">${u.role||'user'} · ${u.trackCount||0} tracks</span>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = ''; }
+}
 
 // ─────────────── STATE ───────────────
 const audio = document.getElementById('audio');
@@ -2913,27 +2898,24 @@ function addTrack() {
 const PLAYLIST_STORAGE_KEY = 'promocat_playlist_v1';
 
 function savePlaylist() {
-  try {
-    localStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify(playlist));
-  } catch(e) {
-    console.warn('Could not save playlist:', e);
-  }
+  scheduleSyncToCloud();
 }
 
 function loadPlaylist() {
+  // Playlist loading is handled by loadCloudPlaylist() after login.
+  // On first visit before login, restore from anonymous local cache.
+  if (currentUser) return;
   try {
-    const stored = localStorage.getItem(PLAYLIST_STORAGE_KEY);
-    if (!stored) return;
-    const loaded = JSON.parse(stored);
-    if (Array.isArray(loaded) && loaded.length) {
-      playlist = loaded;
-      renderPlaylist();
-      if (playlist.length) loadTrack(0);
-      notify('💾', playlist.length + ' track' + (playlist.length !== 1 ? 's' : '') + ' restored!');
+    const stored = localStorage.getItem('promocat_playlist_v1');
+    if (stored) {
+      const loaded = JSON.parse(stored);
+      if (Array.isArray(loaded) && loaded.length) {
+        playlist = loaded;
+        renderPlaylist();
+        loadTrack(0);
+      }
     }
-  } catch(e) {
-    console.warn('Could not load playlist:', e);
-  }
+  } catch(e) {}
 }
 
 // ─────────────── FULL PLAYLIST URL ───────────────
@@ -3478,14 +3460,12 @@ let promoTemplate = {
 const PROMO_PL_KEY = 'promocat_promo_playlists_v1';
 
 function savePromoPlaylists() {
-  try { localStorage.setItem(PROMO_PL_KEY, JSON.stringify(promoPlaylists)); } catch(e) {}
+  scheduleSyncToCloud();
 }
 
 function loadPromoPlaylists() {
-  try {
-    const s = localStorage.getItem(PROMO_PL_KEY);
-    if (s) promoPlaylists = JSON.parse(s);
-  } catch(e) {}
+  // Already populated by loadCloudPlaylist after login.
+  // Just render whatever is in memory.
   renderSavedPromoList();
 }
 
@@ -4046,36 +4026,103 @@ function blankProfile() {
   };
 }
 
-// Keep backward compat — single-profile localStorage key
-function loadUserProfiles() {
-  if (!currentUser) return;
-  const key = 'promocat_profiles_' + currentUser.username;
-  try {
-    const local = localStorage.getItem(key);
-    if (local) artistProfiles = JSON.parse(local);
-  } catch(e) {}
-  renderRoster();
-  renderSettingsRoster();
-  if (artistProfiles.length) {
-    activeProfileIdx = 0;
-    renderArtistProfile(artistProfiles[0]);
-  }
-  // Also refresh invite/user panels if admin
-  if (currentUser.role === 'admin') {
+// ═══════════════════════════════════════════════
+// CLOUD SYNC — playlist + profiles via Worker
+// Falls back to localStorage cache when offline
+// ═══════════════════════════════════════════════
+const CACHE_PLAYLIST = () => 'promocat_playlist_' + (currentUser?.username || '_');
+const CACHE_PROFILES = () => 'promocat_profiles_' + (currentUser?.username || '_');
+const CACHE_PROMO_PL = () => 'promocat_promopl_'  + (currentUser?.username || '_');
+
+// Called once after login — pulls everything from the Worker
+async function loadUserData() {
+  await Promise.all([ loadUserProfiles(), loadCloudPlaylist() ]);
+  if (currentUser?.role === 'admin') {
     renderInviteCodes();
     renderUserList();
   }
 }
 
-// Keep for public/offline roster
-function loadArtistProfileFromStorage() {
-  // No server — nothing to do publicly
+// ── Profiles ──
+async function loadUserProfiles() {
+  if (!currentUser) return;
+  try {
+    const { ok, data } = await api('GET', '/profiles', null);
+    if (ok && Array.isArray(data.profiles)) {
+      artistProfiles = data.profiles;
+      localStorage.setItem(CACHE_PROFILES(), JSON.stringify(artistProfiles));
+    } else {
+      throw new Error('bad response');
+    }
+  } catch(e) {
+    // Offline: restore from cache
+    try { artistProfiles = JSON.parse(localStorage.getItem(CACHE_PROFILES()) || '[]'); } catch(e2) {}
+  }
+  renderRoster(); renderSettingsRoster();
+  if (artistProfiles.length) { activeProfileIdx = 0; renderArtistProfile(artistProfiles[0]); }
 }
 
-function saveProfilesToStorage() {
+function loadArtistProfileFromStorage() { /* no-op — handled by loadUserData */ }
+
+async function saveProfilesToStorage() {
   if (!currentUser) return;
-  const key = 'promocat_profiles_' + currentUser.username;
-  localStorage.setItem(key, JSON.stringify(artistProfiles));
+  localStorage.setItem(CACHE_PROFILES(), JSON.stringify(artistProfiles));
+  try {
+    await api('PUT', '/profiles', { profiles: artistProfiles });
+  } catch(e) {
+    notify('⚠️', 'Saved locally — will sync when back online');
+  }
+}
+
+// ── Playlist + Promo Playlists ──
+async function loadCloudPlaylist() {
+  if (!currentUser) return;
+  try {
+    const { ok, data } = await api('GET', '/playlist', null);
+    if (ok) {
+      if (Array.isArray(data.playlist) && data.playlist.length) {
+        playlist = data.playlist;
+        localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
+      } else {
+        // Cloud empty — try restoring from local cache (first-time sync)
+        const cached = localStorage.getItem(CACHE_PLAYLIST());
+        if (cached) {
+          playlist = JSON.parse(cached);
+          // Push local cache up to cloud
+          await api('PUT', '/playlist', { playlist, promoPlaylists });
+          notify('☁️', 'Local tracks synced to cloud!');
+        }
+      }
+      if (Array.isArray(data.promoPlaylists)) {
+        promoPlaylists = data.promoPlaylists;
+        localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
+      }
+    } else throw new Error('bad response');
+  } catch(e) {
+    // Offline: restore from cache
+    try { playlist = JSON.parse(localStorage.getItem(CACHE_PLAYLIST()) || '[]'); } catch(e2) {}
+    try { promoPlaylists = JSON.parse(localStorage.getItem(CACHE_PROMO_PL()) || '[]'); } catch(e2) {}
+  }
+  if (playlist.length && curIdx < 0) loadTrack(0);
+  renderPlaylist();
+}
+
+// Debounced cloud save — batches rapid changes (ratings, add track, etc.)
+let _syncTimer = null;
+function scheduleSyncToCloud() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(syncPlaylistToCloud, 1500);
+}
+
+async function syncPlaylistToCloud() {
+  if (!currentUser) return;
+  localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
+  localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
+  try {
+    await api('PUT', '/playlist', { playlist, promoPlaylists });
+  } catch(e) {
+    // Silently cached — will retry next save
+  }
 }
 
 // ── ROSTER ──
