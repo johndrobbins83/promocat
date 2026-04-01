@@ -220,36 +220,21 @@ body {
   100% { transform: translateX(0);      opacity: 1; }
 }
 
-@keyframes slide-in-right {
-  0%   { transform: translateX(120px);  opacity: 0; }
-  60%  { transform: translateX(-10px);  opacity: 1; }
-  80%  { transform: translateX(4px);    opacity: 1; }
-  100% { transform: translateX(0);      opacity: 1; }
-}
-
-.promocat-text {
-  animation: slide-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Slide-in applies only to the SVG, not the bob container */
+/* .cat-svg-wrap and .cat-svg have NO CSS animations — all motion is JS-driven */
 .cat-svg-wrap {
   display: inline-flex;
-  /* No animation here — bob loop owns this element's transform */
+  will-change: transform;
 }
 .cat-svg {
   width:58px; height:44px;
   filter: drop-shadow(0 0 7px rgba(255,140,66,.55));
-  animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  /* No transition on transform — JS drives it */
+  opacity: 0; /* starts hidden — JS intro animates it in */
 }
 @media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
-/* Wiggle only when NOT bobbing and mouse is over */
-.cat-svg:not(.bobbing):hover { animation: wiggle .5s ease-in-out infinite; }
-@keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
-/* When bobbing, no CSS animation — JS controls transform on .cat-svg-wrap */
-.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); animation: none !important; }
+/* NO hover animation — it re-triggers slide-in on desktop */
+.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); }
 
-.cat-deco { display:flex; justify-content:center; align-items:center; gap:10px; padding: 6px 0 12px; position:relative; overflow:visible; }
+.cat-deco { display:flex; justify-content:center; align-items:center; gap:10px; padding: 6px 0 20px; position:relative; overflow:visible; }
 .promocat-text {
   font-family: 'Righteous', cursive;
   font-size: 22px;
@@ -265,7 +250,7 @@ body {
   background: var(--lcd-bg);
   border: 2px solid #0a1a0a;
   box-shadow: inset 2px 2px 4px rgba(0,0,0,.8), 0 0 8px rgba(51,255,102,.07);
-  padding: 10px 12px; margin-bottom: 6px;
+  padding: 10px 12px; margin-bottom: 14px;
   position: relative; overflow: hidden; height: 90px;
 }
 @media (min-width: 900px) { .lcd { height: 130px; padding: 16px 20px; margin-bottom: 12px; }
@@ -2971,11 +2956,45 @@ function tickEQ() {
 
 requestAnimationFrame(tickEQ);
 
-// ─────────────── CAT BOB ANIMATION (JS-driven, BPM-accurate) ───────────────
+// ─────────────── CAT INTRO + BOB ANIMATION ───────────────
+// All cat motion is JS-driven. No CSS animations on the cat elements.
+
 let _bobFrame   = null;
 let _bobPhase   = 0;
 let _bobLast    = 0;
 let _bobRunning = false;
+
+function getCatWrap() { return document.querySelector('.cat-svg-wrap'); }
+function getCatSvg()  { return document.querySelector('.cat-svg'); }
+
+// JS slide-in intro — runs once on page load
+function catIntro() {
+  const svg = getCatSvg();
+  if (!svg) return;
+  const dur    = 700;
+  const start  = performance.now();
+  svg.style.opacity = '0';
+  svg.style.transform = 'translateX(120px)';
+
+  function step(ts) {
+    if (_bobRunning) return; // don't fight with bob
+    const p = Math.min((ts - start) / dur, 1);
+    // Cubic ease-out bounce
+    const ease = p < 1
+      ? 1 - Math.pow(1 - p, 3)
+      : 1;
+    // Overshoot keyframes: slide in from right with bounce
+    let tx;
+    if (p < 0.6)      tx = 120 - (120 + 10) * (p / 0.6);     // -10 overshoot
+    else if (p < 0.8) tx = -10 + 14 * ((p - 0.6) / 0.2);     // back to +4
+    else              tx = 4  - 4  * ((p - 0.8) / 0.2);       // settle to 0
+    svg.style.opacity   = String(Math.min(p / 0.3, 1));
+    svg.style.transform = `translateX(${tx.toFixed(1)}px)`;
+    if (p < 1) requestAnimationFrame(step);
+    else { svg.style.transform = ''; svg.style.opacity = '1'; }
+  }
+  requestAnimationFrame(step);
+}
 
 function getBobDurMs() {
   const t = playlist[curIdx];
@@ -2985,13 +3004,12 @@ function getBobDurMs() {
 
 function bobLoop(ts) {
   if (!_bobRunning) {
-    const wrap = document.querySelector('.cat-svg-wrap');
+    const wrap = getCatWrap();
     if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
     _bobFrame = null;
     return;
   }
-
-  const wrap = document.querySelector('.cat-svg-wrap');
+  const wrap = getCatWrap();
   if (!wrap) { _bobFrame = requestAnimationFrame(bobLoop); return; }
 
   const durMs   = getBobDurMs();
@@ -2999,15 +3017,12 @@ function bobLoop(ts) {
   _bobLast  = ts;
   _bobPhase = (_bobPhase + elapsed / durMs) % 1;
 
-  // Sine-based head nod — one full bob per beat
   const p          = _bobPhase * Math.PI * 2;
-  const translateY = Math.sin(p) * -8;          // up to 8px vertical
-  const rotate     = Math.sin(p + 0.5) * 3;     // slight tilt
+  const translateY = Math.sin(p) * -8;
+  const rotate     = Math.sin(p + 0.5) * 3;
   const scaleX     = 1 + Math.abs(Math.sin(p)) * 0.04;
 
-  // Use matrix3d for GPU compositing — avoids main-thread layout
   wrap.style.transform = `translateY(${translateY.toFixed(2)}px) rotate(${rotate.toFixed(2)}deg) scaleX(${scaleX.toFixed(3)})`;
-
   _bobFrame = requestAnimationFrame(bobLoop);
 }
 
@@ -3015,17 +3030,11 @@ function startBob() {
   _bobRunning = true;
   _bobPhase   = 0;
   _bobLast    = 0;
-  // Kill any CSS animations competing for transform on both elements
-  const wrap = document.querySelector('.cat-svg-wrap');
-  const svg  = document.querySelector('.cat-svg');
-  if (wrap) {
-    wrap.style.animation    = 'none';
-    wrap.style.willChange   = 'transform';
-    wrap.style.transformOrigin = 'center bottom';
-  }
-  if (svg) {
-    svg.style.animation = 'none'; // kill slide-in and wiggle
-  }
+  // Ensure SVG has no leftover transform from intro
+  const svg = getCatSvg();
+  if (svg) { svg.style.transform = ''; svg.style.opacity = '1'; svg.style.animation = 'none'; }
+  const wrap = getCatWrap();
+  if (wrap) { wrap.style.animation = 'none'; wrap.style.transformOrigin = 'center bottom'; }
   cancelAnimationFrame(_bobFrame);
   _bobFrame = requestAnimationFrame(bobLoop);
 }
@@ -3034,12 +3043,14 @@ function stopBob() {
   _bobRunning = false;
   cancelAnimationFrame(_bobFrame);
   _bobFrame = null;
-  const wrap = document.querySelector('.cat-svg-wrap');
-  if (wrap) {
-    wrap.style.transform  = 'translateY(0) rotate(0deg) scaleX(1)';
-    wrap.style.willChange = 'auto';
-  }
+  const wrap = getCatWrap();
+  if (wrap) { wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)'; wrap.style.willChange = 'auto'; }
 }
+
+// Run intro on page load
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(catIntro, 100);
+});
 function checkAudioUrl() {
   const url = document.getElementById('f-audio-url').value.trim();
   const st  = document.getElementById('audio-url-status');
@@ -3408,8 +3419,7 @@ function loadTrack(i) {
     _raveLast  = performance.now();
   }
   if (isPlaying) {
-    _bobPhase = 0;
-    _bobLast  = 0;
+    startBob(); // resync bob to new BPM immediately
   }
 
   renderPlaylist();
@@ -3422,9 +3432,11 @@ function playTrack() {
   if (curIdx < 0) {
     isPlaying = true;
     loadTrack(0);
-    return; // loadTrack will call play() since isPlaying is now true
+    return;
   }
   isPlaying = true;
+  document.querySelector('.cat-svg').classList.add('bobbing');
+  startBob();
   audio.play().catch(e => { console.warn('Audio play failed:', e); notify('😾', 'Could not play — check URL or CORS'); });
   setSt('▶ PLAY', true);
 }
@@ -3738,19 +3750,50 @@ function raveClearInlineStyles() {
   varsToClear.forEach(v => document.documentElement.style.removeProperty(v));
 }
 
+// ── Colour interpolation helpers ──
+function hexToRgb(hex) {
+  const h = hex.replace('#','');
+  return [
+    parseInt(h.slice(0,2),16),
+    parseInt(h.slice(2,4),16),
+    parseInt(h.slice(4,6),16)
+  ];
+}
+function rgbToHex(r,g,b) {
+  return '#' + [r,g,b].map(v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+}
+function lerpColor(hexA, hexB, t) {
+  const [r1,g1,b1] = hexToRgb(hexA);
+  const [r2,g2,b2] = hexToRgb(hexB);
+  return {
+    hex: rgbToHex(r1+(r2-r1)*t, g1+(g2-g1)*t, b1+(b2-b1)*t),
+    glow: `${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)}`
+  };
+}
+
 function raveLoop(ts) {
   if (!raveModeOn) return;
   const beatMs  = getRaveBeatMs();
-  const elapsed = Math.min(ts - _raveLast, beatMs); // cap to 1 beat max to avoid jumps
+  const elapsed = Math.min(ts - _raveLast, beatMs);
   _raveLast     = ts;
   _ravePhase   += elapsed / beatMs;
 
-  // Each full beat = advance one colour
   if (_ravePhase >= 1) {
     _ravePhase -= Math.floor(_ravePhase);
     _raveColor  = (_raveColor + 1) % RAVE_COLORS.length;
-    raveApplyColor(RAVE_COLORS[_raveColor]);
   }
+
+  // Smooth interpolation between current and next colour every frame
+  const cur  = RAVE_COLORS[_raveColor];
+  const next = RAVE_COLORS[(_raveColor + 1) % RAVE_COLORS.length];
+
+  // Use a smoothstep curve so colours ease in/out rather than linear
+  const t = _ravePhase * _ravePhase * (3 - 2 * _ravePhase);
+
+  const main = lerpColor(cur.main, next.main, t);
+  const alt  = lerpColor(cur.alt,  next.alt,  t);
+
+  raveApplyColor({ main: main.hex, alt: alt.hex, glow: main.glow });
 
   _raveFrame = requestAnimationFrame(raveLoop);
 }
