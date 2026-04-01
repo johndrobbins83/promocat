@@ -3522,8 +3522,8 @@ const RAVE_COLORS = [
 ];
 
 function getRaveBeatMs() {
-  // Playing: use track BPM. Idle: slow 2s strobe
-  if (!isPlaying) return 2000;
+  // Playing: use track BPM. Idle: slow 3s colour cycle
+  if (!isPlaying) return 3000;
   const t = playlist[curIdx];
   const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 120;
   return (60 / bpm) * 1000;
@@ -3531,71 +3531,152 @@ function getRaveBeatMs() {
 
 function raveApplyColor(c) {
   const r = document.documentElement.style;
-  // Drive all the CSS vars that rave mode reads
-  r.setProperty('--rave-color',     c.main);
-  r.setProperty('--rave-color-alt', c.alt);
 
-  // Directly style key elements for instant BPM-sync flash
-  document.body.style.boxShadow = `inset 0 0 120px rgba(${c.glow},0.08)`;
+  // ── Update ALL theme CSS variables so every element on the page cycles ──
+  r.setProperty('--cat-orange',   c.main);
+  r.setProperty('--cat-hi',       c.alt);
+  r.setProperty('--border-lo',    c.main + '88');
+  r.setProperty('--border-hi',    c.alt);
+  r.setProperty('--lcd-green',    c.main);
+  r.setProperty('--btn-hi',       c.alt);
+  r.setProperty('--fill-grad',    `linear-gradient(90deg, ${c.main}, ${c.alt})`);
+  r.setProperty('--thumb-grad',   `linear-gradient(180deg, ${c.alt}, ${c.main} 50%, ${c.main})`);
+  r.setProperty('--thumb-sh-hi',  c.alt);
+  r.setProperty('--slbl-color',   c.main);
+  r.setProperty('--tab-hover-color', c.alt);
+  r.setProperty('--mbtn-color',   c.main);
+  r.setProperty('--wbtn-color',   c.alt);
+  r.setProperty('--track-border-hi', c.main);
+  r.setProperty('--title-grad',   `linear-gradient(90deg, ${c.main}, ${c.alt}, ${c.main})`);
+  r.setProperty('--wbtn-bg',      `linear-gradient(135deg, ${c.main}44, ${c.alt}22)`);
+  r.setProperty('--wbtn-border-hi', c.alt);
+
+  // ── EQ bars ──
+  r.setProperty('--rave-eq-lo', c.main);
+  r.setProperty('--rave-eq-hi', c.alt);
+
+  // ── Direct overrides for elements that don't use CSS vars ──
+  document.body.style.background = `radial-gradient(ellipse at 50% 50%, rgba(${c.glow},0.12) 0%, #000000 70%)`;
 
   const win = document.querySelector('.win-window');
   if (win) {
     win.style.borderColor = c.main;
-    win.style.boxShadow   = `0 0 24px ${c.main}, 0 0 48px ${c.main}, inset 0 0 12px rgba(${c.glow},.12)`;
+    win.style.boxShadow   = `0 0 30px ${c.main}, 0 0 60px ${c.main}55, inset 0 0 15px rgba(${c.glow},.1)`;
   }
 
-  const tb = document.querySelector('.titlebar');
-  if (tb) tb.style.background = `linear-gradient(90deg, ${c.main}, ${c.alt}, ${c.main})`;
-
   // LCD text
-  ['.lcd-title .stext','.lcd-meta','.lcd-time'].forEach(sel => {
+  ['.lcd-title .stext', '.lcd-meta', '.lcd-time', '.lcd-bpm-display'].forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
       el.style.color = c.main;
       el.style.textShadow = `0 0 10px ${c.main}, 0 0 20px ${c.main}`;
     });
   });
 
-  // Cat glow — apply to the wrapper span so it doesn't conflict with .cat-svg.bobbing filter
+  // PromoCat text
+  const promoText = document.querySelector('.promocat-text');
+  if (promoText) {
+    promoText.style.color = c.main;
+    promoText.style.textShadow = `0 0 12px ${c.main}`;
+  }
+
+  // Active tab
+  document.querySelectorAll('.tab.active').forEach(el => {
+    el.style.color = c.alt;
+    el.style.textShadow = `0 0 8px ${c.alt}`;
+  });
+
+  // Playlist bar title
+  const plTitle = document.querySelector('.pl-bar-title');
+  if (plTitle) plTitle.style.color = c.main;
+
+  // Cat glow on wrapper
   const catWrap = document.querySelector('.cat-svg-wrap');
-  if (catWrap) catWrap.style.filter = `drop-shadow(0 0 12px ${c.main}) drop-shadow(0 0 24px ${c.alt})`;
+  if (catWrap) catWrap.style.filter = `drop-shadow(0 0 14px ${c.main}) drop-shadow(0 0 28px ${c.alt})`;
 
   // Seek + slider fills
-  ['.seek-fill','.sfill'].forEach(sel => {
+  ['.seek-fill', '.sfill'].forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
       el.style.background = `linear-gradient(90deg, ${c.main}, ${c.alt})`;
     });
   });
 
-  // Buttons text color
-  ['.mbtn','.sort-btn','.cat-btn','.filter-toggle'].forEach(sel => {
+  // All buttons
+  ['.mbtn', '.sort-btn', '.cat-btn', '.filter-toggle', '.tbtn svg', '.pl-bar-btn'].forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
       el.style.color = c.main;
-      el.style.textShadow = `0 0 8px ${c.main}`;
+      el.style.textShadow = `0 0 6px ${c.main}`;
     });
   });
 
-  // EQ canvas gets a tint via a data attr read in drawEQ
-  document.documentElement.style.setProperty('--rave-eq-lo',  c.main);
-  document.documentElement.style.setProperty('--rave-eq-hi',  c.alt);
+  // Transport button SVGs — fill not color
+  document.querySelectorAll('.tbtn svg').forEach(el => {
+    el.style.fill = c.main;
+    el.style.filter = `drop-shadow(0 0 4px ${c.main})`;
+  });
+
+  // Window chrome buttons
+  document.querySelectorAll('.wbtn').forEach(el => {
+    el.style.color = c.alt;
+    el.style.textShadow = `0 0 6px ${c.alt}`;
+  });
+
+  // Playlist items — tint the active one
+  document.querySelectorAll('.pl-item.cur').forEach(el => {
+    el.style.borderLeftColor = c.main;
+    el.style.background = `rgba(${c.glow}, 0.12)`;
+  });
+
+  // LCD background glow
+  const lcd = document.querySelector('.lcd');
+  if (lcd) lcd.style.boxShadow = `inset 2px 2px 4px rgba(0,0,0,.8), 0 0 12px rgba(${c.glow},.2)`;
 }
 
 function raveClearInlineStyles() {
-  document.body.style.boxShadow = '';
+  // Reset body background
+  document.body.style.background = '';
+
+  // Reset win-window
   const win = document.querySelector('.win-window');
   if (win) { win.style.borderColor = ''; win.style.boxShadow = ''; }
-  const tb = document.querySelector('.titlebar');
-  if (tb) tb.style.background = '';
-  ['.lcd-title .stext','.lcd-meta','.lcd-time','.mbtn','.sort-btn','.cat-btn','.filter-toggle','.seek-fill','.sfill'].forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
-      el.style.color = ''; el.style.textShadow = ''; el.style.background = ''; el.style.filter = '';
-    });
-  });
+
+  // Reset LCD
+  const lcd = document.querySelector('.lcd');
+  if (lcd) lcd.style.boxShadow = '';
+
+  // Reset cat wrap
   const catWrap = document.querySelector('.cat-svg-wrap');
   if (catWrap) catWrap.style.filter = '';
   const cat = document.querySelector('.cat-svg');
   if (cat) cat.style.filter = '';
-  document.documentElement.style.removeProperty('--rave-eq-lo');
-  document.documentElement.style.removeProperty('--rave-eq-hi');
+
+  // Reset PromoCat text
+  const promoText = document.querySelector('.promocat-text');
+  if (promoText) { promoText.style.color = ''; promoText.style.textShadow = ''; }
+
+  // Reset all direct element overrides
+  const directSelectors = [
+    '.lcd-title .stext', '.lcd-meta', '.lcd-time', '.lcd-bpm-display',
+    '.mbtn', '.sort-btn', '.cat-btn', '.filter-toggle',
+    '.tbtn svg', '.pl-bar-btn', '.wbtn',
+    '.seek-fill', '.sfill', '.tab.active', '.pl-bar-title',
+    '.pl-item.cur', '.tab'
+  ];
+  directSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.color = ''; el.style.textShadow = '';
+      el.style.background = ''; el.style.filter = '';
+      el.style.fill = ''; el.style.borderLeftColor = '';
+    });
+  });
+
+  // Remove CSS var overrides
+  const varsToClear = [
+    '--cat-orange','--cat-hi','--border-lo','--border-hi','--lcd-green',
+    '--btn-hi','--fill-grad','--thumb-grad','--thumb-sh-hi','--slbl-color',
+    '--tab-hover-color','--mbtn-color','--wbtn-color','--track-border-hi',
+    '--title-grad','--wbtn-bg','--wbtn-border-hi','--rave-eq-lo','--rave-eq-hi'
+  ];
+  varsToClear.forEach(v => document.documentElement.style.removeProperty(v));
 }
 
 function raveLoop(ts) {
