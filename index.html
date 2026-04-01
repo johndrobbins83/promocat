@@ -1526,6 +1526,78 @@ body.rave-mode .lcd-art img {
   flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
+
+/* ── LOGIN MODAL ── */
+.login-modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.85);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+.login-modal-overlay.show { display: flex; }
+
+.login-modal {
+  width: 300px;
+  background: var(--win-bg);
+  border: 2px solid var(--border-lo);
+  box-shadow: 2px 2px 0 var(--border-hi), 0 0 40px rgba(255,140,66,.3);
+}
+.login-modal-title {
+  height: 22px;
+  background: var(--title-grad);
+  display: flex; align-items: center; padding: 0 8px;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #fff8e0; text-shadow: 1px 1px 0 rgba(0,0,0,.8);
+}
+.login-modal-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.login-tab-btns { display: flex; gap: 3px; margin-bottom: 4px; }
+.login-tab-btn {
+  flex: 1; font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); background: var(--vis-bg);
+  border: 1px solid var(--border-lo); padding: 5px; cursor: pointer;
+  transition: all .1s;
+}
+.login-tab-btn.on { color: var(--border-hi); background: var(--btn-bg); border-color: var(--cat-orange); text-shadow: 0 0 5px rgba(255,200,80,.5); }
+.login-form { display: flex; flex-direction: column; gap: 8px; }
+.login-form.hidden { display: none; }
+.login-err { font-family: 'Press Start 2P', monospace; font-size: 6px; color: #ff4444; text-align: center; display: none; }
+.login-err.show { display: block; }
+.login-ok  { font-family: 'Press Start 2P', monospace; font-size: 6px; color: #44ff88; text-align: center; display: none; }
+.login-ok.show  { display: block; }
+
+/* Logged-in user bar (shown when session active) */
+.user-bar {
+  display: none;
+  background: var(--pl-bar-bg);
+  border-bottom: 1px solid var(--border-lo);
+  padding: 4px 8px;
+  align-items: center; justify-content: space-between;
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo);
+}
+.user-bar.show { display: flex; }
+.user-bar-name { color: var(--cat-orange); }
+.user-bar-logout {
+  background: none; border: 1px solid var(--border-lo);
+  color: var(--border-lo); font-family: 'Press Start 2P', monospace;
+  font-size: 5px; padding: 2px 6px; cursor: pointer; transition: color .1s;
+}
+.user-bar-logout:hover { color: #ff4444; border-color: #441111; }
+
+/* Login button in tab bar */
+.login-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); background: none;
+  border: 1px solid var(--border-lo); padding: 4px 8px;
+  cursor: pointer; margin-left: auto; margin-right: 4px;
+  align-self: center; transition: color .1s, border-color .1s;
+  position: relative; top: 1px;
+}
+.login-btn:hover { color: var(--cat-orange); border-color: var(--cat-orange); }
+.login-btn.logged-in { color: var(--lcd-green); border-color: #226644; }
+
 /* ── NOTIFICATION ── */
 .notif {
   position:fixed; bottom:20px; right:20px;
@@ -1543,6 +1615,12 @@ body.rave-mode .lcd-art img {
 </style>
 </head>
 <body>
+<!-- User bar (shows when logged in) -->
+<div class="user-bar" id="user-bar">
+  <span>🐱 LOGGED IN AS <span class="user-bar-name" id="user-bar-name"></span></span>
+  <button class="user-bar-logout" onclick="logout()">LOG OUT</button>
+</div>
+
 <div id="shell">
 
   <!-- TAB BAR -->
@@ -1552,6 +1630,7 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">🔒 ADD TRACK</div>
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">📧 PROMO</div>
     <div class="tab" id="tab-settings" onclick="switchTab('settings')" style="display:none">⚙️ SETTINGS</div>
+    <button class="login-btn" id="login-btn" onclick="showLoginModal()">🔑 LOGIN</button>
   </div>
 
   <!-- WINDOW -->
@@ -2267,9 +2346,9 @@ Listen here: {link}
 <audio id="audio"></audio>
 
 <script>
-// ─────────────── PASSWORD ───────────────
-// Change this to whatever password you want!
-const ADMIN_PASSWORD = 'meowmeow';
+// ─────────────── API CONFIG ───────────────
+// Update this to your Cloudflare Worker URL after deploying
+const API_BASE = 'https://promocat-api.johnthepm.com';
 
 // ─────────────── TAB SWITCHING ───────────────
 function switchTab(name) {
@@ -2280,13 +2359,13 @@ function switchTab(name) {
 }
 
 // ─────────────── LOCK / UNLOCK ───────────────
-let unlocked = false;
+// ─────────────── AUTH STATE ───────────────
+let unlocked  = false;
+let currentUser = null;   // { username, token }
 
-// ── Secret admin token (change this too if you want a URL-based login) ──
-const ADMIN_TOKEN = 'promocat-admin-9x7z';
-
-function applyUnlock() {
+function applyUnlock(username) {
   unlocked = true;
+  currentUser = { username };
   document.body.classList.add('admin-unlocked');
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
@@ -2294,51 +2373,127 @@ function applyUnlock() {
   document.getElementById('tab-promo').style.display = 'block';
   document.getElementById('tab-promo').textContent = '📧 PROMO';
   document.getElementById('tab-settings').style.display = 'block';
+  // Update UI
+  document.getElementById('user-bar').classList.add('show');
+  document.getElementById('user-bar-name').textContent = username.toUpperCase();
+  const lb = document.getElementById('login-btn');
+  lb.textContent = '🐱 ' + username.toUpperCase();
+  lb.classList.add('logged-in');
+  // Load this user's artist profiles from Worker
+  loadUserProfiles();
 }
 
-function checkPass() {
-  const val = document.getElementById('lock-input').value;
-  const err = document.getElementById('lock-err');
-  if (val === ADMIN_PASSWORD) {
-    // Save to localStorage so this device stays logged in
-    localStorage.setItem('promocat_auth', ADMIN_TOKEN);
-    applyUnlock();
-    err.classList.remove('show');
-    document.getElementById('lock-input').value = '';
-    notify('🐾', 'Logged in & remembered on this device!');
-  } else {
-    err.classList.add('show');
-    document.getElementById('lock-input').value = '';
-    document.getElementById('lock-input').focus();
-    const li = document.getElementById('lock-input');
-    li.style.transition = 'transform .05s';
-    let s = 0;
-    const shake = setInterval(() => {
-      li.style.transform = `translateX(${s % 2 === 0 ? 5 : -5}px)`;
-      s++;
-      if (s > 6) { clearInterval(shake); li.style.transform = ''; }
-    }, 50);
+function logout() {
+  unlocked = false;
+  currentUser = null;
+  localStorage.removeItem('promocat_session');
+  document.body.classList.remove('admin-unlocked');
+  document.getElementById('user-bar').classList.remove('show');
+  const lb = document.getElementById('login-btn');
+  lb.textContent = '🔑 LOGIN';
+  lb.classList.remove('logged-in');
+  document.getElementById('tab-upload').textContent = '🔒 ADD TRACK';
+  document.getElementById('tab-promo').style.display = 'none';
+  document.getElementById('tab-settings').style.display = 'none';
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('upload-form').style.display = 'none';
+  artistProfiles = [];
+  renderRoster();
+  switchTab('player');
+  notify('👋', 'Logged out');
+}
+
+// ── LOGIN MODAL ──
+function showLoginModal() {
+  if (unlocked) { logout(); return; }
+  document.getElementById('login-modal').classList.add('show');
+}
+function hideLoginModal() {
+  document.getElementById('login-modal').classList.remove('show');
+}
+function switchLoginTab(tab) {
+  document.getElementById('lf-signin').classList.toggle('hidden', tab !== 'signin');
+  document.getElementById('lf-register').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('lt-signin').classList.toggle('on', tab === 'signin');
+  document.getElementById('lt-register').classList.toggle('on', tab === 'register');
+  document.getElementById('login-err').classList.remove('show');
+  document.getElementById('login-ok').classList.remove('show');
+}
+
+function setLoginMsg(msg, isErr) {
+  const errEl = document.getElementById('login-err');
+  const okEl  = document.getElementById('login-ok');
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+  if (isErr) { errEl.textContent = msg; errEl.classList.add('show'); }
+  else        { okEl.textContent  = msg; okEl.classList.add('show'); }
+}
+
+async function doLogin() {
+  const username = document.getElementById('l-username').value.trim();
+  const password = document.getElementById('l-password').value;
+  if (!username || !password) { setLoginMsg('😾 ENTER USERNAME & PASSWORD', true); return; }
+  try {
+    const res = await fetch(API_BASE + '/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { setLoginMsg('😾 ' + (data.error || 'LOGIN FAILED').toUpperCase(), true); return; }
+    // Store session token
+    localStorage.setItem('promocat_session', JSON.stringify({ username, token: data.token }));
+    currentUser = { username, token: data.token };
+    hideLoginModal();
+    applyUnlock(username);
+    notify('🐾', 'Welcome back ' + username + '!');
+  } catch(e) {
+    setLoginMsg('😾 COULD NOT REACH SERVER', true);
   }
 }
 
-// ── Auto-unlock on page load: check localStorage OR URL token ──
-(function autoUnlock() {
-  // 1. Check URL param: https://johnthepm.com/promocat/?admin=promocat-admin-9x7z
-  const params = new URLSearchParams(window.location.search);
-  const urlToken = params.get('admin');
-  if (urlToken === ADMIN_TOKEN) {
-    // Save to localStorage for this device too
-    localStorage.setItem('promocat_auth', ADMIN_TOKEN);
-    applyUnlock();
-    return;
+async function doRegister() {
+  const username = document.getElementById('r-username').value.trim();
+  const password = document.getElementById('r-password').value;
+  const password2= document.getElementById('r-password2').value;
+  const invite   = document.getElementById('r-invite').value.trim();
+  if (!username || !password) { setLoginMsg('😾 FILL IN ALL FIELDS', true); return; }
+  if (password !== password2) { setLoginMsg('😾 PASSWORDS DO NOT MATCH', true); return; }
+  if (!invite)                { setLoginMsg('😾 INVITE CODE REQUIRED', true); return; }
+  try {
+    const res = await fetch(API_BASE + '/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, inviteCode: invite })
+    });
+    const data = await res.json();
+    if (!res.ok) { setLoginMsg('😾 ' + (data.error || 'REGISTRATION FAILED').toUpperCase(), true); return; }
+    setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
+    switchLoginTab('signin');
+    document.getElementById('l-username').value = username;
+  } catch(e) {
+    setLoginMsg('😾 COULD NOT REACH SERVER', true);
   }
-  // 2. Check localStorage (returning device)
-  if (localStorage.getItem('promocat_auth') === ADMIN_TOKEN) {
-    applyUnlock();
-  }
+}
+
+// ── AUTO-LOGIN from stored session ──
+(async function autoLogin() {
+  const stored = localStorage.getItem('promocat_session');
+  if (!stored) return;
+  try {
+    const { username, token } = JSON.parse(stored);
+    const res = await fetch(API_BASE + '/verify', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+      currentUser = { username, token };
+      applyUnlock(username);
+    } else {
+      localStorage.removeItem('promocat_session');
+    }
+  } catch(e) { /* server unreachable — stay logged out */ }
 })();
 
-// ── Re-lock when switching away from upload tab
+// ── Re-lock when switching to upload tab without session
 document.getElementById('tab-upload').addEventListener('click', function() {
   if (!unlocked) {
     document.getElementById('lock-screen').style.display = 'flex';
@@ -2766,14 +2921,19 @@ function loadTrack(i) {
   }
 
   renderPlaylist();
-  if (isPlaying) audio.play().catch(()=>{});
+  audio.load();
+  if (isPlaying) audio.play().catch(e => { console.warn('Audio play failed:', e); notify('😾', 'Could not play — check URL or CORS'); });
 }
 
 function playTrack() {
   if (!playlist.length) { notify('😿', 'No tracks! Add music first.'); return; }
-  if (curIdx < 0) loadTrack(0);
+  if (curIdx < 0) {
+    isPlaying = true;
+    loadTrack(0);
+    return; // loadTrack will call play() since isPlaying is now true
+  }
   isPlaying = true;
-  audio.play().catch(()=>{});
+  audio.play().catch(e => { console.warn('Audio play failed:', e); notify('😾', 'Could not play — check URL or CORS'); });
   setSt('▶ PLAY', true);
 }
 
@@ -2803,7 +2963,7 @@ function nextTrack() {
     curIdx = (curIdx + 1) % playlist.length;
   }
   loadTrack(curIdx);
-  if (isPlaying) audio.play().catch(()=>{});
+
 }
 
 function prevTrack() {
@@ -2811,7 +2971,7 @@ function prevTrack() {
   if (audio.currentTime > 3) { audio.currentTime = 0; return; }
   curIdx = (curIdx-1+playlist.length)%playlist.length;
   loadTrack(curIdx);
-  if (isPlaying) audio.play().catch(()=>{});
+
 }
 
 function setSt(txt, active) {
@@ -3478,29 +3638,63 @@ function blankProfile() {
 }
 
 // Keep backward compat — single-profile localStorage key
-function loadArtistProfileFromStorage() {
-  // Try new multi-profile key first
-  const multi = localStorage.getItem('promocat_profiles');
-  if (multi) {
-    try { artistProfiles = JSON.parse(multi); } catch(e) { artistProfiles = []; }
-  } else {
-    // Fall back to old single profile
-    const old = localStorage.getItem('promocat_profile');
-    if (old) {
-      try { artistProfiles = [JSON.parse(old)]; } catch(e) { artistProfiles = []; }
+async function loadUserProfiles() {
+  if (!currentUser) return;
+  try {
+    const res = await fetch(API_BASE + '/profiles', {
+      headers: { 'Authorization': 'Bearer ' + currentUser.token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    artistProfiles = data.profiles || [];
+    renderRoster();
+    renderSettingsRoster();
+    if (artistProfiles.length) {
+      activeProfileIdx = 0;
+      renderArtistProfile(artistProfiles[0]);
     }
-  }
-  if (!artistProfiles.length) artistProfiles = [];
-  renderRoster();
-  renderSettingsRoster();
-  if (artistProfiles.length) {
-    activeProfileIdx = 0;
-    renderArtistProfile(artistProfiles[0]);
+  } catch(e) {
+    // Offline fallback — use localStorage
+    const local = localStorage.getItem('promocat_profiles_' + (currentUser?.username||''));
+    if (local) { try { artistProfiles = JSON.parse(local); } catch(e){} }
+    renderRoster(); renderSettingsRoster();
   }
 }
 
-function saveProfilesToStorage() {
-  localStorage.setItem('promocat_profiles', JSON.stringify(artistProfiles));
+// Keep for public/offline roster
+function loadArtistProfileFromStorage() {
+  // Load public profiles (no auth needed)
+  fetch(API_BASE + '/public-profiles')
+    .then(r => r.json())
+    .then(data => {
+      if (!unlocked) {
+        artistProfiles = data.profiles || [];
+        renderRoster();
+      }
+    })
+    .catch(() => {
+      // Offline: nothing to show publicly
+    });
+}
+
+async function saveProfilesToStorage() {
+  if (!currentUser) return;
+  try {
+    await fetch(API_BASE + '/profiles', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + currentUser.token
+      },
+      body: JSON.stringify({ profiles: artistProfiles })
+    });
+    // Also cache locally
+    localStorage.setItem('promocat_profiles_' + currentUser.username, JSON.stringify(artistProfiles));
+  } catch(e) {
+    // Offline fallback
+    localStorage.setItem('promocat_profiles_' + currentUser.username, JSON.stringify(artistProfiles));
+    notify('⚠️', 'Saved locally (server unreachable)');
+  }
 }
 
 // ── ROSTER ──
@@ -3709,7 +3903,7 @@ function getCurrentProfile() {
   return artistProfiles[activeProfileIdx] || blankProfile();
 }
 
-// Load on startup
+// Load public profiles on startup (no auth needed)
 window.addEventListener('DOMContentLoaded', () => {
   loadArtistProfileFromStorage();
 });
@@ -3923,6 +4117,41 @@ function downloadEPK() {
     </div>
   </div>
 
+
+<!-- ── LOGIN MODAL ── -->
+<div class="login-modal-overlay" id="login-modal">
+  <div class="login-modal">
+    <div class="login-modal-title">🔑 PROMOCAT LOGIN</div>
+    <div class="login-modal-body">
+      <div class="login-tab-btns">
+        <button class="login-tab-btn on" id="lt-signin" onclick="switchLoginTab('signin')">SIGN IN</button>
+        <button class="login-tab-btn"    id="lt-register" onclick="switchLoginTab('register')">REGISTER</button>
+      </div>
+
+      <!-- Sign In form -->
+      <div class="login-form" id="lf-signin">
+        <input class="finput" type="text" id="l-username" placeholder="Username..." autocomplete="username">
+        <input class="finput" type="password" id="l-password" placeholder="Password..."
+               onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+        <button class="lock-btn" onclick="doLogin()">🐾 SIGN IN</button>
+      </div>
+
+      <!-- Register form -->
+      <div class="login-form hidden" id="lf-register">
+        <input class="finput" type="text" id="r-username" placeholder="Choose username..." autocomplete="username">
+        <input class="finput" type="password" id="r-password" placeholder="Choose password..." autocomplete="new-password">
+        <input class="finput" type="password" id="r-password2" placeholder="Confirm password...">
+        <input class="finput" type="text" id="r-invite" placeholder="Invite code...">
+        <button class="lock-btn" onclick="doRegister()">🐾 CREATE ACCOUNT</button>
+      </div>
+
+      <div class="login-err" id="login-err"></div>
+      <div class="login-ok"  id="login-ok"></div>
+      <button class="back-btn" onclick="hideLoginModal()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>`;
 
@@ -3952,5 +4181,40 @@ function notify(icon, msg) {
   notifT = setTimeout(() => document.getElementById('notif').classList.remove('show'), 3000);
 }
 </script>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="login-modal-overlay" id="login-modal">
+  <div class="login-modal">
+    <div class="login-modal-title">🔑 PROMOCAT LOGIN</div>
+    <div class="login-modal-body">
+      <div class="login-tab-btns">
+        <button class="login-tab-btn on" id="lt-signin" onclick="switchLoginTab('signin')">SIGN IN</button>
+        <button class="login-tab-btn"    id="lt-register" onclick="switchLoginTab('register')">REGISTER</button>
+      </div>
+
+      <!-- Sign In form -->
+      <div class="login-form" id="lf-signin">
+        <input class="finput" type="text" id="l-username" placeholder="Username..." autocomplete="username">
+        <input class="finput" type="password" id="l-password" placeholder="Password..."
+               onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+        <button class="lock-btn" onclick="doLogin()">🐾 SIGN IN</button>
+      </div>
+
+      <!-- Register form -->
+      <div class="login-form hidden" id="lf-register">
+        <input class="finput" type="text" id="r-username" placeholder="Choose username..." autocomplete="username">
+        <input class="finput" type="password" id="r-password" placeholder="Choose password..." autocomplete="new-password">
+        <input class="finput" type="password" id="r-password2" placeholder="Confirm password...">
+        <input class="finput" type="text" id="r-invite" placeholder="Invite code...">
+        <button class="lock-btn" onclick="doRegister()">🐾 CREATE ACCOUNT</button>
+      </div>
+
+      <div class="login-err" id="login-err"></div>
+      <div class="login-ok"  id="login-ok"></div>
+      <button class="back-btn" onclick="hideLoginModal()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
