@@ -232,9 +232,10 @@ body {
 }
 
 .cat-svg-wrap {
-  animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   display: inline-flex;
 }
+/* Clear the intro animation after it's done so JS bob transform works */
 .promocat-text {
   animation: slide-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -251,23 +252,12 @@ body {
   line-height: 1;
   white-space: nowrap;
 }
-.cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); transition: filter .3s; }
-.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); }
+.cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); }
 @media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
 .cat-svg:not(.bobbing):hover { animation: wiggle .5s ease-in-out infinite; }
 @keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
-
-.cat-svg.bobbing {
-  animation: cat-bob var(--bob-dur, 0.5s) ease-in-out infinite !important;
-  transform-origin: center bottom;
-}
-@keyframes cat-bob {
-  0%   { transform: translateY(0)    rotate(0deg)   scaleX(1); }
-  25%  { transform: translateY(-4px) rotate(-2deg)  scaleX(1.03); }
-  50%  { transform: translateY(-6px) rotate(0deg)   scaleX(1); }
-  75%  { transform: translateY(-4px) rotate(2deg)   scaleX(1.03); }
-  100% { transform: translateY(0)    rotate(0deg)   scaleX(1); }
-}
+/* bobbing transform is driven by JS requestAnimationFrame — no CSS animation needed */
+.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); transform-origin: center bottom; }
 
 /* LCD */
 .lcd {
@@ -2935,7 +2925,62 @@ function tickEQ() {
 
 requestAnimationFrame(tickEQ);
 
-// ─────────────── AUDIO URL CHECK ───────────────
+// ─────────────── CAT BOB ANIMATION (JS-driven, BPM-accurate) ───────────────
+let _bobFrame   = null;
+let _bobPhase   = 0;
+let _bobLast    = 0;
+let _bobRunning = false;
+
+function getBobDurMs() {
+  const t = playlist[curIdx];
+  const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 120;
+  return (60 / bpm) * 1000;
+}
+
+function bobLoop(ts) {
+  if (!_bobRunning) {
+    const wrap = document.querySelector('.cat-svg-wrap');
+    if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
+    _bobFrame = null;
+    return;
+  }
+
+  const wrap = document.querySelector('.cat-svg-wrap');
+  if (!wrap) { _bobFrame = requestAnimationFrame(bobLoop); return; }
+
+  const durMs   = getBobDurMs();
+  const elapsed = _bobLast ? Math.min(ts - _bobLast, durMs) : 0;
+  _bobLast  = ts;
+  _bobPhase = (_bobPhase + elapsed / durMs) % 1;
+
+  const p          = _bobPhase * Math.PI * 2;
+  const translateY = Math.sin(p) * -8;
+  const rotate     = Math.sin(p + 0.4) * 3;
+  const scaleX     = 1 + Math.abs(Math.sin(p)) * 0.04;
+
+  wrap.style.transform = `translateY(${translateY.toFixed(2)}px) rotate(${rotate.toFixed(2)}deg) scaleX(${scaleX.toFixed(3)})`;
+  wrap.style.transformOrigin = 'center bottom';
+  _bobFrame = requestAnimationFrame(bobLoop);
+}
+
+function startBob() {
+  _bobRunning = true;
+  _bobPhase   = 0;
+  _bobLast    = 0;
+  // Clear any lingering CSS animation on the wrapper so JS transform works
+  const wrap = document.querySelector('.cat-svg-wrap');
+  if (wrap) { wrap.style.animation = 'none'; wrap.style.transform = ''; }
+  cancelAnimationFrame(_bobFrame);
+  _bobFrame = requestAnimationFrame(bobLoop);
+}
+
+function stopBob() {
+  _bobRunning = false;
+  cancelAnimationFrame(_bobFrame);
+  _bobFrame = null;
+  const wrap = document.querySelector('.cat-svg-wrap');
+  if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
+}
 function checkAudioUrl() {
   const url = document.getElementById('f-audio-url').value.trim();
   const st  = document.getElementById('audio-url-status');
@@ -3298,10 +3343,14 @@ function loadTrack(i) {
     setCatMouth(0);
   }
 
-  // Resync rave loop to new track's BPM instantly
+  // Resync rave loop and bob to new track's BPM instantly
   if (raveModeOn) {
     _ravePhase = 0;
     _raveLast  = performance.now();
+  }
+  if (isPlaying) {
+    _bobPhase = 0;
+    _bobLast  = 0;
   }
 
   renderPlaylist();
@@ -3331,6 +3380,7 @@ function stopTrack() {
   isPlaying = false; setSt('■ STOP', false);
   setSeek(0);
   document.querySelector('.cat-svg').classList.remove('bobbing');
+  stopBob();
   setEyeSquint(0);
   setCatMouth(0);
   scheduleNextBlink();
@@ -3375,11 +3425,15 @@ audio.addEventListener('ended', () => { if (doRepeat) { audio.currentTime=0; aud
 audio.addEventListener('play',  () => {
   isPlaying=true; setSt('▶ PLAY', true);
   document.querySelector('.cat-svg').classList.add('bobbing');
+  startBob();
 });
 audio.addEventListener('pause', () => {
   if (!audio.ended) { isPlaying=false; setSt('⏸ PAUSE', false); }
   document.querySelector('.cat-svg').classList.remove('bobbing');
+  stopBob();
   setEyeSquint(0);
+  // Reset rave timing so idle strobe starts fresh at slow speed
+  if (raveModeOn) { _raveLast = performance.now(); _ravePhase = 0; }
 });
 
 function fmt(s) { const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+String(sec).padStart(2,'0'); }
@@ -3468,10 +3522,11 @@ const RAVE_COLORS = [
 ];
 
 function getRaveBeatMs() {
-  // Use current track BPM if available, else slow default (1 beat = 1.5s)
+  // Playing: use track BPM. Idle: slow 2s strobe
+  if (!isPlaying) return 2000;
   const t = playlist[curIdx];
-  const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 40;
-  return (60 / bpm) * 1000; // ms per beat
+  const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 120;
+  return (60 / bpm) * 1000;
 }
 
 function raveApplyColor(c) {
@@ -3546,13 +3601,13 @@ function raveClearInlineStyles() {
 function raveLoop(ts) {
   if (!raveModeOn) return;
   const beatMs  = getRaveBeatMs();
-  const elapsed = ts - _raveLast;
+  const elapsed = Math.min(ts - _raveLast, beatMs); // cap to 1 beat max to avoid jumps
   _raveLast     = ts;
   _ravePhase   += elapsed / beatMs;
 
   // Each full beat = advance one colour
   if (_ravePhase >= 1) {
-    _ravePhase -= Math.floor(_ravePhase); // keep fractional part
+    _ravePhase -= Math.floor(_ravePhase);
     _raveColor  = (_raveColor + 1) % RAVE_COLORS.length;
     raveApplyColor(RAVE_COLORS[_raveColor]);
   }
