@@ -75,22 +75,28 @@ body {
 /* ── TAB BAR ── */
 .tab-bar {
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   flex-wrap: wrap;
   gap: 2px;
   padding: 0 2px;
   position: relative;
   z-index: 2;
+  background: var(--body-bg);
 }
 
 .tab {
   font-family: 'Press Start 2P', monospace;
-  font-size: 5px; letter-spacing: .3px;
-  padding: 6px 7px 5px;
-  border: 2px solid var(--border-lo); border-bottom: none;
-  background: var(--tab-inactive-bg); color: var(--tab-inactive-color);
-  cursor: pointer; user-select: none;
-  position: relative; top: 2px;
+  font-size: 5px;
+  letter-spacing: .3px;
+  padding: 7px 8px 6px;
+  border: 2px solid var(--border-lo);
+  border-bottom: none;
+  background: var(--tab-inactive-bg);
+  color: var(--tab-inactive-color);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  top: 2px;
   transition: color .1s, background .1s;
   white-space: nowrap;
   flex-shrink: 0;
@@ -103,30 +109,61 @@ body {
   top: 0; z-index: 3;
 }
 
-/* Login button — sits at end of tab bar */
+/* User pill — always last in tab-bar, pushed to right */
+.tab-user-pill {
+  margin-left: auto;
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 0 6px;
+  align-self: center;
+  flex-shrink: 0;
+}
+.tab-user-pill.show { display: flex; }
+.tab-user-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: var(--lcd-green);
+  white-space: nowrap;
+}
+.tab-user-logout {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 4px;
+  color: var(--border-lo);
+  background: none;
+  border: 1px solid var(--border-lo);
+  padding: 2px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .1s, border-color .1s;
+}
+.tab-user-logout:hover { color: #ff4444; border-color: #661111; }
+
+/* Login button */
 .login-btn {
-  font-family: 'Press Start 2P', monospace; font-size: 5px;
-  color: var(--border-lo); background: none;
-  border: 1px solid var(--border-lo); padding: 4px 6px;
-  cursor: pointer; margin-left: auto;
-  align-self: center; transition: color .1s, border-color .1s;
-  position: relative; top: 1px;
-  white-space: nowrap; flex-shrink: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: var(--border-lo);
+  background: none;
+  border: 1px solid var(--border-lo);
+  padding: 4px 7px;
+  cursor: pointer;
+  margin-left: auto;
+  align-self: center;
+  transition: color .1s, border-color .1s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .login-btn:hover { color: var(--cat-orange); border-color: var(--cat-orange); }
-.login-btn.logged-in { color: var(--lcd-green); border-color: #226644; }
+.login-btn.logged-in { display: none; } /* hidden when user pill is shown */
 
-/* Tablet — more breathing room */
-@media (min-width: 600px) {
-  .tab { font-size: 6px; padding: 7px 10px 6px; letter-spacing: .4px; }
-  .login-btn { font-size: 6px; padding: 4px 8px; }
-}
-
-/* Desktop — full size, single row */
+/* Desktop — all in one row, bigger text */
 @media (min-width: 900px) {
   .tab-bar { flex-wrap: nowrap; gap: 3px; padding: 0 4px; }
-  .tab { font-size: 7px; padding: 8px 14px 7px; letter-spacing: .5px; }
-  .login-btn { font-size: 7px; padding: 5px 10px; }
+  .tab { font-size: 7px; padding: 9px 14px 7px; letter-spacing: .5px; }
+  .login-btn { font-size: 7px; padding: 5px 12px; }
+  .tab-user-name { font-size: 7px; }
+  .tab-user-logout { font-size: 5px; padding: 3px 7px; }
 }
 
 /* ── WINDOW CHROME ── */
@@ -1649,24 +1686,8 @@ body.rave-mode .lcd-art img {
 .login-ok  { font-family: 'Press Start 2P', monospace; font-size: 6px; color: #44ff88; text-align: center; display: none; }
 .login-ok.show  { display: block; }
 
-/* Logged-in user bar (shown when session active) */
-.user-bar {
-  display: none;
-  background: var(--pl-bar-bg);
-  border-bottom: 1px solid var(--border-lo);
-  padding: 4px 8px;
-  align-items: center; justify-content: space-between;
-  font-family: 'Press Start 2P', monospace; font-size: 6px;
-  color: var(--border-lo);
-}
-.user-bar.show { display: flex; }
-.user-bar-name { color: var(--cat-orange); }
-.user-bar-logout {
-  background: none; border: 1px solid var(--border-lo);
-  color: var(--border-lo); font-family: 'Press Start 2P', monospace;
-  font-size: 5px; padding: 2px 6px; cursor: pointer; transition: color .1s;
-}
-.user-bar-logout:hover { color: #ff4444; border-color: #441111; }
+/* Logged-in user bar — now lives inside tab-bar, hidden when logged out */
+.user-bar { display: none; }  /* keep for JS compat but visually replaced */
 
 /* ── NOTIFICATION ── */
 .notif {
@@ -1685,10 +1706,9 @@ body.rave-mode .lcd-art img {
 </style>
 </head>
 <body>
-<!-- User bar (shows when logged in) -->
-<div class="user-bar" id="user-bar">
-  <span>🐱 LOGGED IN AS <span class="user-bar-name" id="user-bar-name"></span></span>
-  <button class="user-bar-logout" onclick="logout()">LOG OUT</button>
+<!-- Hidden legacy user-bar for JS compat -->
+<div class="user-bar" id="user-bar" style="display:none">
+  <span class="user-bar-name" id="user-bar-name"></span>
 </div>
 
 <div id="shell">
@@ -1701,6 +1721,10 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">📧 PROMO</div>
     <div class="tab" id="tab-settings" onclick="switchTab('settings')" style="display:none">⚙️ SETTINGS</div>
     <button class="login-btn" id="login-btn" onclick="showLoginModal()">🔑 LOGIN</button>
+    <div class="tab-user-pill" id="tab-user-pill">
+      <span class="tab-user-name" id="tab-user-name">🐱 JOHNADMIN</span>
+      <button class="tab-user-logout" onclick="logout()">LOG OUT</button>
+    </div>
   </div>
 
   <!-- WINDOW -->
@@ -2527,8 +2551,13 @@ function applyUnlock(username, role, token) {
   document.getElementById('tab-upload').textContent = '🎵 ADD TRACK';
   document.getElementById('tab-promo').style.display = 'block';
   document.getElementById('tab-settings').style.display = 'block';
-  document.getElementById('user-bar').classList.add('show');
+  document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
+  // Show user pill in tab bar, hide login button
+  const pill = document.getElementById('tab-user-pill');
+  const pillName = document.getElementById('tab-user-name');
+  if (pill) { pill.classList.add('show'); }
+  if (pillName) pillName.textContent = '🐱 ' + username.toUpperCase();
   const lb = document.getElementById('login-btn');
   lb.textContent = '🐱 ' + username.toUpperCase();
   lb.classList.add('logged-in');
@@ -2543,6 +2572,8 @@ function logout() {
   localStorage.removeItem(SESSION_KEY);
   document.body.classList.remove('admin-unlocked');
   document.getElementById('user-bar').classList.remove('show');
+  const pill = document.getElementById('tab-user-pill');
+  if (pill) pill.classList.remove('show');
   const lb = document.getElementById('login-btn');
   lb.textContent = '🔑 LOGIN';
   lb.classList.remove('logged-in');
@@ -2776,9 +2807,15 @@ function drawEQ() {
 
   // Read CSS vars for colours
   const style   = getComputedStyle(document.documentElement);
-  const colLow  = style.getPropertyValue('--lcd-green').trim()  || '#00ff44';
-  const colMid  = style.getPropertyValue('--cat-hi').trim()     || '#ffb347';
-  const colHigh = style.getPropertyValue('--cat-orange').trim() || '#ff4400';
+  const colLow  = raveModeOn
+    ? (style.getPropertyValue('--rave-eq-lo').trim()  || '#ff00ff')
+    : (style.getPropertyValue('--lcd-green').trim()   || '#00ff44');
+  const colMid  = raveModeOn
+    ? (style.getPropertyValue('--rave-eq-hi').trim()  || '#00ffff')
+    : (style.getPropertyValue('--cat-hi').trim()      || '#ffb347');
+  const colHigh = raveModeOn
+    ? (style.getPropertyValue('--rave-eq-lo').trim()  || '#ffff00')
+    : (style.getPropertyValue('--cat-orange').trim()  || '#ff4400');
 
   for (let i = 0; i < EQ_BANDS; i++) {
     const x   = BAR_GAP + i * (bw + BAR_GAP);
@@ -3197,25 +3234,24 @@ function loadTrack(i) {
   const catSvg = document.querySelector('.cat-svg');
 
   if (bpm >= 40 && bpm <= 300) {
-    // Bob speed: 60/bpm seconds per beat
     const dur = (60 / bpm).toFixed(3) + 's';
-    const raveDur = (60 / bpm / 2).toFixed(3) + 's'; // 2 colour flashes per beat
     catSvg.style.setProperty('--bob-dur', dur);
-    document.documentElement.style.setProperty('--rave-dur', raveDur);
     document.getElementById('lcd-bpm').textContent = bpm + ' BPM';
-
-    // Squint: map BPM 40→300 to eyelid scaleY 0.05→0.90
-    // Lower BPM = barely squinting, higher BPM = eyes nearly shut
     const t_val = Math.min(1, Math.max(0, (bpm - 40) / 260));
     const squintScale = (0.05 + t_val * 0.85).toFixed(2);
     setEyeSquint(squintScale);
     setCatMouth(bpm);
   } else {
     catSvg.style.setProperty('--bob-dur', '0.5s');
-    document.documentElement.style.setProperty('--rave-dur', '0.25s');
     document.getElementById('lcd-bpm').textContent = '';
     setEyeSquint(0);
     setCatMouth(0);
+  }
+
+  // Resync rave loop to new track's BPM instantly
+  if (raveModeOn) {
+    _ravePhase = 0;
+    _raveLast  = performance.now();
   }
 
   renderPlaylist();
@@ -3367,19 +3403,139 @@ let lastThemeIdx = 0;
 let toastTimer;
 
 let raveModeOn = false;
+let _raveFrame  = null;   // requestAnimationFrame handle
+let _ravePhase  = 0;      // 0–1 position within current beat
+let _raveLast   = 0;      // timestamp of last frame
+let _raveColor  = 0;      // current colour index
+
+const RAVE_COLORS = [
+  { main:'#ff00ff', alt:'#00ffff', glow:'255,0,255'   },
+  { main:'#00ffff', alt:'#ff00ff', glow:'0,255,255'   },
+  { main:'#ffff00', alt:'#ff0066', glow:'255,255,0'   },
+  { main:'#00ff66', alt:'#ff6600', glow:'0,255,102'   },
+  { main:'#ff0066', alt:'#00ffff', glow:'255,0,102'   },
+  { main:'#ff6600', alt:'#ffff00', glow:'255,102,0'   },
+];
+
+function getRaveBeatMs() {
+  // Use current track BPM if available, else slow default (1 beat = 1.5s)
+  const t = playlist[curIdx];
+  const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 40;
+  return (60 / bpm) * 1000; // ms per beat
+}
+
+function raveApplyColor(c) {
+  const r = document.documentElement.style;
+  // Drive all the CSS vars that rave mode reads
+  r.setProperty('--rave-color',     c.main);
+  r.setProperty('--rave-color-alt', c.alt);
+
+  // Directly style key elements for instant BPM-sync flash
+  document.body.style.boxShadow = `inset 0 0 120px rgba(${c.glow},0.08)`;
+
+  const win = document.querySelector('.win-window');
+  if (win) {
+    win.style.borderColor = c.main;
+    win.style.boxShadow   = `0 0 24px ${c.main}, 0 0 48px ${c.main}, inset 0 0 12px rgba(${c.glow},.12)`;
+  }
+
+  const tb = document.querySelector('.titlebar');
+  if (tb) tb.style.background = `linear-gradient(90deg, ${c.main}, ${c.alt}, ${c.main})`;
+
+  // LCD text
+  ['.lcd-title .stext','.lcd-meta','.lcd-time'].forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.color = c.main;
+      el.style.textShadow = `0 0 10px ${c.main}, 0 0 20px ${c.main}`;
+    });
+  });
+
+  // Cat glow
+  const cat = document.querySelector('.cat-svg');
+  if (cat) cat.style.filter = `drop-shadow(0 0 12px ${c.main}) drop-shadow(0 0 24px ${c.alt})`;
+
+  // Seek + slider fills
+  ['.seek-fill','.sfill'].forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.background = `linear-gradient(90deg, ${c.main}, ${c.alt})`;
+    });
+  });
+
+  // Buttons text color
+  ['.mbtn','.sort-btn','.cat-btn','.filter-toggle'].forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.color = c.main;
+      el.style.textShadow = `0 0 8px ${c.main}`;
+    });
+  });
+
+  // EQ canvas gets a tint via a data attr read in drawEQ
+  document.documentElement.style.setProperty('--rave-eq-lo',  c.main);
+  document.documentElement.style.setProperty('--rave-eq-hi',  c.alt);
+}
+
+function raveClearInlineStyles() {
+  document.body.style.boxShadow = '';
+  const win = document.querySelector('.win-window');
+  if (win) { win.style.borderColor = ''; win.style.boxShadow = ''; }
+  const tb = document.querySelector('.titlebar');
+  if (tb) tb.style.background = '';
+  ['.lcd-title .stext','.lcd-meta','.lcd-time','.mbtn','.sort-btn','.cat-btn','.filter-toggle','.seek-fill','.sfill'].forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.color = ''; el.style.textShadow = ''; el.style.background = ''; el.style.filter = '';
+    });
+  });
+  const cat = document.querySelector('.cat-svg');
+  if (cat) cat.style.filter = '';
+  document.documentElement.style.removeProperty('--rave-eq-lo');
+  document.documentElement.style.removeProperty('--rave-eq-hi');
+}
+
+function raveLoop(ts) {
+  if (!raveModeOn) return;
+  const beatMs  = getRaveBeatMs();
+  const elapsed = ts - _raveLast;
+  _raveLast     = ts;
+  _ravePhase   += elapsed / beatMs;
+
+  // Each full beat = advance one colour
+  if (_ravePhase >= 1) {
+    _ravePhase -= Math.floor(_ravePhase); // keep fractional part
+    _raveColor  = (_raveColor + 1) % RAVE_COLORS.length;
+    raveApplyColor(RAVE_COLORS[_raveColor]);
+  }
+
+  _raveFrame = requestAnimationFrame(raveLoop);
+}
 
 function toggleRaveMode() {
   raveModeOn = !raveModeOn;
   const btn = document.getElementById('btn-rave');
+
   if (raveModeOn) {
     const raveTheme = THEMES.find(t => t.rave);
     if (raveTheme) applyTheme(raveTheme);
     btn.classList.add('on');
+
+    // Remove CSS animation-based strobing — JS loop takes over
+    document.documentElement.style.setProperty('--rave-dur', '99999s');
+
+    // Start the beat loop
+    _ravePhase = 0;
+    _raveColor = 0;
+    _raveLast  = performance.now();
+    raveApplyColor(RAVE_COLORS[0]);
+    cancelAnimationFrame(_raveFrame);
+    _raveFrame = requestAnimationFrame(raveLoop);
   } else {
+    cancelAnimationFrame(_raveFrame);
+    _raveFrame = null;
+    raveClearInlineStyles();
     document.body.classList.remove('rave-mode');
     btn.classList.remove('on');
-    // Restore classic cat theme
     applyTheme(THEMES[0]);
+    // Restore rave-dur to something sane for next time
+    document.documentElement.style.setProperty('--rave-dur', '1.5s');
   }
 }
 
