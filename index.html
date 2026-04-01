@@ -1739,8 +1739,8 @@ body.rave-mode .lcd-art img {
     <div class="titlebar">
       <span class="titlebar-text" id="titlebar-text">🐱 PromoCat v1.0 — Purrfect Tunes</span>
       <div class="wbtns">
-        <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">_</div>
-        <div class="wbtn" id="wbtn-settings" onclick="wbtnSettings()" title="Settings">▲</div>
+        <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">👤</div>
+        <div class="wbtn" id="wbtn-settings" onclick="wbtnSettings()" title="Settings">⚙</div>
         <div class="wbtn" id="wbtn-close" onclick="wbtnClose()" title="Log Out / Login">×</div>
       </div>
     </div>
@@ -3024,6 +3024,7 @@ function bobLoop(ts) {
   const rotate     = Math.sin(p + 0.5) * 3;
   const scaleX     = 1 + Math.abs(Math.sin(p)) * 0.04;
 
+  if (!_bobRunning) return; // guard against stale frame
   wrap.style.transform = `translateY(${translateY.toFixed(2)}px) rotate(${rotate.toFixed(2)}deg) scaleX(${scaleX.toFixed(3)})`;
   _bobFrame = requestAnimationFrame(bobLoop);
 }
@@ -3045,28 +3046,13 @@ function stopBob() {
   _bobRunning = false;
   cancelAnimationFrame(_bobFrame);
   _bobFrame = null;
-  // Smoothly ease back to neutral
+
   const wrap = getCatWrap();
   if (!wrap) return;
-  const startTs = performance.now();
-  const duration = 300;
-  // Read current transform values from inline style
-  const match = (wrap.style.transform || '').match(/translateY\(([^)]+)px\).*rotate\(([^)]+)deg\).*scaleX\(([^)]+)\)/);
-  const startY  = match ? parseFloat(match[1]) : 0;
-  const startR  = match ? parseFloat(match[2]) : 0;
-  const startSX = match ? parseFloat(match[3]) : 1;
 
-  function easeBack(ts) {
-    const p = Math.min((ts - startTs) / duration, 1);
-    const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
-    const y  = startY  * (1 - e);
-    const r  = startR  * (1 - e);
-    const sx = startSX + (1 - startSX) * e;
-    wrap.style.transform = `translateY(${y.toFixed(2)}px) rotate(${r.toFixed(2)}deg) scaleX(${sx.toFixed(3)})`;
-    if (p < 1) requestAnimationFrame(easeBack);
-    else { wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)'; wrap.style.willChange = 'auto'; }
-  }
-  requestAnimationFrame(easeBack);
+  // Snap immediately to neutral — no easing, no race condition
+  wrap.style.transform  = 'translateY(0) rotate(0deg) scaleX(1)';
+  wrap.style.willChange = 'auto';
 }
 
 // Run intro on page load
