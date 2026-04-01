@@ -905,32 +905,33 @@ body {
 .template-hints span { color: var(--cat-orange); }
 
 /* Track picker */
-.track-picker { max-height: 140px; overflow-y: auto; margin-bottom: 8px; }
+.track-picker { max-height: 260px; overflow-y: auto; margin-bottom: 8px; border: 1px solid var(--border-lo); background: var(--pl-list-bg); }
 .track-picker::-webkit-scrollbar { width: 6px; }
 .track-picker::-webkit-scrollbar-track { background: var(--vis-bg); }
 .track-picker::-webkit-scrollbar-thumb { background: var(--border-lo); }
 
 .pick-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 4px 6px; border-bottom: 1px solid var(--vis-bg);
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-bottom: 1px solid rgba(255,140,66,.08);
   cursor: pointer; transition: background .1s;
 }
-.pick-item:hover { background: rgba(255,140,66,.07); }
-.pick-item.picked { background: rgba(255,140,66,.13); border-left: 2px solid var(--cat-orange); }
+.pick-item:hover { background: rgba(255,140,66,.09); }
+.pick-item.picked { background: rgba(255,140,66,.16); border-left: 3px solid var(--cat-orange); padding-left: 7px; }
 .pick-check {
-  width: 10px; height: 10px; flex-shrink: 0;
+  width: 12px; height: 12px; flex-shrink: 0;
   border: 1px solid var(--border-lo);
   border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
   background: var(--vis-bg); position: relative;
 }
 .pick-item.picked .pick-check::after {
-  content: ''; position: absolute; top: 1px; left: 1px;
+  content: ''; position: absolute; top: 2px; left: 2px;
   width: 6px; height: 6px;
   background: var(--cat-orange); box-shadow: 0 0 4px rgba(255,140,66,.8);
 }
-.pick-info { flex: 1; overflow: hidden; }
-.pick-title { font-family: 'VT323', monospace; font-size: 15px; color: var(--lcd-green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pick-artist { font-family: 'VT323', monospace; font-size: 12px; color: var(--border-lo); }
+.pick-info { flex: 1; overflow: hidden; min-width: 0; }
+.pick-title { font-family: 'VT323', monospace; font-size: 19px; color: var(--lcd-green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; }
+.pick-artist { font-family: 'VT323', monospace; font-size: 14px; color: var(--cat-orange); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-meta { font-family: 'Press Start 2P', monospace; font-size: 4px; color: var(--border-lo); white-space: nowrap; flex-shrink: 0; text-align: right; line-height: 2; }
 
 /* Promo action buttons row */
 .promo-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
@@ -3837,7 +3838,7 @@ function loadTemplate() {
 function renderPromoPicker() {
   const el = document.getElementById('promo-track-picker');
   if (!playlist.length) {
-    el.innerHTML = '<div class="contact-empty">NO TRACKS IN PLAYLIST YET</div>';
+    el.innerHTML = '<div class="contact-empty">NO TRACKS LOADED — ADD TRACKS FIRST</div>';
     return;
   }
   el.innerHTML = playlist.map((t, i) => `
@@ -3845,9 +3846,12 @@ function renderPromoPicker() {
       <div class="pick-check"></div>
       <div class="pick-info">
         <div class="pick-title">${esc(t.title)}</div>
-        <div class="pick-artist">${esc(t.artist)}${t.album ? ' · ' + esc(t.album) : ''}</div>
+        <div class="pick-artist">${esc(t.artist)}${t.album && t.album !== 'Unknown Album' ? ' · ' + esc(t.album) : ''}${t.bpm ? ' · ' + t.bpm + ' BPM' : ''}</div>
       </div>
-      <span class="avail-badge ${t.avail||'undecided'}" style="font-size:4px;padding:1px 3px;">${(t.avail||'?').toUpperCase()}</span>
+      <div class="pick-meta">
+        <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'?').toUpperCase()}</span>
+        ${t.genre ? `<div style="margin-top:2px;color:var(--border-lo);">${esc(t.genre)}</div>` : ''}
+      </div>
     </div>`).join('');
 }
 
