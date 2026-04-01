@@ -73,18 +73,27 @@ body {
 @media (min-width: 900px) { #shell { width: 832px; max-width: 832px; } body { padding: 50px 40px 60px; } }
 
 /* ── TAB BAR ── */
-.tab-bar { display: flex; align-items: flex-end; gap: 3px; padding: 0 4px; position: relative; z-index: 2; }
+.tab-bar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 0 2px;
+  position: relative;
+  z-index: 2;
+}
 
 .tab {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px; letter-spacing: .5px;
-  padding: 7px 11px 6px;
+  font-size: 5px; letter-spacing: .3px;
+  padding: 6px 7px 5px;
   border: 2px solid var(--border-lo); border-bottom: none;
   background: var(--tab-inactive-bg); color: var(--tab-inactive-color);
   cursor: pointer; user-select: none;
   position: relative; top: 2px;
   transition: color .1s, background .1s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .tab:hover { color: var(--tab-hover-color); background: var(--win-bg); }
 .tab.active {
@@ -92,6 +101,32 @@ body {
   text-shadow: 0 0 6px rgba(255,200,100,.6);
   box-shadow: 2px 0 0 var(--border-hi), -1px 0 0 var(--border-hi), 0 -2px 0 var(--border-hi);
   top: 0; z-index: 3;
+}
+
+/* Login button — sits at end of tab bar */
+.login-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); background: none;
+  border: 1px solid var(--border-lo); padding: 4px 6px;
+  cursor: pointer; margin-left: auto;
+  align-self: center; transition: color .1s, border-color .1s;
+  position: relative; top: 1px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.login-btn:hover { color: var(--cat-orange); border-color: var(--cat-orange); }
+.login-btn.logged-in { color: var(--lcd-green); border-color: #226644; }
+
+/* Tablet — more breathing room */
+@media (min-width: 600px) {
+  .tab { font-size: 6px; padding: 7px 10px 6px; letter-spacing: .4px; }
+  .login-btn { font-size: 6px; padding: 4px 8px; }
+}
+
+/* Desktop — full size, single row */
+@media (min-width: 900px) {
+  .tab-bar { flex-wrap: nowrap; gap: 3px; padding: 0 4px; }
+  .tab { font-size: 7px; padding: 8px 14px 7px; letter-spacing: .5px; }
+  .login-btn { font-size: 7px; padding: 5px 10px; }
 }
 
 /* ── WINDOW CHROME ── */
@@ -1632,18 +1667,6 @@ body.rave-mode .lcd-art img {
   font-size: 5px; padding: 2px 6px; cursor: pointer; transition: color .1s;
 }
 .user-bar-logout:hover { color: #ff4444; border-color: #441111; }
-
-/* Login button in tab bar */
-.login-btn {
-  font-family: 'Press Start 2P', monospace; font-size: 6px;
-  color: var(--border-lo); background: none;
-  border: 1px solid var(--border-lo); padding: 4px 8px;
-  cursor: pointer; margin-left: auto; margin-right: 4px;
-  align-self: center; transition: color .1s, border-color .1s;
-  position: relative; top: 1px;
-}
-.login-btn:hover { color: var(--cat-orange); border-color: var(--cat-orange); }
-.login-btn.logged-in { color: var(--lcd-green); border-color: #226644; }
 
 /* ── NOTIFICATION ── */
 .notif {
