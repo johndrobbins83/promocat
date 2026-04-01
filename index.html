@@ -231,33 +231,34 @@ body {
   animation: slide-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Slide-in applies only to the SVG, not the bob container */
 .cat-svg-wrap {
-  animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   display: inline-flex;
+  /* No animation here — bob loop owns this element's transform */
 }
-/* Clear the intro animation after it's done so JS bob transform works */
-.promocat-text {
-  animation: slide-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+.cat-svg {
+  width:58px; height:44px;
+  filter: drop-shadow(0 0 7px rgba(255,140,66,.55));
+  animation: slide-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* No transition on transform — JS drives it */
 }
+@media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
+/* Wiggle only when NOT bobbing and mouse is over */
+.cat-svg:not(.bobbing):hover { animation: wiggle .5s ease-in-out infinite; }
+@keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
+/* When bobbing, no CSS animation — JS controls transform on .cat-svg-wrap */
+.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); animation: none !important; }
 
 .cat-deco { display:flex; justify-content:center; align-items:center; gap:10px; padding: 6px 0 12px; position:relative; overflow:visible; }
 .promocat-text {
   font-family: 'Righteous', cursive;
   font-size: 22px;
   color: var(--cat-orange);
+  animation: slide-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-@media (min-width: 900px) { .promocat-text { font-size: 54px; letter-spacing: 3px; }
-  text-shadow: 0 0 10px rgba(255,140,66,.6), 1px 1px 0 #441100;
-  letter-spacing: 1px;
-  line-height: 1;
-  white-space: nowrap;
+@media (min-width: 900px) {
+  .promocat-text { font-size: 54px; letter-spacing: 3px; text-shadow: 0 0 10px rgba(255,140,66,.6), 1px 1px 0 #441100; line-height: 1; white-space: nowrap; }
 }
-.cat-svg { width:58px; height:44px; filter: drop-shadow(0 0 7px rgba(255,140,66,.55)); }
-@media (min-width: 900px) { .cat-svg { width:130px; height:100px; } }
-.cat-svg:not(.bobbing):hover { animation: wiggle .5s ease-in-out infinite; }
-@keyframes wiggle { 0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} }
-/* bobbing transform is driven by JS requestAnimationFrame — no CSS animation needed */
-.cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); transform-origin: center bottom; }
 
 /* LCD */
 .lcd {
@@ -2998,13 +2999,15 @@ function bobLoop(ts) {
   _bobLast  = ts;
   _bobPhase = (_bobPhase + elapsed / durMs) % 1;
 
+  // Sine-based head nod — one full bob per beat
   const p          = _bobPhase * Math.PI * 2;
-  const translateY = Math.sin(p) * -8;
-  const rotate     = Math.sin(p + 0.4) * 3;
+  const translateY = Math.sin(p) * -8;          // up to 8px vertical
+  const rotate     = Math.sin(p + 0.5) * 3;     // slight tilt
   const scaleX     = 1 + Math.abs(Math.sin(p)) * 0.04;
 
+  // Use matrix3d for GPU compositing — avoids main-thread layout
   wrap.style.transform = `translateY(${translateY.toFixed(2)}px) rotate(${rotate.toFixed(2)}deg) scaleX(${scaleX.toFixed(3)})`;
-  wrap.style.transformOrigin = 'center bottom';
+
   _bobFrame = requestAnimationFrame(bobLoop);
 }
 
@@ -3012,9 +3015,17 @@ function startBob() {
   _bobRunning = true;
   _bobPhase   = 0;
   _bobLast    = 0;
-  // Clear any lingering CSS animation on the wrapper so JS transform works
+  // Kill any CSS animations competing for transform on both elements
   const wrap = document.querySelector('.cat-svg-wrap');
-  if (wrap) { wrap.style.animation = 'none'; wrap.style.transform = ''; }
+  const svg  = document.querySelector('.cat-svg');
+  if (wrap) {
+    wrap.style.animation    = 'none';
+    wrap.style.willChange   = 'transform';
+    wrap.style.transformOrigin = 'center bottom';
+  }
+  if (svg) {
+    svg.style.animation = 'none'; // kill slide-in and wiggle
+  }
   cancelAnimationFrame(_bobFrame);
   _bobFrame = requestAnimationFrame(bobLoop);
 }
@@ -3024,7 +3035,10 @@ function stopBob() {
   cancelAnimationFrame(_bobFrame);
   _bobFrame = null;
   const wrap = document.querySelector('.cat-svg-wrap');
-  if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
+  if (wrap) {
+    wrap.style.transform  = 'translateY(0) rotate(0deg) scaleX(1)';
+    wrap.style.willChange = 'auto';
+  }
 }
 function checkAudioUrl() {
   const url = document.getElementById('f-audio-url').value.trim();
