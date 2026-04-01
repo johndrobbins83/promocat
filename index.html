@@ -841,7 +841,7 @@ body {
 
 .promo-section-hdr {
   background: var(--pl-bar-bg);
-  padding: 5px 8px;
+  padding: 7px 10px;
   font-family: 'Press Start 2P', monospace;
   font-size: 6px;
   color: var(--cat-orange);
@@ -853,28 +853,69 @@ body {
   gap: 6px;
 }
 
-.promo-section-body { padding: 8px; background: var(--win-bg); }
+.promo-section-body { padding: 10px; background: var(--win-bg); }
+
+/* Contact add row */
+.contact-add-row {
+  display: flex; gap: 6px; margin-bottom: 10px; align-items: center;
+}
+.contact-add-row .finput {
+  flex: 1; font-size: 18px !important; padding: 6px 10px !important;
+  background: #0a0a0a; color: #ffffff;
+  border: 1px solid #444; border-bottom-color: var(--cat-orange);
+}
+.contact-add-row .finput::placeholder { color: #555 !important; }
+.contact-add-row .finput:focus { border-color: var(--cat-orange); color: #ffffff; }
 
 /* Contact list */
-.contact-add-row { display: flex; gap: 6px; margin-bottom: 8px; }
-.contact-add-row .finput { flex: 1; }
-
-.contact-list { max-height: 120px; overflow-y: auto; }
+.contact-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border-lo); background: #080808; }
 .contact-list::-webkit-scrollbar { width: 6px; }
 .contact-list::-webkit-scrollbar-track { background: var(--vis-bg); }
 .contact-list::-webkit-scrollbar-thumb { background: var(--border-lo); }
 
 .contact-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 3px 4px; border-bottom: 1px solid var(--vis-bg);
-  font-family: 'VT323', monospace; font-size: 15px;
-  color: var(--lcd-green);
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-bottom: 1px solid #1a1a1a;
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: #cccccc; cursor: pointer; transition: background .1s;
+  user-select: none;
 }
+.contact-item:hover { background: rgba(255,140,66,.07); }
 .contact-item:last-child { border-bottom: none; }
-.contact-name { color: var(--cat-hi); margin-right: 6px; font-size: 13px; }
-.contact-del { background: none; border: none; color: var(--border-lo); cursor: pointer; font-size: 12px; transition: color .1s; }
+.contact-item.selected { background: rgba(255,140,66,.14); border-left: 3px solid var(--cat-orange); padding-left: 7px; }
+
+/* Contact checkbox */
+.contact-check {
+  width: 13px; height: 13px; flex-shrink: 0;
+  border: 1px solid #444; border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
+  background: #0a0a0a; position: relative;
+}
+.contact-item.selected .contact-check::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 7px; height: 7px;
+  background: var(--cat-orange); box-shadow: 0 0 4px rgba(255,140,66,.8);
+}
+.contact-name { color: var(--cat-orange); font-weight: bold; margin-right: 4px; }
+.contact-email { color: #aaaaaa; }
+.contact-del {
+  background: none; border: none; color: #444; cursor: pointer;
+  font-size: 14px; transition: color .1s; margin-left: auto; flex-shrink: 0;
+}
 .contact-del:hover { color: #ff4444; }
-.contact-empty { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--border-lo); text-align: center; padding: 10px; }
+.contact-empty { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--border-lo); text-align: center; padding: 14px; }
+
+/* Select all row */
+.contact-select-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 8px; border-bottom: 1px solid var(--border-lo);
+  background: #0d0d0d;
+}
+.contact-select-label {
+  font-family: 'Press Start 2P', monospace; font-size: 5px; color: var(--border-lo);
+}
+.contact-select-count {
+  font-family: 'VT323', monospace; font-size: 16px; color: var(--lcd-green);
+}
 
 /* Template editor */
 .template-textarea {
@@ -2385,14 +2426,18 @@ body.rave-mode .lcd-art img {
         <div class="promo-section">
           <div class="promo-section-hdr">
             <span>📋 PROMO LIST</span>
-            <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 CONTACTS</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 CONTACTS</span>
+              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="selectAllContacts()">ALL</button>
+              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="clearContactSelection()">NONE</button>
+            </div>
           </div>
           <div class="promo-section-body">
             <div class="contact-add-row">
-              <input class="finput" type="text" id="c-name" placeholder="Name..." style="max-width:100px;">
-              <input class="finput" type="email" id="c-email" placeholder="email@example.com..."
+              <input class="finput" type="text" id="c-name" placeholder="Name...">
+              <input class="finput" type="email" id="c-email" placeholder="email@example.com"
                      onkeydown="if(event.key==='Enter')addContact()">
-              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:4px 8px;" onclick="addContact()">+ ADD</button>
+              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
             </div>
             <div class="contact-list" id="contact-list">
               <div class="contact-empty" id="contact-empty">NO CONTACTS YET</div>
@@ -3925,12 +3970,16 @@ function clearPromoSelection() {
 }
 
 // ── CONTACTS ──
+let selectedContacts = new Set(); // indices of selected contacts
+
 function addContact() {
   const name  = document.getElementById('c-name').value.trim();
   const email = document.getElementById('c-email').value.trim();
   if (!email || !email.includes('@')) { notify('😾', 'Enter a valid email!'); return; }
   if (contacts.find(c => c.email === email)) { notify('😾', 'Already in list!'); return; }
   contacts.push({ name: name || email.split('@')[0], email });
+  // Auto-select newly added contact
+  selectedContacts.add(contacts.length - 1);
   document.getElementById('c-name').value = '';
   document.getElementById('c-email').value = '';
   renderContacts();
@@ -3939,20 +3988,47 @@ function addContact() {
 
 function removeContact(i) {
   contacts.splice(i, 1);
+  // Rebuild selectedContacts with shifted indices
+  const newSel = new Set();
+  selectedContacts.forEach(idx => { if (idx < i) newSel.add(idx); else if (idx > i) newSel.add(idx - 1); });
+  selectedContacts = newSel;
+  renderContacts();
+}
+
+function toggleContactSelect(i) {
+  if (selectedContacts.has(i)) selectedContacts.delete(i);
+  else selectedContacts.add(i);
+  renderContacts();
+}
+
+function selectAllContacts() {
+  contacts.forEach((_, i) => selectedContacts.add(i));
+  renderContacts();
+}
+
+function clearContactSelection() {
+  selectedContacts.clear();
   renderContacts();
 }
 
 function renderContacts() {
   const el = document.getElementById('contact-list');
-  document.getElementById('contact-count').textContent = contacts.length + ' CONTACT' + (contacts.length !== 1 ? 'S' : '');
-  if (!contacts.length) {
-    el.innerHTML = '<div class="contact-empty" id="contact-empty">NO CONTACTS YET</div>';
+  const selCount = selectedContacts.size;
+  const total = contacts.length;
+  document.getElementById('contact-count').textContent =
+    total + ' CONTACT' + (total !== 1 ? 'S' : '') +
+    (total ? ' · ' + selCount + ' SELECTED' : '');
+
+  if (!total) {
+    el.innerHTML = '<div class="contact-empty">NO CONTACTS YET — ADD EMAILS ABOVE</div>';
     return;
   }
   el.innerHTML = contacts.map((c, i) => `
-    <div class="contact-item">
-      <span><span class="contact-name">${esc(c.name)}</span>${esc(c.email)}</span>
-      <button class="contact-del" onclick="removeContact(${i})">✕</button>
+    <div class="contact-item${selectedContacts.has(i) ? ' selected' : ''}" onclick="toggleContactSelect(${i})">
+      <div class="contact-check"></div>
+      <span class="contact-name">${esc(c.name)}</span>
+      <span class="contact-email">${esc(c.email)}</span>
+      <button class="contact-del" onclick="event.stopPropagation();removeContact(${i})" title="Remove">✕</button>
     </div>`).join('');
 }
 
@@ -4042,42 +4118,35 @@ function buildTracklistText() {
 
 // ── FIRE PROMO ──
 function firePromo() {
-  if (!contacts.length)   { notify('😾', 'No contacts in promo list!'); return; }
-  if (!pickedTracks.size) { notify('😾', 'Pick at least one track!');   return; }
+  const toSend = contacts.filter((_, i) => selectedContacts.has(i));
+  if (!toSend.length)     { notify('😾', 'Select at least one contact first!'); return; }
+  if (!pickedTracks.size) { notify('😾', 'Pick at least one track!');           return; }
 
-  // Save template first
   saveTemplate();
-
   const link      = window._promoLink || genPromoLink();
   const tracklist = buildTracklistText();
   const subject   = promoTemplate.subject;
 
-  // Build mailto: with all contacts in BCC
-  const bcc = contacts.map(c => c.email).join(',');
-
-  // For mailto we use the first contact's name as {name} since mailto can't personalise per recipient
-  // But we'll open one mailto per contact for personalisation
-  if (contacts.length === 1) {
+  if (toSend.length === 1) {
     const body = promoTemplate.body
-      .replace(/{name}/g,      contacts[0].name)
+      .replace(/{name}/g,      toSend[0].name)
       .replace(/{tracklist}/g, tracklist)
       .replace(/{link}/g,      link);
-    window.location.href = 'mailto:' + encodeURIComponent(contacts[0].email) +
+    window.location.href = 'mailto:' + encodeURIComponent(toSend[0].email) +
       '?subject=' + encodeURIComponent(subject) +
       '&body='    + encodeURIComponent(body);
   } else {
-    // Multiple contacts: BCC all, use generic greeting
+    const bcc  = toSend.map(c => c.email).join(',');
     const body = promoTemplate.body
       .replace(/{name}/g,      'there')
       .replace(/{tracklist}/g, tracklist)
       .replace(/{link}/g,      link);
-    window.location.href = 'mailto:pplprsnproject@gmail.com' +
+    window.location.href = 'mailto:' +
       '?bcc='     + encodeURIComponent(bcc) +
       '&subject=' + encodeURIComponent(subject) +
       '&body='    + encodeURIComponent(body);
   }
-
-  notify('🚀', 'Opening mail client!');
+  notify('🚀', 'Opening mail client for ' + toSend.length + ' contact' + (toSend.length !== 1 ? 's' : '') + '!');
 }
 
 // ── PROMO VIEW MODE: if URL has #playlist=... or legacy #promo=... load tracks ──
