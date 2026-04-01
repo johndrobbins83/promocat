@@ -493,6 +493,8 @@ body {
 
 .pl-del { background:none; border:none; color:#2a1208; cursor:pointer; font-size:12px; padding:0 2px; line-height:1; transition:color .1s; }
 .pl-del:hover { color:#ff4444; }
+.pl-edit { background:none; border:none; color:#2a3a1a; cursor:pointer; font-size:11px; padding:0 2px; line-height:1; transition:color .1s; }
+.pl-edit:hover { color:#88ff44; }
 
 .pl-empty { font-family:'Press Start 2P',monospace; font-size:7px; color:#1a3d1a; text-align:center; padding:18px 10px; line-height:2.2; }
 .pl-empty-icon { font-size:24px; display:block; margin-bottom:6px; opacity:.4; }
@@ -2045,7 +2047,7 @@ body.rave-mode .lcd-art img {
       <!-- UPLOAD FORM (hidden until unlocked) -->
       <div class="upload-body" id="upload-form" style="display:none">
 
-        <div class="upload-title">🎵 ADD TRACK TO CATAMP</div>
+        <div class="upload-title" id="upload-title">🎵 ADD TRACK TO CATAMP</div>
 
         <div class="frow">
           <label class="flbl" for="f-audio-url">🎧 AUDIO STREAM LINK</label>
@@ -2190,8 +2192,8 @@ body.rave-mode .lcd-art img {
           </div>
         </div>
 
-        <button class="sub-btn" onclick="addTrack()">🐾 ADD TO PLAYLIST 🐾</button>
-        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+        <button class="sub-btn" id="track-submit-btn" onclick="submitTrackForm()">🐾 ADD TO PLAYLIST 🐾</button>
+        <button class="back-btn" id="track-cancel-btn" onclick="cancelTrackEdit()">← BACK TO PLAYER</button>
       </div>
 
     </div><!-- /panel-upload -->
@@ -2999,7 +3001,7 @@ function catIntro() {
 function getBobDurMs() {
   const t = playlist[curIdx];
   const bpm = (t && t.bpm >= 40 && t.bpm <= 300) ? t.bpm : 120;
-  return (60 / bpm) * 1000;
+  return (60 / bpm) * 1000 * 2; // half speed — one bob every 2 beats
 }
 
 function bobLoop(ts) {
@@ -3043,8 +3045,28 @@ function stopBob() {
   _bobRunning = false;
   cancelAnimationFrame(_bobFrame);
   _bobFrame = null;
+  // Smoothly ease back to neutral
   const wrap = getCatWrap();
-  if (wrap) { wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)'; wrap.style.willChange = 'auto'; }
+  if (!wrap) return;
+  const startTs = performance.now();
+  const duration = 300;
+  // Read current transform values from inline style
+  const match = (wrap.style.transform || '').match(/translateY\(([^)]+)px\).*rotate\(([^)]+)deg\).*scaleX\(([^)]+)\)/);
+  const startY  = match ? parseFloat(match[1]) : 0;
+  const startR  = match ? parseFloat(match[2]) : 0;
+  const startSX = match ? parseFloat(match[3]) : 1;
+
+  function easeBack(ts) {
+    const p = Math.min((ts - startTs) / duration, 1);
+    const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    const y  = startY  * (1 - e);
+    const r  = startR  * (1 - e);
+    const sx = startSX + (1 - startSX) * e;
+    wrap.style.transform = `translateY(${y.toFixed(2)}px) rotate(${r.toFixed(2)}deg) scaleX(${sx.toFixed(3)})`;
+    if (p < 1) requestAnimationFrame(easeBack);
+    else { wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)'; wrap.style.willChange = 'auto'; }
+  }
+  requestAnimationFrame(easeBack);
 }
 
 // Run intro on page load
@@ -3115,6 +3137,98 @@ function addTrack() {
 
   if (playlist.length === 1) loadTrack(0);
   setTimeout(() => switchTab('player'), 700);
+}
+
+// ─────────────── TRACK EDIT ───────────────
+let _editingTrackIdx = -1; // -1 = adding new, >= 0 = editing existing
+
+function editTrack(e, i) {
+  e.stopPropagation();
+  if (!unlocked) { notify('😾', 'Log in to edit tracks!'); return; }
+  _editingTrackIdx = i;
+  const t = playlist[i];
+
+  // Populate form with track data
+  document.getElementById('f-audio-url').value = t.url || '';
+  document.getElementById('f-title').value     = t.title !== 'Unknown' ? t.title : '';
+  document.getElementById('f-artist').value    = t.artist !== 'Unknown Artist' ? t.artist : '';
+  document.getElementById('f-album').value     = t.album !== 'Unknown Album' ? t.album : '';
+  document.getElementById('f-year').value      = t.year   || '';
+  document.getElementById('f-bpm').value       = t.bpm    || '';
+  document.getElementById('f-genre').value     = t.genre  || '';
+  document.getElementById('f-buy').value       = t.buyLink || '';
+  document.getElementById('f-art').value       = t.artUrl  || '';
+  document.getElementById('f-email').value     = t.email   || '';
+  document.getElementById('f-wav').value       = t.wavLink || '';
+  document.getElementById('f-mp3').value       = t.mp3Link || '';
+
+  // Set radio buttons
+  const statusRadio = document.querySelector(`input[name="status"][value="${t.status||'released'}"]`);
+  if (statusRadio) statusRadio.checked = true;
+  const catRadio = document.querySelector(`input[name="category"][value="${t.category||'dj'}"]`);
+  if (catRadio) catRadio.checked = true;
+  const availRadio = document.querySelector(`input[name="avail"][value="${t.avail||'undecided'}"]`);
+  if (availRadio) availRadio.checked = true;
+
+  // Update UI to show edit mode
+  document.getElementById('upload-title').textContent     = '✏️ EDIT TRACK';
+  document.getElementById('track-submit-btn').textContent = '🐾 SAVE CHANGES 🐾';
+  document.getElementById('track-cancel-btn').textContent = '✕ CANCEL';
+
+  // Switch to upload tab and show form
+  switchTab('upload');
+  document.getElementById('upload-form').style.display = 'block';
+  document.getElementById('lock-screen').style.display = 'none';
+  notify('✏️', 'Editing: ' + t.title);
+}
+
+function submitTrackForm() {
+  if (_editingTrackIdx >= 0) saveTrackEdit();
+  else addTrack();
+}
+
+function saveTrackEdit() {
+  const i = _editingTrackIdx;
+  if (i < 0 || i >= playlist.length) return;
+  const t = playlist[i];
+
+  t.url     = document.getElementById('f-audio-url').value.trim() || t.url;
+  t.title   = document.getElementById('f-title').value.trim()     || 'Unknown';
+  t.artist  = document.getElementById('f-artist').value.trim()    || 'Unknown Artist';
+  t.album   = document.getElementById('f-album').value.trim()     || 'Unknown Album';
+  t.year    = document.getElementById('f-year').value.trim();
+  t.bpm     = parseInt(document.getElementById('f-bpm').value)    || 0;
+  t.genre   = document.getElementById('f-genre').value;
+  t.buyLink = document.getElementById('f-buy').value.trim();
+  t.artUrl  = document.getElementById('f-art').value.trim();
+  t.email   = document.getElementById('f-email').value.trim();
+  t.wavLink = document.getElementById('f-wav').value.trim();
+  t.mp3Link = document.getElementById('f-mp3').value.trim();
+  t.status  = document.querySelector('input[name="status"]:checked')?.value   || t.status;
+  t.category= document.querySelector('input[name="category"]:checked')?.value || t.category;
+  t.avail   = document.querySelector('input[name="avail"]:checked')?.value    || t.avail;
+
+  playlist[i] = t;
+
+  // Refresh LCD if editing currently playing track
+  if (i === curIdx) {
+    document.getElementById('lcd-title-text').textContent = t.title.toUpperCase();
+    document.getElementById('lcd-artist').textContent     = t.artist.toUpperCase();
+    document.getElementById('lcd-album').textContent      = t.album.toUpperCase();
+  }
+
+  savePlaylist();
+  renderPlaylist();
+  cancelTrackEdit();
+  notify('💾', '"' + t.title + '" updated!');
+}
+
+function cancelTrackEdit() {
+  _editingTrackIdx = -1;
+  document.getElementById('upload-title').textContent     = '🎵 ADD TRACK TO CATAMP';
+  document.getElementById('track-submit-btn').textContent = '🐾 ADD TO PLAYLIST 🐾';
+  document.getElementById('track-cancel-btn').textContent = '← BACK TO PLAYER';
+  switchTab('player');
 }
 
 // ─────────────── PLAYLIST PERSISTENCE ───────────────
@@ -3289,6 +3403,7 @@ function renderPlaylist() {
       ${(t.wavLink||t.mp3Link) ? `<div class="pl-btn pl-dl" onclick="event.stopPropagation()">⬇ DL<div class="pl-dl-menu">${t.wavLink?`<a class="pl-dl-opt" href="${esc(t.wavLink)}" target="_blank" download>WAV</a>`:''}${t.mp3Link?`<a class="pl-dl-opt" href="${esc(t.mp3Link)}" target="_blank" download>MP3</a>`:''}</div></div>` : ''}
       ${t.email ? `<a class="pl-btn pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
       <button class="pl-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo playlist">📤 PROMO</button>
+      <button class="pl-edit" onclick="editTrack(event,${origIdx})" title="Edit track info">✏️</button>
       <button class="pl-del" onclick="delTrack(event,${origIdx})">✕</button>
     </div>`).join('');
 }
@@ -3442,8 +3557,13 @@ function playTrack() {
 }
 
 function pauseTrack() {
-  if (isPlaying) { audio.pause(); isPlaying = false; setSt('⏸ PAUSE', false); }
-  else playTrack();
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+    setSt('⏸ PAUSE', false);
+    document.querySelector('.cat-svg').classList.remove('bobbing');
+    stopBob();
+  } else playTrack();
 }
 
 function stopTrack() {
