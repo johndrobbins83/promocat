@@ -542,6 +542,53 @@ body {
 }
 
 
+/* ── PL-BAR BUTTON ── */
+.pl-bar-btn {
+  font-family:'Press Start 2P',monospace; font-size:5px;
+  color:var(--lcd-green); background:rgba(0,60,20,.4);
+  border:1px solid #1a4d22; padding:2px 6px; cursor:pointer;
+  white-space:nowrap; letter-spacing:.3px;
+  transition:background .1s,color .1s;
+}
+.pl-bar-btn:hover { background:rgba(0,120,40,.5); color:#88ffcc; }
+
+/* ── PROMO SEND BUTTON on tracks ── */
+.pl-promo-add {
+  font-family:'Press Start 2P',monospace; font-size:4px !important;
+  color:#ffcc44 !important; background:rgba(60,40,0,.5) !important;
+  border:1px solid #664400 !important; padding:2px 4px !important;
+  cursor:pointer; white-space:nowrap; letter-spacing:.3px;
+  transition:background .1s,color .1s;
+  height:auto !important; min-width:auto !important;
+}
+.pl-promo-add:hover { background:rgba(120,80,0,.6) !important; color:#ffee88 !important; }
+.pl-promo-add.added { color:#44ff88 !important; background:rgba(0,60,20,.5) !important; border-color:#1a6630 !important; }
+
+/* ── SAVED PROMO PLAYLIST ITEMS ── */
+.saved-promo-item {
+  display:flex; align-items:center; gap:6px;
+  padding:5px 10px; border-bottom:1px solid var(--border-lo);
+  cursor:pointer; transition:background .1s;
+}
+.saved-promo-item:hover { background:rgba(255,140,66,.06); }
+.saved-promo-item.active { background:rgba(0,160,60,.12); border-left:2px solid var(--lcd-green); }
+.saved-promo-name { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--cat-orange); flex:1; }
+.saved-promo-count { font-family:'VT323',monospace; font-size:14px; color:#556655; }
+.saved-promo-actions { display:flex; gap:3px; }
+.saved-promo-link-btn {
+  font-family:'Press Start 2P',monospace; font-size:4px;
+  color:var(--lcd-green); background:rgba(0,50,20,.4); border:1px solid #1a4422;
+  padding:2px 4px; cursor:pointer; white-space:nowrap;
+  transition:background .1s;
+}
+.saved-promo-link-btn:hover { background:rgba(0,100,40,.5); }
+.saved-promo-del-btn {
+  font-family:'Press Start 2P',monospace; font-size:4px;
+  color:#884422; background:none; border:1px solid #441100;
+  padding:2px 4px; cursor:pointer; transition:color .1s;
+}
+.saved-promo-del-btn:hover { color:#ff4444; }
+
 /* ── THEME TRANSITIONS ── */
 *, *::before, *::after {
   transition: background-color .4s ease, border-color .3s ease, color .3s ease, box-shadow .4s ease, text-shadow .3s ease;
@@ -1820,6 +1867,7 @@ body.rave-mode .lcd-art img {
         <div class="pl-bar">
           <span class="pl-bar-title">🐾 PLAYLIST</span>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
+          <button class="pl-bar-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
         </div>
         <!-- FILTER BAR — compact dropdowns -->
         <div class="filter-bar">
@@ -2247,6 +2295,30 @@ body.rave-mode .lcd-art img {
         </div>
 
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+
+        <!-- ══ ADMIN ONLY: INVITE CODES & USERS ══ -->
+        <div class="admin-only-section" style="display:none;">
+
+          <div class="settings-section" style="margin-top:12px;">
+            <div class="settings-hdr">🎟️ INVITE CODES</div>
+            <div class="settings-content">
+              <div style="font-family:'VT323',monospace;font-size:16px;color:#556655;margin-bottom:10px;line-height:1.5;">
+                Generate a code and send it to someone. They use it to create their own login.
+              </div>
+              <button class="settings-save-btn" onclick="createInviteCode()" style="margin-bottom:10px;">🎟️ GENERATE &amp; COPY CODE</button>
+              <div id="invite-code-list" style="max-height:200px;overflow-y:auto;"></div>
+            </div>
+          </div>
+
+          <div class="settings-section" style="margin-top:12px;">
+            <div class="settings-hdr">👥 REGISTERED USERS</div>
+            <div class="settings-content">
+              <div id="user-list" style="max-height:160px;overflow-y:auto;"></div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div><!-- /panel-settings -->
 
@@ -2303,16 +2375,38 @@ Listen here: {link}
           </div>
         </div>
 
-        <!-- ── SECTION 3: BUILD & FIRE ── -->
+        <!-- ── SECTION 3: SAVED PROMO PLAYLISTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">
+            <span>💾 PROMO PLAYLISTS</span>
+            <button class="promo-btn" style="flex:0;padding:3px 7px;font-size:5px;" onclick="newPromoPlaylist()">+ NEW</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="saved-promo-list" style="max-height:160px;overflow-y:auto;">
+              <!-- rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SECTION 4: BUILD & FIRE ── -->
         <div class="promo-section">
           <div class="promo-section-hdr">
             <span>🚀 BUILD & FIRE</span>
-            <button class="promo-btn" style="flex:0;padding:3px 7px;font-size:5px;" onclick="selectAllTracks()">SELECT ALL</button>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <span id="active-promo-name" style="font-family:'VT323',monospace;font-size:14px;color:var(--lcd-green);"></span>
+              <button class="promo-btn" style="flex:0;padding:3px 7px;font-size:5px;" onclick="selectAllTracks()">ALL</button>
+              <button class="promo-btn" style="flex:0;padding:3px 7px;font-size:5px;" onclick="clearPromoSelection()">CLEAR</button>
+            </div>
           </div>
           <div class="promo-section-body">
             <div class="flbl" style="margin-bottom:6px;">PICK TRACKS TO INCLUDE:</div>
             <div class="track-picker" id="promo-track-picker">
               <div class="contact-empty">NO TRACKS IN PLAYLIST YET</div>
+            </div>
+
+            <div style="display:flex;gap:6px;align-items:center;margin:8px 0 4px;">
+              <input class="finput" type="text" id="promo-pl-name" placeholder="Playlist name..." style="flex:1;font-size:14px;padding:3px 7px;">
+              <button class="promo-btn" style="flex:0;padding:3px 8px;font-size:5px;" onclick="savePromoPlaylist()">💾 SAVE</button>
             </div>
 
             <div class="promo-actions">
@@ -2346,10 +2440,6 @@ Listen here: {link}
 <audio id="audio"></audio>
 
 <script>
-// ─────────────── API CONFIG ───────────────
-// Update this to your Cloudflare Worker URL after deploying
-const API_BASE = 'https://promocat-api.johnthepm.com';
-
 // ─────────────── TAB SWITCHING ───────────────
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2358,35 +2448,177 @@ function switchTab(name) {
   document.getElementById('panel-' + name).classList.add('active');
 }
 
-// ─────────────── LOCK / UNLOCK ───────────────
-// ─────────────── AUTH STATE ───────────────
-let unlocked  = false;
-let currentUser = null;   // { username, token }
+// ═══════════════════════════════════════════════
+// SELF-CONTAINED AUTH SYSTEM (localStorage)
+// No server required. Admin seeded on first load.
+// ═══════════════════════════════════════════════
+const AUTH_KEY    = 'promocat_users_v1';
+const INVITE_KEY  = 'promocat_invites_v1';
+const SESSION_KEY = 'promocat_session';
+const ADMIN_USER  = 'johnadmin';
+// Password stored as a simple hash (not cryptographic, but not plaintext)
+function hashPass(p) {
+  let h = 0;
+  for (let i = 0; i < p.length; i++) { h = Math.imul(31, h) + p.charCodeAt(i) | 0; }
+  return 'ph_' + Math.abs(h).toString(36) + '_' + p.length;
+}
 
-function applyUnlock(username) {
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveUsers(u) { localStorage.setItem(AUTH_KEY, JSON.stringify(u)); }
+
+function getInvites() {
+  try { return JSON.parse(localStorage.getItem(INVITE_KEY)) || []; } catch(e) { return []; }
+}
+function saveInvites(v) { localStorage.setItem(INVITE_KEY, JSON.stringify(v)); }
+
+// Seed admin account on first load
+(function seedAdmin() {
+  const users = getUsers();
+  if (!users[ADMIN_USER]) {
+    users[ADMIN_USER] = { hash: hashPass('J3ffG0ldblum'), role: 'admin', created: Date.now() };
+    saveUsers(users);
+  }
+})();
+
+// ── AUTH STATE ──
+let unlocked    = false;
+let currentUser = null;   // { username, role }
+
+// ── CORE AUTH FUNCTIONS ──
+function authLogin(username, password) {
+  const users = getUsers();
+  const u = users[username.toLowerCase()];
+  if (!u) return { ok: false, error: 'USER NOT FOUND' };
+  if (u.hash !== hashPass(password)) return { ok: false, error: 'WRONG PASSWORD' };
+  return { ok: true, role: u.role || 'user' };
+}
+
+function authRegister(username, password, inviteCode) {
+  const users = getUsers();
+  const key   = username.toLowerCase();
+  if (users[key]) return { ok: false, error: 'USERNAME TAKEN' };
+  const invites = getInvites();
+  const invIdx  = invites.findIndex(i => i.code === inviteCode && !i.used);
+  if (invIdx === -1) return { ok: false, error: 'INVALID OR USED INVITE CODE' };
+  // Mark invite used
+  invites[invIdx].used = true;
+  invites[invIdx].usedBy = key;
+  invites[invIdx].usedAt = Date.now();
+  saveInvites(invites);
+  users[key] = { hash: hashPass(password), role: 'user', created: Date.now() };
+  saveUsers(users);
+  return { ok: true };
+}
+
+// ── INVITE CODE MANAGEMENT ──
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'CAT-';
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function createInviteCode() {
+  const invites = getInvites();
+  const code = generateInviteCode();
+  invites.push({ code, created: Date.now(), used: false });
+  saveInvites(invites);
+  renderInviteCodes();
+  navigator.clipboard.writeText(code).then(() => notify('🎟️', 'Invite code copied: ' + code))
+    .catch(() => notify('🎟️', 'Code: ' + code));
+}
+
+function revokeInvite(code) {
+  const invites = getInvites().filter(i => i.code !== code);
+  saveInvites(invites);
+  renderInviteCodes();
+}
+
+function renderInviteCodes() {
+  const el = document.getElementById('invite-code-list');
+  if (!el) return;
+  const invites = getInvites();
+  if (!invites.length) {
+    el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>';
+    return;
+  }
+  el.innerHTML = invites.map(i => `
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-lo);">
+      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:1px;">${i.code}</span>
+      ${i.used
+        ? `<span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">USED BY ${(i.usedBy||'?').toUpperCase()}</span>`
+        : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🔗','Copied!'))" style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:2px 5px;cursor:pointer;">COPY</button>
+           <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">REVOKE</button>`
+      }
+    </div>`).join('');
+}
+
+function renderUserList() {
+  const el = document.getElementById('user-list');
+  if (!el) return;
+  const users = getUsers();
+  const entries = Object.entries(users);
+  if (!entries.length) { el.innerHTML = ''; return; }
+  el.innerHTML = entries.map(([uname, u]) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-lo);">
+      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:${u.role==='admin'?'var(--cat-orange)':'var(--lcd-green)'};flex:1;">${uname.toUpperCase()}</span>
+      <span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">${u.role||'user'}</span>
+      ${u.role !== 'admin' ? `<button onclick="deleteUser('${uname}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">✕</button>` : ''}
+    </div>`).join('');
+}
+
+function deleteUser(username) {
+  if (!confirm('Remove user ' + username + '?')) return;
+  const users = getUsers();
+  delete users[username];
+  saveUsers(users);
+  renderUserList();
+  notify('🗑️', username + ' removed');
+}
+
+// ── LOCK SCREEN (upload tab) ──
+function checkPass() {
+  const input = document.getElementById('lock-input');
+  const errEl = document.getElementById('lock-err');
+  const val   = input.value.trim();
+  if (!val) { errEl.classList.add('show'); errEl.textContent = '😾 ENTER PASSWORD!'; return; }
+  errEl.classList.remove('show');
+  if (!currentUser) { showLoginModal(); return; }
+  const result = authLogin(currentUser.username, val);
+  if (result.ok) {
+    applyUnlock(currentUser.username, result.role);
+    input.value = '';
+  } else {
+    errEl.classList.add('show'); errEl.textContent = '😾 WRONG PASSWORD!';
+  }
+}
+
+function applyUnlock(username, role) {
   unlocked = true;
-  currentUser = { username };
+  currentUser = { username, role: role || 'user' };
   document.body.classList.add('admin-unlocked');
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = '🎵 ADD TRACK';
   document.getElementById('tab-promo').style.display = 'block';
-  document.getElementById('tab-promo').textContent = '📧 PROMO';
   document.getElementById('tab-settings').style.display = 'block';
-  // Update UI
   document.getElementById('user-bar').classList.add('show');
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
   const lb = document.getElementById('login-btn');
   lb.textContent = '🐱 ' + username.toUpperCase();
   lb.classList.add('logged-in');
-  // Load this user's artist profiles from Worker
+  // Show invite/user management only for admin
+  const adminSections = document.querySelectorAll('.admin-only-section');
+  adminSections.forEach(s => s.style.display = (role === 'admin') ? 'block' : 'none');
   loadUserProfiles();
 }
 
 function logout() {
   unlocked = false;
   currentUser = null;
-  localStorage.removeItem('promocat_session');
+  localStorage.removeItem(SESSION_KEY);
   document.body.classList.remove('admin-unlocked');
   document.getElementById('user-bar').classList.remove('show');
   const lb = document.getElementById('login-btn');
@@ -2416,8 +2648,8 @@ function switchLoginTab(tab) {
   document.getElementById('lf-register').classList.toggle('hidden', tab !== 'register');
   document.getElementById('lt-signin').classList.toggle('on', tab === 'signin');
   document.getElementById('lt-register').classList.toggle('on', tab === 'register');
-  document.getElementById('login-err').classList.remove('show');
-  document.getElementById('login-ok').classList.remove('show');
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('login-ok').textContent  = '';
 }
 
 function setLoginMsg(msg, isErr) {
@@ -2428,69 +2660,47 @@ function setLoginMsg(msg, isErr) {
   else        { okEl.textContent  = msg; okEl.classList.add('show'); }
 }
 
-async function doLogin() {
-  const username = document.getElementById('l-username').value.trim();
+function doLogin() {
+  const username = document.getElementById('l-username').value.trim().toLowerCase();
   const password = document.getElementById('l-password').value;
   if (!username || !password) { setLoginMsg('😾 ENTER USERNAME & PASSWORD', true); return; }
-  try {
-    const res = await fetch(API_BASE + '/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) { setLoginMsg('😾 ' + (data.error || 'LOGIN FAILED').toUpperCase(), true); return; }
-    // Store session token
-    localStorage.setItem('promocat_session', JSON.stringify({ username, token: data.token }));
-    currentUser = { username, token: data.token };
-    hideLoginModal();
-    applyUnlock(username);
-    notify('🐾', 'Welcome back ' + username + '!');
-  } catch(e) {
-    setLoginMsg('😾 COULD NOT REACH SERVER', true);
-  }
+  const result = authLogin(username, password);
+  if (!result.ok) { setLoginMsg('😾 ' + result.error, true); return; }
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ username, role: result.role }));
+  hideLoginModal();
+  applyUnlock(username, result.role);
+  notify('🐾', 'Welcome back, ' + username + '!');
 }
 
-async function doRegister() {
-  const username = document.getElementById('r-username').value.trim();
+function doRegister() {
+  const username = document.getElementById('r-username').value.trim().toLowerCase();
   const password = document.getElementById('r-password').value;
   const password2= document.getElementById('r-password2').value;
-  const invite   = document.getElementById('r-invite').value.trim();
+  const invite   = document.getElementById('r-invite').value.trim().toUpperCase();
   if (!username || !password) { setLoginMsg('😾 FILL IN ALL FIELDS', true); return; }
   if (password !== password2) { setLoginMsg('😾 PASSWORDS DO NOT MATCH', true); return; }
   if (!invite)                { setLoginMsg('😾 INVITE CODE REQUIRED', true); return; }
-  try {
-    const res = await fetch(API_BASE + '/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, inviteCode: invite })
-    });
-    const data = await res.json();
-    if (!res.ok) { setLoginMsg('😾 ' + (data.error || 'REGISTRATION FAILED').toUpperCase(), true); return; }
-    setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
-    switchLoginTab('signin');
-    document.getElementById('l-username').value = username;
-  } catch(e) {
-    setLoginMsg('😾 COULD NOT REACH SERVER', true);
-  }
+  const result = authRegister(username, password, invite);
+  if (!result.ok) { setLoginMsg('😾 ' + result.error, true); return; }
+  setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
+  switchLoginTab('signin');
+  document.getElementById('l-username').value = username;
 }
 
 // ── AUTO-LOGIN from stored session ──
-(async function autoLogin() {
-  const stored = localStorage.getItem('promocat_session');
+(function autoLogin() {
+  const stored = localStorage.getItem(SESSION_KEY);
   if (!stored) return;
   try {
-    const { username, token } = JSON.parse(stored);
-    const res = await fetch(API_BASE + '/verify', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (res.ok) {
-      currentUser = { username, token };
-      applyUnlock(username);
+    const { username, role } = JSON.parse(stored);
+    // Verify user still exists
+    const users = getUsers();
+    if (users[username]) {
+      applyUnlock(username, role);
     } else {
-      localStorage.removeItem('promocat_session');
+      localStorage.removeItem(SESSION_KEY);
     }
-  } catch(e) { /* server unreachable — stay logged out */ }
+  } catch(e) { localStorage.removeItem(SESSION_KEY); }
 })();
 
 // ── Re-lock when switching to upload tab without session
@@ -2673,6 +2883,7 @@ function addTrack() {
   };
   playlist.push(t);
   renderPlaylist();
+  savePlaylist();
   notify('🐾', '"' + t.title + '" added!');
 
   // reset form
@@ -2698,7 +2909,87 @@ function addTrack() {
   setTimeout(() => switchTab('player'), 700);
 }
 
-// ─────────────── PLAYLIST ───────────────
+// ─────────────── PLAYLIST PERSISTENCE ───────────────
+const PLAYLIST_STORAGE_KEY = 'promocat_playlist_v1';
+
+function savePlaylist() {
+  try {
+    localStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify(playlist));
+  } catch(e) {
+    console.warn('Could not save playlist:', e);
+  }
+}
+
+function loadPlaylist() {
+  try {
+    const stored = localStorage.getItem(PLAYLIST_STORAGE_KEY);
+    if (!stored) return;
+    const loaded = JSON.parse(stored);
+    if (Array.isArray(loaded) && loaded.length) {
+      playlist = loaded;
+      renderPlaylist();
+      if (playlist.length) loadTrack(0);
+      notify('💾', playlist.length + ' track' + (playlist.length !== 1 ? 's' : '') + ' restored!');
+    }
+  } catch(e) {
+    console.warn('Could not load playlist:', e);
+  }
+}
+
+// ─────────────── FULL PLAYLIST URL ───────────────
+function encodePlaylistToUrl(tracks) {
+  const data = tracks.map(t => ({
+    url:     t.url,
+    title:   t.title,
+    artist:  t.artist,
+    album:   t.album,
+    year:    t.year,
+    bpm:     t.bpm,
+    status:  t.status,
+    genre:   t.genre,
+    category:t.category,
+    buyLink: t.buyLink,
+    avail:   t.avail,
+    artUrl:  t.artUrl,
+    email:   t.email,
+    wavLink: t.wavLink,
+    mp3Link: t.mp3Link,
+    rating:  t.rating
+  }));
+  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+
+function copyFullPlaylistUrl() {
+  if (!playlist.length) { notify('😾', 'No tracks to share!'); return; }
+  const encoded = encodePlaylistToUrl(playlist);
+  const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+  navigator.clipboard.writeText(link).then(() => {
+    notify('🔗', 'Full playlist URL copied! (' + playlist.length + ' tracks)');
+  }).catch(() => {
+    // Fallback: show the link
+    prompt('Copy this link:', link);
+  });
+}
+
+// ─────────────── ADD TRACK TO PROMO ───────────────
+function addToPromo(e, origIdx) {
+  e.stopPropagation();
+  pickedTracks.add(origIdx);
+  renderPromoPicker();
+  // Visual feedback on the button
+  const btn = e.currentTarget;
+  btn.classList.add('added');
+  btn.textContent = '✓ PROMO';
+  setTimeout(() => {
+    btn.classList.remove('added');
+    btn.textContent = '📤 PROMO';
+  }, 1800);
+  notify('📤', '"' + playlist[origIdx].title + '" added to promo!');
+  // Auto-switch to promo tab after a short delay
+  // (don't auto-switch, let user queue multiple tracks)
+}
+
+
 let activeCat   = 'all';
 let activeSort  = 'default';
 let activeAvail = 'all';
@@ -2792,6 +3083,7 @@ function renderPlaylist() {
       ${t.buyLink ? `<a class="pl-btn pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
       ${(t.wavLink||t.mp3Link) ? `<div class="pl-btn pl-dl" onclick="event.stopPropagation()">⬇ DL<div class="pl-dl-menu">${t.wavLink?`<a class="pl-dl-opt" href="${esc(t.wavLink)}" target="_blank" download>WAV</a>`:''}${t.mp3Link?`<a class="pl-dl-opt" href="${esc(t.mp3Link)}" target="_blank" download>MP3</a>`:''}</div></div>` : ''}
       ${t.email ? `<a class="pl-btn pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
+      <button class="pl-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo playlist">📤 PROMO</button>
       <button class="pl-del" onclick="delTrack(event,${origIdx})">✕</button>
     </div>`).join('');
 }
@@ -2803,6 +3095,7 @@ function delTrack(e, i) {
   if (i === curIdx) stopTrack();
   playlist.splice(i, 1);
   if (curIdx >= playlist.length) curIdx = playlist.length - 1;
+  savePlaylist();
   renderPlaylist();
 }
 
@@ -3175,10 +3468,114 @@ function applyTheme(th) {
 // ═══════════════════════════════════════════════
 let contacts = [];        // { name, email }
 let pickedTracks = new Set(); // indices into playlist
+let promoPlaylists = [];  // { id, name, trackIndices[] }
+let activePromoPlIdx = -1; // which saved promo playlist is active
 let promoTemplate = {
   subject: 'New Music From PromoCat 🐱',
   body: `Hey {name},\n\nCheck out these tracks I wanted to share with you:\n\n{tracklist}\n\nListen here: {link}\n\n— PromoCat 🐱`
 };
+
+const PROMO_PL_KEY = 'promocat_promo_playlists_v1';
+
+function savePromoPlaylists() {
+  try { localStorage.setItem(PROMO_PL_KEY, JSON.stringify(promoPlaylists)); } catch(e) {}
+}
+
+function loadPromoPlaylists() {
+  try {
+    const s = localStorage.getItem(PROMO_PL_KEY);
+    if (s) promoPlaylists = JSON.parse(s);
+  } catch(e) {}
+  renderSavedPromoList();
+}
+
+function renderSavedPromoList() {
+  const el = document.getElementById('saved-promo-list');
+  if (!el) return;
+  if (!promoPlaylists.length) {
+    el.innerHTML = '<div style="font-family:\'Press Start 2P\',monospace;font-size:5px;color:var(--border-lo);padding:10px 12px;opacity:.5;">NO SAVED PLAYLISTS — BUILD ONE BELOW</div>';
+    return;
+  }
+  el.innerHTML = promoPlaylists.map((pl, i) => `
+    <div class="saved-promo-item${activePromoPlIdx===i?' active':''}" onclick="loadPromoPlaylist(${i})">
+      <span class="saved-promo-name">${esc(pl.name)}</span>
+      <span class="saved-promo-count">${pl.trackIndices.length} track${pl.trackIndices.length!==1?'s':''}</span>
+      <div class="saved-promo-actions">
+        <button class="saved-promo-link-btn" onclick="event.stopPropagation();copyPromoPlaylistUrl(${i})" title="Copy shareable URL">🔗</button>
+        <button class="saved-promo-del-btn" onclick="event.stopPropagation();deletePromoPlaylist(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function newPromoPlaylist() {
+  activePromoPlIdx = -1;
+  pickedTracks.clear();
+  document.getElementById('promo-pl-name').value = '';
+  document.getElementById('active-promo-name').textContent = '— NEW —';
+  renderPromoPicker();
+  renderSavedPromoList();
+  notify('➕', 'Select tracks then name & save!');
+}
+
+function savePromoPlaylist() {
+  if (!pickedTracks.size) { notify('😾', 'Pick at least one track first!'); return; }
+  const name = document.getElementById('promo-pl-name').value.trim();
+  if (!name) { notify('😾', 'Give the playlist a name!'); return; }
+
+  // Resolve picked indices to stable track IDs by URL (so order changes don't break them)
+  const trackIndices = [...pickedTracks];
+
+  if (activePromoPlIdx >= 0) {
+    promoPlaylists[activePromoPlIdx] = { id: promoPlaylists[activePromoPlIdx].id, name, trackIndices };
+  } else {
+    promoPlaylists.push({ id: Date.now(), name, trackIndices });
+    activePromoPlIdx = promoPlaylists.length - 1;
+  }
+  savePromoPlaylists();
+  renderSavedPromoList();
+  document.getElementById('active-promo-name').textContent = name;
+  notify('💾', '"' + name + '" saved!');
+}
+
+function loadPromoPlaylist(i) {
+  activePromoPlIdx = i;
+  const pl = promoPlaylists[i];
+  pickedTracks = new Set(pl.trackIndices.filter(idx => idx < playlist.length));
+  document.getElementById('promo-pl-name').value = pl.name;
+  document.getElementById('active-promo-name').textContent = pl.name;
+  renderPromoPicker();
+  renderSavedPromoList();
+  notify('📋', '"' + pl.name + '" loaded!');
+}
+
+function deletePromoPlaylist(i) {
+  promoPlaylists.splice(i, 1);
+  if (activePromoPlIdx === i) { activePromoPlIdx = -1; pickedTracks.clear(); document.getElementById('active-promo-name').textContent = ''; }
+  else if (activePromoPlIdx > i) activePromoPlIdx--;
+  savePromoPlaylists();
+  renderSavedPromoList();
+  notify('🗑️', 'Playlist deleted');
+}
+
+function copyPromoPlaylistUrl(i) {
+  const pl = promoPlaylists[i];
+  const tracks = pl.trackIndices.filter(idx => idx < playlist.length).map(idx => playlist[idx]);
+  if (!tracks.length) { notify('😾', 'No valid tracks in this playlist!'); return; }
+  const encoded = encodePlaylistToUrl(tracks);
+  const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+  navigator.clipboard.writeText(link).then(() => {
+    notify('🔗', '"' + pl.name + '" URL copied!');
+  }).catch(() => { prompt('Copy this link:', link); });
+}
+
+function clearPromoSelection() {
+  pickedTracks.clear();
+  activePromoPlIdx = -1;
+  document.getElementById('active-promo-name').textContent = '';
+  document.getElementById('promo-pl-name').value = '';
+  renderPromoPicker();
+  renderSavedPromoList();
+}
 
 // ── CONTACTS ──
 function addContact() {
@@ -3264,25 +3661,9 @@ function selectAllTracks() {
 function genPromoLink() {
   if (!pickedTracks.size) { notify('😾', 'Pick at least one track!'); return; }
 
-  // Build a lightweight track manifest (no audio blob URLs — just metadata)
-  // The link encodes track metadata; audio files must be re-uploaded per session
-  // So we encode titles/artists/albums as a promo-view manifest
-  const picked = [...pickedTracks].map(i => ({
-    title:  playlist[i].title,
-    artist: playlist[i].artist,
-    album:  playlist[i].album,
-    year:   playlist[i].year,
-    avail:  playlist[i].avail,
-    status: playlist[i].status,
-    buyLink: playlist[i].buyLink,
-    email:   playlist[i].email,
-    wavLink: playlist[i].wavLink,
-    mp3Link: playlist[i].mp3Link,
-    artUrl:  playlist[i].artUrl
-  }));
-
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(picked))));
-  const link = 'https://johnthepm.com/promocat/#promo=' + encoded;
+  const picked = [...pickedTracks].map(i => playlist[i]);
+  const encoded = encodePlaylistToUrl(picked);
+  const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
 
   const box = document.getElementById('promo-link-box');
   document.getElementById('promo-link-text').textContent = link;
@@ -3349,37 +3730,64 @@ function firePromo() {
   notify('🚀', 'Opening mail client!');
 }
 
-// ── PROMO VIEW MODE: if URL has #promo=... render a read-only promo page ──
+// ── PROMO VIEW MODE: if URL has #playlist=... or legacy #promo=... load tracks ──
 function checkPromoHash() {
   const hash = window.location.hash;
-  if (!hash.startsWith('#promo=')) return;
-  try {
-    const encoded = hash.replace('#promo=', '');
-    const tracks  = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+  let encoded = null;
 
-    // Inject tracks as metadata-only into playlist and switch to player
+  if (hash.startsWith('#playlist=')) {
+    encoded = hash.replace('#playlist=', '');
+  } else if (hash.startsWith('#promo=')) {
+    encoded = hash.replace('#promo=', '');
+  }
+  if (!encoded) return;
+
+  try {
+    const tracks = JSON.parse(decodeURIComponent(escape(atob(encoded))));
     playlist = tracks.map(t => ({
-      ...t,
-      url: null,  // no audio in promo view
-      promoOnly: true
+      url:      t.url || null,
+      title:    t.title   || 'Unknown',
+      artist:   t.artist  || 'Unknown Artist',
+      album:    t.album   || '',
+      year:     t.year    || '',
+      bpm:      t.bpm     || 0,
+      status:   t.status  || 'released',
+      genre:    t.genre   || '',
+      category: t.category|| 'dj',
+      buyLink:  t.buyLink || '',
+      avail:    t.avail   || 'undecided',
+      artUrl:   t.artUrl  || '',
+      email:    t.email   || '',
+      wavLink:  t.wavLink || '',
+      mp3Link:  t.mp3Link || '',
+      rating:   t.rating  || 0
     }));
     renderPlaylist();
+    if (playlist.length) loadTrack(0);
     switchTab('player');
-    notify('🎵', 'Promo playlist loaded! (' + tracks.length + ' tracks)');
+    notify('🎵', 'Playlist loaded! (' + tracks.length + ' tracks)');
+    // Don't persist URL-loaded playlists automatically — user can save if they want
   } catch(e) {
-    console.warn('Invalid promo hash', e);
+    console.warn('Invalid playlist hash', e);
   }
 }
 
 // Run on load
 window.addEventListener('DOMContentLoaded', () => {
-  checkPromoHash();
+  const hash = window.location.hash;
+  if (hash.startsWith('#playlist=') || hash.startsWith('#promo=')) {
+    checkPromoHash(); // URL takes priority — don't load localStorage
+  } else {
+    loadPlaylist();   // restore saved tracks
+  }
+  loadPromoPlaylists();
   loadTemplate();
 });
 
 // Refresh picker when promo tab is opened
 document.getElementById('tab-promo').addEventListener('click', () => {
   renderPromoPicker();
+  renderSavedPromoList();
   loadTemplate();
 });
 
@@ -3387,6 +3795,7 @@ document.getElementById('tab-promo').addEventListener('click', () => {
 // ─────────────── STAR RATINGS ───────────────
 function setRating(trackIdx, stars) {
   playlist[trackIdx].rating = stars;
+  savePlaylist();
   renderPlaylist();
   notify('⭐', stars + ' star' + (stars !== 1 ? 's' : '') + ' — ' + playlist[trackIdx].title);
 }
@@ -3638,63 +4047,35 @@ function blankProfile() {
 }
 
 // Keep backward compat — single-profile localStorage key
-async function loadUserProfiles() {
+function loadUserProfiles() {
   if (!currentUser) return;
+  const key = 'promocat_profiles_' + currentUser.username;
   try {
-    const res = await fetch(API_BASE + '/profiles', {
-      headers: { 'Authorization': 'Bearer ' + currentUser.token }
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    artistProfiles = data.profiles || [];
-    renderRoster();
-    renderSettingsRoster();
-    if (artistProfiles.length) {
-      activeProfileIdx = 0;
-      renderArtistProfile(artistProfiles[0]);
-    }
-  } catch(e) {
-    // Offline fallback — use localStorage
-    const local = localStorage.getItem('promocat_profiles_' + (currentUser?.username||''));
-    if (local) { try { artistProfiles = JSON.parse(local); } catch(e){} }
-    renderRoster(); renderSettingsRoster();
+    const local = localStorage.getItem(key);
+    if (local) artistProfiles = JSON.parse(local);
+  } catch(e) {}
+  renderRoster();
+  renderSettingsRoster();
+  if (artistProfiles.length) {
+    activeProfileIdx = 0;
+    renderArtistProfile(artistProfiles[0]);
+  }
+  // Also refresh invite/user panels if admin
+  if (currentUser.role === 'admin') {
+    renderInviteCodes();
+    renderUserList();
   }
 }
 
 // Keep for public/offline roster
 function loadArtistProfileFromStorage() {
-  // Load public profiles (no auth needed)
-  fetch(API_BASE + '/public-profiles')
-    .then(r => r.json())
-    .then(data => {
-      if (!unlocked) {
-        artistProfiles = data.profiles || [];
-        renderRoster();
-      }
-    })
-    .catch(() => {
-      // Offline: nothing to show publicly
-    });
+  // No server — nothing to do publicly
 }
 
-async function saveProfilesToStorage() {
+function saveProfilesToStorage() {
   if (!currentUser) return;
-  try {
-    await fetch(API_BASE + '/profiles', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + currentUser.token
-      },
-      body: JSON.stringify({ profiles: artistProfiles })
-    });
-    // Also cache locally
-    localStorage.setItem('promocat_profiles_' + currentUser.username, JSON.stringify(artistProfiles));
-  } catch(e) {
-    // Offline fallback
-    localStorage.setItem('promocat_profiles_' + currentUser.username, JSON.stringify(artistProfiles));
-    notify('⚠️', 'Saved locally (server unreachable)');
-  }
+  const key = 'promocat_profiles_' + currentUser.username;
+  localStorage.setItem(key, JSON.stringify(artistProfiles));
 }
 
 // ── ROSTER ──
