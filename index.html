@@ -23,52 +23,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Righteous&display=swap');
 
 :root {
-  --cat-orange: #ff8c42;
-  --cat-hi: #ffb347;
-  --border-lo: #663300;
-  --border-hi: #ffcc66;
-  --win-bg: #1e1206;
-  --panel-bg: #2a1a08;
-  --lcd-bg: #0a1a0a;
-  --lcd-green: #33ff66;
-  --btn-bg: #3a2510;
-  --btn-hi: #ff9944;
-  --btn-sh: #661100;
-  --vis-bg: #040d04;
-  /* Derived theme vars used by hardcoded elements */
-  --title-grad: linear-gradient(180deg,#ff9944 0%,#cc5500 30%,#aa3300 60%,#cc5500 80%,#ff7700 100%);
-  --wbtn-bg: linear-gradient(135deg,#cc8833,#663300);
-  --wbtn-border-hi: #ffaa44;
-  --wbtn-border-lo: #330000;
-  --wbtn-color: #ffe0a0;
-  --tab-inactive-bg: #110a02;
-  --tab-inactive-color: #553311;
-  --tab-hover-color: #cc7722;
-  --mbtn-color: #884422;
-  --mbtn-bg: linear-gradient(180deg,#2a1a08,#1a0a02);
-  --mbtn-border-hi: #553311;
-  --mbtn-border-lo: #110500;
-  --mbtn-on-bg: linear-gradient(180deg,#3a2010,#220d04);
-  --pl-bar-bg: #150d04;
-  --pl-list-bg: #0a0d08;
-  --pl-foot-bg: #0a0f0a;
-  --body-bg: #0d0802;
+  --cat-orange: #44dd88;
+  --cat-hi: #88ffbb;
+  --border-lo: #004422;
+  --border-hi: #66ffaa;
+  --win-bg: #061410;
+  --panel-bg: #0a1e14;
+  --lcd-bg: #020e08;
+  --lcd-green: #00ff88;
+  --btn-bg: #0e3020;
+  --btn-hi: #88ffbb;
+  --btn-sh: #002210;
+  --vis-bg: #010804;
+  /* Derived theme vars */
+  --title-grad: linear-gradient(180deg,#88ffbb 0%,#44dd88 30%,#004422 60%,#44dd88 80%,#66ffaa 100%);
+  --wbtn-bg: linear-gradient(135deg,#44dd88,#004422);
+  --wbtn-border-hi: #88ffbb;
+  --wbtn-border-lo: #001a08;
+  --wbtn-color: #aaffdd;
+  --tab-inactive-bg: #020e06;
+  --tab-inactive-color: #1a5533;
+  --tab-hover-color: #44dd88;
+  --mbtn-color: #22bb66;
+  --mbtn-bg: linear-gradient(180deg,#0e3020,#061410);
+  --mbtn-border-hi: #1a5533;
+  --mbtn-border-lo: #010a04;
+  --mbtn-on-bg: linear-gradient(180deg,#1a4428,#0a1e10);
+  --pl-bar-bg: #0a1e14;
+  --pl-list-bg: #040e08;
+  --pl-foot-bg: #040e08;
+  --body-bg: #030e06;
   /* Seek / slider / vbar vars */
-  --track-bg: #0d0803;
-  --track-border-lo: #330d00;
-  --track-border-hi: #cc6600;
-  --fill-grad: linear-gradient(90deg,#ff4400,#ff8800,#ffcc00);
-  --thumb-grad: linear-gradient(180deg,#ffcc66,#cc6600 50%,#ff9900);
-  --thumb-border: #884400;
-  --thumb-sh-hi: #ffcc44;
-  --thumb-sh-lo: #441100;
-  --slbl-color: #884422;
+  --track-bg: #030e06;
+  --track-border-lo: #004422;
+  --track-border-hi: #44dd88;
+  --fill-grad: linear-gradient(90deg,#004422,#44dd88,#88ffbb);
+  --thumb-grad: linear-gradient(180deg,#88ffbb,#44dd88 50%,#004422);
+  --thumb-border: #004422;
+  --thumb-sh-hi: #88ffbb;
+  --thumb-sh-lo: #001a08;
+  --slbl-color: #22bb66;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  background: #0d0802;
+  background: #030e06;
   min-height: 100vh;
   min-height: 100dvh; /* dynamic viewport height — fixes mobile browser chrome */
   display: flex;
@@ -77,10 +77,10 @@ body {
   padding: 0;          /* no padding on mobile — shell goes edge to edge */
   font-family: 'VT323', monospace;
   background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(255,140,66,.07) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(255,140,66,.04) 0%, transparent 50%),
-    repeating-linear-gradient(0deg,  transparent, transparent 40px, rgba(255,140,66,.013) 40px, rgba(255,140,66,.013) 41px),
-    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,140,66,.013) 40px, rgba(255,140,66,.013) 41px);
+    radial-gradient(ellipse at 20% 20%, rgba(68,221,136,.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(68,221,136,.04) 0%, transparent 50%),
+    repeating-linear-gradient(0deg,  transparent, transparent 40px, rgba(68,221,136,.013) 40px, rgba(68,221,136,.013) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(68,221,136,.013) 40px, rgba(68,221,136,.013) 41px);
 }
 
 /* ── SHELL ── */
@@ -412,6 +412,34 @@ body {
   width:12px; height:22px;
   background:var(--thumb-grad);
   border:1px solid var(--thumb-border); box-shadow:1px 1px 0 var(--thumb-sh-hi),-1px -1px 0 var(--thumb-sh-lo);
+}
+
+/* TRANSPORT */
+.transport { display:flex; gap:5px; margin-bottom:10px; align-items:center; }
+.tbtn {
+  background:linear-gradient(180deg,var(--btn-bg) 0%,var(--vis-bg) 50%,var(--btn-bg) 100%);
+  border-top:1px solid var(--btn-hi); border-left:1px solid var(--btn-hi);
+  border-bottom:1px solid var(--btn-sh); border-right:1px solid var(--btn-sh);
+  cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .1s;
+}
+.tbtn:hover { background:linear-gradient(180deg,var(--border-lo),var(--vis-bg) 50%,var(--border-lo)); border-top-color:var(--cat-hi); border-left-color:var(--cat-hi); }
+.tbtn:active { border-top:1px solid var(--btn-sh); border-left:1px solid var(--btn-sh); border-bottom:1px solid var(--btn-hi); border-right:1px solid var(--btn-hi); transform:translateY(1px); }
+.tbtn svg { fill:#cc8833; filter:drop-shadow(0 0 2px rgba(255,140,50,.4)); display:block; }
+.tbtn:hover svg { fill:var(--cat-hi); filter:drop-shadow(0 0 4px rgba(255,180,80,.8)); }
+/* Mobile sizes — large touch targets */
+.t-prev,.t-next { width:60px; height:52px; }
+.t-play         { width:72px; height:52px; }
+.t-pause,.t-stop{ width:60px; height:52px; }
+.t-eject        { width:48px; height:52px; margin-left:auto; display:none; }
+.admin-unlocked .t-eject { display:flex; }
+.tbtn svg       { width:24px; height:24px; }
+@media (min-width: 900px) {
+  .t-prev,.t-next { width:80px; height:60px; }
+  .t-play         { width:96px; height:60px; }
+  .t-pause,.t-stop{ width:80px; height:60px; }
+  .admin-unlocked .t-eject { width:64px; height:60px; }
+  .transport      { gap:8px; margin-bottom:14px; }
+  .tbtn svg       { width:32px; height:32px; }
 }
 
 /* MODE BTNS */
@@ -1793,10 +1821,12 @@ body.rave-mode .lcd-art img {
   font-family:'Press Start 2P',monospace; font-size:7px;
   color:var(--cat-orange); text-shadow:0 0 6px rgba(255,140,66,.6);
   max-width:260px; line-height:2;
-  transform:translateX(130%);
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  transform:translateY(120px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
 }
-.notif.show { transform:translateX(0); }
+.notif.show { transform:translateY(0); opacity:1; pointer-events:auto; }
 .notif-icon { font-size:16px; margin-right:6px; }
 </style>
 </head>
@@ -1811,10 +1841,10 @@ body.rave-mode .lcd-art img {
   <!-- TAB BAR -->
   <div class="tab-bar">
     <div class="tab active" id="tab-player" onclick="switchTab('player')">PLAYER</div>
-    <div class="tab" id="tab-artist" onclick="switchTab('artist')">😺 ARTIST</div>
-    <div class="tab" id="tab-upload" onclick="switchTab('upload')">🔒 ADD TRACK</div>
-    <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">📧 PROMO</div>
-    <div class="tab" id="tab-settings" onclick="switchTab('settings')" style="display:none">⚙️ SETTINGS</div>
+    <div class="tab" id="tab-artist" onclick="switchTab('artist')">ARTIST</div>
+    <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
+    <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">PROMO</div>
+    <div class="tab" id="tab-settings" onclick="switchTab('settings')" style="display:none">SETTINGS</div>
   </div>
 
   <!-- WINDOW -->
@@ -2626,7 +2656,7 @@ Listen here: {link}
 
 <!-- Notification -->
 <div class="notif" id="notif">
-  <span class="notif-icon">🐱</span><span id="notif-text"></span>
+  <span class="notif-icon" id="notif-icon">♪</span><span id="notif-text"></span>
 </div>
 
 <audio id="audio"></audio>
@@ -2714,7 +2744,7 @@ function applyUnlock(username, role, token) {
   document.body.classList.add('admin-unlocked');
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
-  document.getElementById('tab-upload').textContent = '🎵 ADD TRACK';
+  document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'block';
   document.getElementById('tab-settings').style.display = 'block';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
@@ -2729,11 +2759,11 @@ function applyUnlock(username, role, token) {
   if (wProfile) wProfile.title = 'Artist Profile';
   // Hide legacy login btn / pill (may not exist anymore)
   const lb = document.getElementById('login-btn');
-  if (lb) { lb.textContent = '🐱 ' + username.toUpperCase(); lb.classList.add('logged-in'); }
+  if (lb) { lb.textContent = username.toUpperCase(); lb.classList.add('logged-in'); }
   const pill = document.getElementById('tab-user-pill');
   if (pill) pill.classList.add('show');
   const pillName = document.getElementById('tab-user-name');
-  if (pillName) pillName.textContent = '🐱 ' + username.toUpperCase();
+  if (pillName) pillName.textContent = username.toUpperCase();
   document.querySelectorAll('.admin-only-section').forEach(s =>
     s.style.display = (role === 'admin') ? 'block' : 'none');
   loadUserData();
@@ -2760,7 +2790,7 @@ function logout() {
   if (pill) pill.classList.remove('show');
   const lb = document.getElementById('login-btn');
   if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
-  document.getElementById('tab-upload').textContent = '🔒 ADD TRACK';
+  document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('lock-screen').style.display = 'flex';
@@ -3510,16 +3540,26 @@ function encodePlaylistToUrl(tracks) {
   return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
 }
 
-function copyFullPlaylistUrl() {
+async function copyFullPlaylistUrl() {
   if (!playlist.length) { notify('😾', 'No tracks to share!'); return; }
+  notify('⏳', 'Generating link...');
+  try {
+    const name = (artistProfiles[activeProfileIdx]?.name || 'full-playlist');
+    const { ok, data } = await api('POST', '/share', { name, tracks: playlist });
+    if (ok && data.slug) {
+      const link = window.location.origin + window.location.pathname + '#p=' + data.slug;
+      navigator.clipboard.writeText(link)
+        .then(() => notify('🔗', 'Link copied! (' + playlist.length + ' tracks)'))
+        .catch(() => prompt('Copy this link:', link));
+      return;
+    }
+  } catch(e) {}
+  // Fallback to long URL
   const encoded = encodePlaylistToUrl(playlist);
   const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
-  navigator.clipboard.writeText(link).then(() => {
-    notify('🔗', 'Full playlist URL copied! (' + playlist.length + ' tracks)');
-  }).catch(() => {
-    // Fallback: show the link
-    prompt('Copy this link:', link);
-  });
+  navigator.clipboard.writeText(link)
+    .then(() => notify('🔗', 'Full playlist URL copied!'))
+    .catch(() => prompt('Copy this link:', link));
 }
 
 // ─────────────── ADD TRACK TO PROMO ───────────────
@@ -3918,6 +3958,7 @@ document.querySelectorAll('.paw').forEach(b => {
 
 // ─────────────── COLOUR THEMES ───────────────
 const THEMES = [
+  { name:'🌿 JUNGLE GREEN',   orange:'#44dd88', hi:'#88ffbb',  borderLo:'#004422', borderHi:'#66ffaa', winBg:'#061410', lcdBg:'#020e08', lcdGreen:'#00ff88', btnBg:'#0e3020', btnSh:'#002210', visBg:'#010804', bodyBg:'#030e06' },
   { name:'🔥 CLASSIC CAT',    orange:'#ff8c42', hi:'#ffb347',  borderLo:'#663300', borderHi:'#ffcc66', winBg:'#1e1206', lcdBg:'#0a1a0a', lcdGreen:'#33ff66', btnBg:'#3a2510', btnSh:'#661100', visBg:'#040d04', bodyBg:'#0d0802' },
   { name:'💜 DEEP PURPLE',    orange:'#bb66ff', hi:'#dd99ff',  borderLo:'#440066', borderHi:'#cc88ff', winBg:'#0e0618', lcdBg:'#0a0015', lcdGreen:'#cc66ff', btnBg:'#2a1040', btnSh:'#220044', visBg:'#060010', bodyBg:'#080010' },
   { name:'🩵 ARCTIC ICE',     orange:'#44ccff', hi:'#88eeff',  borderLo:'#004466', borderHi:'#66ddff', winBg:'#061418', lcdBg:'#000a10', lcdGreen:'#00ffee', btnBg:'#0a2030', btnSh:'#001a30', visBg:'#000608', bodyBg:'#020a0e' },
@@ -4501,21 +4542,39 @@ function selectAllTracks() {
 
 // ── LINK GENERATION ──
 // Encode picked tracks as a base64 JSON blob in the URL hash
-function genPromoLink() {
+async function genPromoLink() {
   if (!pickedTracks.size) { notify('😾', 'Pick at least one track!'); return; }
 
   const picked = [...pickedTracks].map(i => playlist[i]);
-  const encoded = encodePlaylistToUrl(picked);
-  const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+  const name   = document.getElementById('promo-pl-name').value.trim() ||
+                 (activePromoPlIdx >= 0 ? promoPlaylists[activePromoPlIdx].name : '') ||
+                 'promo';
 
-  const box = document.getElementById('promo-link-box');
-  document.getElementById('promo-link-text').textContent = link;
+  const box     = document.getElementById('promo-link-box');
+  const textEl  = document.getElementById('promo-link-text');
+  textEl.textContent = '⏳ GENERATING LINK...';
   box.classList.add('show');
-  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-  // Store link for fire step
-  window._promoLink = link;
-  return link;
+  try {
+    const { ok, data } = await api('POST', '/share', { name, tracks: picked });
+    if (ok && data.slug) {
+      const link = window.location.origin + window.location.pathname + '#p=' + data.slug;
+      textEl.textContent = link;
+      window._promoLink = link;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return link;
+    } else {
+      throw new Error('no slug');
+    }
+  } catch(e) {
+    // Fallback to long URL if Worker unreachable
+    const encoded = encodePlaylistToUrl(picked);
+    const link    = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+    textEl.textContent = link;
+    window._promoLink = link;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return link;
+  }
 }
 
 function copyPromoLink() {
@@ -4567,56 +4626,70 @@ function firePromo() {
 }
 
 // ── PROMO VIEW MODE: if URL has #playlist=... or legacy #promo=... load tracks ──
-function checkPromoHash() {
+async function checkPromoHash() {
   const hash = window.location.hash;
-  let encoded = null;
+  let tracks = null;
 
-  if (hash.startsWith('#playlist=')) {
-    encoded = hash.replace('#playlist=', '');
-  } else if (hash.startsWith('#promo=')) {
-    encoded = hash.replace('#promo=', '');
-  }
-  if (!encoded) return;
-
-  try {
-    const tracks = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    playlist = tracks.map(t => ({      url:      t.url || null,
-      title:    t.title   || 'Unknown',
-      artist:   t.artist  || 'Unknown Artist',
-      album:    t.album   || '',
-      year:     t.year    || '',
-      bpm:      t.bpm     || 0,
-      status:   t.status  || 'released',
-      genre:    t.genre   || '',
-      category: t.category|| 'dj',
-      buyLink:  t.buyLink || '',
-      avail:    t.avail   || 'undecided',
-      artUrl:   t.artUrl  || '',
-      email:    t.email   || '',
-      wavLink:  t.wavLink || '',
-      mp3Link:  t.mp3Link || '',
-      rating:   t.rating  || 0
-    }));
-    renderPlaylist();
-    if (playlist.length) loadTrack(0);
-    switchTab('player');
-    notify('🎵', 'Playlist loaded! (' + tracks.length + ' tracks)');
-    // Fire a view event so the owner knows their playlist was opened
-    if (playlist.length) {
-      fireTrackEvent('play', playlist[0], { listener: 'shared link visitor' });
+  // Short slug link — fetch from Worker
+  if (hash.startsWith('#p=')) {
+    const slug = hash.replace('#p=', '');
+    try {
+      const res  = await fetch(API_BASE + '/share/' + slug);
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.tracks)) {
+        tracks = data.tracks;
+        document.title = data.name ? data.name + ' — PromoCat' : 'PromoCat';
+      } else {
+        notify('😾', 'Playlist not found');
+        return;
+      }
+    } catch(e) {
+      notify('😾', 'Could not load playlist');
+      return;
     }
-  } catch(e) {
-    console.warn('Invalid playlist hash', e);
   }
+  // Long base64 link (legacy / fallback)
+  else if (hash.startsWith('#playlist=')) {
+    try { tracks = JSON.parse(decodeURIComponent(escape(atob(hash.replace('#playlist=', ''))))); } catch(e) {}
+  }
+  else if (hash.startsWith('#promo=')) {
+    try { tracks = JSON.parse(decodeURIComponent(escape(atob(hash.replace('#promo=', ''))))); } catch(e) {}
+  }
+
+  if (!tracks || !tracks.length) return;
+
+  playlist = tracks.map(t => ({
+    url:      t.url      || null,
+    title:    t.title    || 'Unknown',
+    artist:   t.artist   || 'Unknown Artist',
+    album:    t.album    || '',
+    year:     t.year     || '',
+    bpm:      t.bpm      || 0,
+    status:   t.status   || 'released',
+    genre:    t.genre    || '',
+    category: t.category || 'dj',
+    buyLink:  t.buyLink  || '',
+    avail:    t.avail    || 'undecided',
+    artUrl:   t.artUrl   || '',
+    email:    t.email    || '',
+    wavLink:  t.wavLink  || '',
+    mp3Link:  t.mp3Link  || '',
+    rating:   t.rating   || 0
+  }));
+  renderPlaylist();
+  if (playlist.length) loadTrack(0);
+  switchTab('player');
+  notify('🎵', 'Playlist loaded! (' + tracks.length + ' tracks)');
+  if (playlist.length) fireTrackEvent('play', playlist[0], { listener: 'shared link visitor' });
 }
 
 // Run on load
 window.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash;
-  if (hash.startsWith('#playlist=') || hash.startsWith('#promo=')) {
-    checkPromoHash(); // URL takes priority — don't load localStorage
+  if (hash.startsWith('#playlist=') || hash.startsWith('#promo=') || hash.startsWith('#p=')) {
+    checkPromoHash(); // async — URL takes priority
   } else {
-    loadPlaylist();   // restore saved tracks
+    loadPlaylist();
   }
   loadPromoPlaylists();
   loadTemplate();
@@ -5497,7 +5570,7 @@ function downloadEPK() {
 // ─────────────── NOTIFICATION ───────────────
 let notifT;
 function notify(icon, msg) {
-  document.getElementById('notif').querySelector('.notif-icon').textContent = icon;
+  document.getElementById('notif-icon').textContent = icon;
   document.getElementById('notif-text').textContent = msg;
   document.getElementById('notif').classList.add('show');
   clearTimeout(notifT);
