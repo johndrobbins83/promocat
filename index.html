@@ -2275,6 +2275,7 @@ body.rave-mode .lcd-art img {
             <div class="lcd-bpm-display" id="lcd-bpm"></div>
           </div>
           <div class="lcd-mode" id="lcd-mode"></div>
+          <div class="lcd-st" id="lcd-st"></div>
         </div>
 
         <!-- Visualiser -->
@@ -2605,6 +2606,7 @@ body.rave-mode .lcd-art img {
 
         <button class="sub-btn" id="track-submit-btn" onclick="submitTrackForm()">🐾 ADD TO PLAYLIST 🐾</button>
         <button class="back-btn" id="track-cancel-btn" onclick="cancelTrackEdit()">← BACK TO PLAYER</button>
+        <button class="back-btn" id="track-clear-btn" onclick="if(confirm('Clear all fields?'))resetTrackForm()" style="color:#ff8844;border-color:#662200;">🗑 CLEAR FORM</button>
       </div>
 
     </div><!-- /panel-upload -->
@@ -3642,6 +3644,30 @@ function checkAudioUrl() {
 }
 
 // ─────────────── ADD TRACK ───────────────
+function resetTrackForm() {
+  document.getElementById('f-audio-url').value = '';
+  document.getElementById('audio-url-status').textContent = '';
+  document.getElementById('audio-url-status').className = 'audio-url-status';
+  document.getElementById('f-title').value    = '';
+  document.getElementById('f-artist').value   = '';
+  document.getElementById('f-album').value    = '';
+  document.getElementById('f-year').value     = '';
+  document.getElementById('f-bpm').value      = '';
+  document.getElementById('f-genre').value    = '';
+  document.getElementById('f-buy').value      = '';
+  document.getElementById('f-wav').value      = '';
+  document.getElementById('f-mp3').value      = '';
+  document.getElementById('f-email').value    = '';
+  document.getElementById('f-mgmt').value     = '';
+  document.getElementById('f-mgmt-email').value = '';
+  document.getElementById('f-booking').value  = '';
+  document.getElementById('f-label').value    = '';
+  document.querySelector('input[name="status"][value="released"]').checked  = true;
+  document.querySelector('input[name="category"][value="dj"]').checked      = true;
+  document.querySelector('input[name="avail"][value="available"]').checked  = true;
+  resetArtField();
+}
+
 function addTrack() {
   const audioUrl = document.getElementById('f-audio-url').value.trim();
   if (!audioUrl) { notify('😾', 'Enter an audio stream link first!'); return; }
@@ -3672,28 +3698,7 @@ function addTrack() {
   // Immediate sync — don't debounce track adds
   syncPlaylistToCloud().then(() => notify('🐾', '"' + t.title + '" saved to cloud!'));
 
-  // reset form
-  document.getElementById('f-title').value = '';
-  document.getElementById('f-artist').value = '';
-  document.getElementById('f-album').value = '';
-  document.getElementById('f-year').value = '';
-  document.getElementById('f-bpm').value = '';
-  document.querySelector('input[name="status"][value="released"]').checked = true;
-  document.getElementById('f-genre').value = '';
-  document.querySelector('input[name="category"][value="dj"]').checked = true;
-  document.querySelector('input[name="avail"][value="available"]').checked = true;
-  document.getElementById('f-buy').value = '';
-  resetArtField();
-  document.getElementById('f-email').value = '';
-  document.getElementById('f-mgmt').value = '';
-  document.getElementById('f-mgmt-email').value = '';
-  document.getElementById('f-booking').value = '';
-  document.getElementById('f-label').value = '';
-  document.getElementById('f-wav').value = '';
-  document.getElementById('f-mp3').value = '';
-  document.getElementById('f-audio-url').value = '';
-  document.getElementById('audio-url-status').textContent = '';
-  document.getElementById('audio-url-status').className = 'audio-url-status';
+  resetTrackForm();
 
   if (playlist.length === 1) loadTrack(0);
   setTimeout(() => switchTab('player'), 700);
@@ -4364,6 +4369,7 @@ function prevTrack() {
 
 function setSt(txt, active) {
   const el = document.getElementById('lcd-st');
+  if (!el) return;
   el.textContent = txt;
   el.className = 'lcd-st' + (active ? ' on' : '');
 }
