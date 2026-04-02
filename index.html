@@ -70,12 +70,13 @@
 body {
   background: #030e06;
   min-height: 100vh;
-  min-height: 100dvh; /* dynamic viewport height — fixes mobile browser chrome */
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0;          /* no padding on mobile — shell goes edge to edge */
+  padding: 0;
   font-family: 'VT323', monospace;
+  overflow-x: hidden;
   background-image:
     radial-gradient(ellipse at 20% 20%, rgba(68,221,136,.07) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 80%, rgba(68,221,136,.04) 0%, transparent 50%),
@@ -94,7 +95,7 @@ body {
   overflow-x: hidden;
 }
 @media (min-width: 600px) {
-  body  { padding: 24px 16px; align-items: flex-start; }
+  body  { padding: 24px 16px; }
   #shell { max-width: 560px; min-height: auto; }
 }
 @media (min-width: 900px) {
@@ -108,17 +109,18 @@ body {
   align-items: stretch;
   flex-wrap: wrap;
   gap: 2px;
-  padding: 0 2px;
+  padding: 2px 2px 0;
   position: relative;
   z-index: 2;
   background: var(--body-bg);
+  width: 100%;
 }
 
 .tab {
   font-family: 'Press Start 2P', monospace;
-  font-size: 5px;
+  font-size: 6px;
   letter-spacing: .3px;
-  padding: 7px 8px 6px;
+  padding: 8px 10px 7px;
   border: 2px solid var(--border-lo);
   border-bottom: none;
   background: var(--tab-inactive-bg);
@@ -133,11 +135,12 @@ body {
 }
 .tab:hover { color: var(--tab-hover-color); background: var(--win-bg); }
 .tab.active {
-  background: var(--win-bg); color: #ffcc66;
-  text-shadow: 0 0 6px rgba(255,200,100,.6);
+  background: var(--win-bg); color: var(--border-hi);
+  text-shadow: 0 0 6px rgba(68,221,136,.6);
   box-shadow: 2px 0 0 var(--border-hi), -1px 0 0 var(--border-hi), 0 -2px 0 var(--border-hi);
   top: 0; z-index: 3;
 }
+
 
 /* User pill — always last in tab-bar, pushed to right */
 .tab-user-pill {
@@ -199,8 +202,8 @@ body {
 /* ── WINDOW CHROME ── */
 .win-window {
   border: 2px solid var(--border-lo);
-  box-shadow: 2px 2px 0 var(--border-hi), -1px -1px 0 #330d00,
-              inset 1px 1px 0 rgba(255,200,100,.12), 0 0 40px rgba(255,140,66,.18);
+  box-shadow: 2px 2px 0 var(--border-hi), -1px -1px 0 #001a08,
+              inset 1px 1px 0 rgba(68,221,136,.08), 0 0 40px rgba(68,221,136,.12);
   background: var(--win-bg);
   position: relative; z-index: 1;
   width: 100%;
@@ -209,29 +212,44 @@ body {
 }
 
 .titlebar {
-  height: 32px;
+  height: 36px;
   background: var(--title-grad);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 8px; cursor: move; user-select: none; overflow: hidden; position: relative;
+  padding: 0 6px; cursor: default; user-select: none;
+  overflow: hidden; position: relative;
+  gap: 6px;
 }
-@media (min-width: 900px) { .titlebar { height: 44px; } .titlebar-text { font-size: 12px !important; } .wbtn { width:30px !important; height:24px !important; font-size:12px !important; } .wbtns { gap: 4px !important; } }
-.titlebar::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:rgba(255,220,120,.6); }
+@media (min-width: 900px) { .titlebar { height: 44px; cursor: move; } }
+.titlebar::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:rgba(68,221,136,.4); }
+
 .titlebar-text {
-  font-family: 'Press Start 2P', monospace; font-size: 8px;
-  color: #fff8e0; text-shadow: 1px 1px 0 rgba(0,0,0,.8); letter-spacing: .5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #e0ffe8;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.8);
+  letter-spacing: .3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
-.wbtns { display: flex; gap: 3px; }
+@media (min-width: 900px) { .titlebar-text { font-size: 11px; letter-spacing: .5px; } }
+
+.wbtns { display: flex; gap: 2px; flex-shrink: 0; }
 .wbtn {
-  width:22px; height:18px;
+  width: 22px; height: 18px;
   background: var(--wbtn-bg);
   border-top:1px solid var(--wbtn-border-hi); border-left:1px solid var(--wbtn-border-hi);
   border-bottom:1px solid var(--wbtn-border-lo); border-right:1px solid var(--wbtn-border-lo);
   cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-size:9px; color:var(--wbtn-color);
-  font-family:'Press Start 2P',monospace; text-shadow:1px 1px 0 rgba(0,0,0,.9);
-  transition: background .1s, color .1s;
+  font-size: 10px; color: var(--wbtn-color);
+  transition: filter .1s; flex-shrink: 0;
 }
-.wbtn:hover { background: linear-gradient(135deg,var(--cat-hi),var(--border-lo)); }
+.wbtn:hover { filter: brightness(1.3); }
+@media (min-width: 900px) { .wbtn { width:28px; height:22px; font-size:13px; } }
+
+
 #wbtn-profile:hover { background: linear-gradient(135deg,#44aa44,#224422) !important; color: #aaffaa !important; }
 #wbtn-settings:hover { background: linear-gradient(135deg,#aaaa22,#444422) !important; color: #ffffaa !important; }
 #wbtn-close:hover { background: linear-gradient(135deg,#aa2222,#441111) !important; color: #ffaaaa !important; }
@@ -811,11 +829,12 @@ body {
 }
 
 /* ── FORM ROWS ── */
-.frow { margin-bottom: 12px; width: 100%; }
+.frow { margin-bottom: 14px; width: 100%; }
 .flbl {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px; color: var(--cat-orange);
-  display: block; margin-bottom: 5px; letter-spacing: .5px;
+  font-size: 7px; color: var(--cat-orange);
+  display: block; margin-bottom: 6px; letter-spacing: .5px;
+  line-height: 1.8;
 }
 
 /* ── INPUTS — full width, large enough to tap ── */
@@ -827,64 +846,81 @@ body {
   border-right-color: var(--cat-orange);
   color: var(--lcd-green);
   font-family: 'VT323', monospace;
-  font-size: 18px;
-  padding: 8px 10px;
+  font-size: 20px;
+  padding: 8px 12px;
   outline: none;
   box-sizing: border-box;
   box-shadow: inset 1px 1px 3px rgba(0,0,0,.8);
   caret-color: var(--lcd-green);
+  transition: border-color .2s;
 }
-.finput::placeholder { color: var(--border-lo); opacity: .6; }
+.finput::placeholder { color: var(--border-lo); opacity: .7; }
 .finput:focus {
   border-color: var(--cat-orange);
-  box-shadow: inset 1px 1px 3px rgba(0,0,0,.8), 0 0 5px rgba(68,221,136,.2);
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,.8), 0 0 8px rgba(68,221,136,.2);
 }
-textarea.finput { resize: vertical; min-height: 100px; line-height: 1.5; }
+textarea.finput { resize: vertical; min-height: 120px; line-height: 1.6; }
+select.finput { cursor: pointer; }
 
-.upload-title { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--cat-orange); letter-spacing:.5px; padding:4px 0 8px; border-bottom:1px solid var(--border-lo); margin-bottom:10px; }
+.upload-title {
+  font-family:'Press Start 2P',monospace; font-size:8px;
+  color: var(--cat-orange); letter-spacing:.5px;
+  padding:6px 0 10px; border-bottom:1px solid var(--border-lo); margin-bottom:14px;
+}
 
-.rgroup { display:flex; gap:8px; flex-wrap:wrap; }
-.rlbl { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--mbtn-color); display:flex; align-items:center; gap:6px; cursor:pointer; transition:color .2s; }
+.rgroup { display:flex; gap:10px; flex-wrap:wrap; }
+.rlbl {
+  font-family:'Press Start 2P',monospace; font-size:6px;
+  color:var(--mbtn-color); display:flex; align-items:center; gap:7px;
+  cursor:pointer; transition:color .2s; padding:4px 0;
+}
 .rlbl:hover { color:var(--cat-orange); }
 .rlbl input { display:none; }
 .rcust {
-  width:12px; height:12px;
-  border:1px solid var(--border-lo); border-bottom-color:var(--cat-orange); border-right-color:var(--cat-orange);
-  background:var(--vis-bg); position:relative; flex-shrink:0;
+  width:14px; height:14px; flex-shrink:0;
+  border:1px solid var(--border-lo);
+  border-bottom-color:var(--cat-orange); border-right-color:var(--cat-orange);
+  background:var(--vis-bg); position:relative;
 }
-.rlbl input:checked + .rcust::after { content:''; position:absolute; top:2px; left:2px; width:6px; height:6px; background:var(--cat-orange); box-shadow:0 0 4px rgba(68,221,136,.8); }
+.rlbl input:checked + .rcust::after {
+  content:''; position:absolute; top:2px; left:2px; width:8px; height:8px;
+  background:var(--cat-orange); box-shadow:0 0 4px rgba(68,221,136,.8);
+}
 .rlbl input:checked ~ .rtxt { color:var(--cat-orange); text-shadow:0 0 4px rgba(68,221,136,.5); }
 
 
 .audio-url-status {
-  font-family:'VT323',monospace; font-size:14px;
-  margin-top:5px; min-height:18px;
+  font-family:'VT323',monospace; font-size:16px;
+  margin-top:5px; min-height:20px;
   display:flex; align-items:center; gap:6px;
+  word-break: break-all;
 }
 .audio-url-status.ok    { color:#44ff88; }
 .audio-url-status.err   { color:#ff5544; }
 .audio-url-status.checking { color:var(--cat-orange); }
 
 .sub-btn {
-  width:100%; padding:9px; margin-top:10px;
-  background:linear-gradient(180deg,#553311,#331a08 40%,#220d04 60%,#331a08);
-  border-top:2px solid #ff9944; border-left:2px solid #ff9944;
-  border-bottom:2px solid #330800; border-right:2px solid #330800;
-  color:#ffcc66; font-family:'Press Start 2P',monospace; font-size:8px;
+  width:100%; padding:14px; margin-top:14px;
+  background: linear-gradient(180deg, var(--border-lo), var(--btn-sh));
+  border-top:2px solid var(--cat-orange); border-left:2px solid var(--cat-orange);
+  border-bottom:2px solid var(--btn-sh); border-right:2px solid var(--btn-sh);
+  color: var(--border-hi);
+  font-family:'Press Start 2P',monospace; font-size:9px;
   letter-spacing:1px; cursor:pointer; transition:all .1s;
-  text-shadow:0 0 8px rgba(255,200,100,.6); overflow:hidden; position:relative;
+  text-shadow:0 0 8px rgba(68,221,136,.6); overflow:hidden; position:relative;
 }
-.sub-btn::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,180,80,.1),transparent); transition:left .4s; }
-.sub-btn:hover { background:linear-gradient(180deg,#774422,#441a08 40%,#331108 60%,#441a08); }
+.sub-btn::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(68,221,136,.1),transparent); transition:left .4s; }
+.sub-btn:hover { filter: brightness(1.2); }
 .sub-btn:hover::before { left:100%; }
-.sub-btn:active { border-top:2px solid #330800; border-left:2px solid #330800; border-bottom:2px solid #ff9944; border-right:2px solid #ff9944; transform:translateY(1px); }
+.sub-btn:active { border-top:2px solid var(--btn-sh); border-left:2px solid var(--btn-sh); border-bottom:2px solid var(--cat-orange); border-right:2px solid var(--cat-orange); transform:translateY(1px); }
 
 .back-btn {
-  display:block; width:100%; margin-top:10px; text-align:center;
-  font-family:'Press Start 2P',monospace; font-size:6px; color:#553311; letter-spacing:.5px;
-  background:none; border:none; cursor:pointer; transition:color .2s;
+  display:block; width:100%; margin-top:14px; text-align:center; padding:8px;
+  font-family:'Press Start 2P',monospace; font-size:6px; color:var(--border-lo); letter-spacing:.5px;
+  background:none; border:1px solid var(--border-lo); cursor:pointer; transition:color .2s, border-color .2s;
 }
-.back-btn:hover { color:#ff8844; }
+.back-btn:hover { color:var(--cat-orange); border-color:var(--cat-orange); }
+
 
 
 /* ── PROMO TAB ── */
@@ -1892,8 +1928,8 @@ body.rave-mode .lcd-art img {
     <div class="titlebar">
       <span class="titlebar-text" id="titlebar-text">PromoCat v1.0 — Purrfect Tunes</span>
       <div class="wbtns">
-        <div class="wbtn" id="wbtn-bell" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;">
-          🔔
+        <div class="wbtn" id="wbtn-bell" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;font-size:12px;">
+          &#9993;
           <div class="notif-bell-badge" id="notif-bell-badge"></div>
         </div>
         <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">👤</div>
