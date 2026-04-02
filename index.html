@@ -812,7 +812,7 @@ body {
   background:var(--win-bg);
 }
 .lock-icon { font-size:36px; margin-bottom:4px; }
-.lock-title { font-family:'Press Start 2P',monospace; font-size:7px; color:#884422; letter-spacing:.5px; text-align:center; line-height:2; }
+.lock-title { font-family:'Press Start 2P',monospace; font-size:8px; color:var(--cat-orange); letter-spacing:.5px; text-align:center; line-height:2; margin-bottom:16px; }
 .lock-input {
   width:100%; background:#0d0803;
   border:1px solid #330d00; border-bottom-color:#884400; border-right-color:#884400;
@@ -2251,12 +2251,9 @@ body.rave-mode .lcd-art img {
 
       <!-- LOCK SCREEN (shown until password entered) -->
       <div class="lock-screen" id="lock-screen">
-        <div class="lock-icon">🔒</div>
-        <div class="lock-title">ADMIN ONLY<br>ENTER PASSWORD</div>
-        <input class="lock-input" type="password" id="lock-input" placeholder="••••••••"
-               onkeydown="if(event.key==='Enter')checkPass()">
-        <button class="lock-btn" onclick="checkPass()">🐾 UNLOCK 🐾</button>
-        <div class="lock-err" id="lock-err">😾 WRONG PASSWORD!</div>
+        <div class="lock-icon">🐱</div>
+        <div class="lock-title">LOG IN TO ADD TRACKS</div>
+        <button class="lock-btn" onclick="showLoginModal()">🐾 LOG IN 🐾</button>
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
       </div>
 
@@ -3353,8 +3350,7 @@ function addTrack() {
   playlist.push(t);
   renderPlaylist();
   // Immediate sync — don't debounce track adds
-  syncPlaylistToCloud();
-  notify('🐾', '"' + t.title + '" added!');
+  syncPlaylistToCloud().then(() => notify('🐾', '"' + t.title + '" saved to cloud!'));
 
   // reset form
   document.getElementById('f-title').value = '';
@@ -3781,10 +3777,12 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function delTrack(e, i) {
   e.stopPropagation();
   if (i === curIdx) stopTrack();
+  if (curIdx > i) curIdx--;
   playlist.splice(i, 1);
   if (curIdx >= playlist.length) curIdx = playlist.length - 1;
-  savePlaylist();
   renderPlaylist();
+  // Immediate sync — don't debounce deletes
+  syncPlaylistToCloud().then(() => notify('🗑️', 'Track deleted'));
 }
 
 // ─────────────── PLAYBACK ───────────────
@@ -5335,18 +5333,21 @@ function scheduleSyncToCloud() {
 
 async function syncPlaylistToCloud() {
   if (!currentUser) return;
-  // Save to this user's local cache
   cacheSet(CACHE_PLAYLIST(), playlist);
   cacheSet(CACHE_PROMO_PL(), promoPlaylists);
   cacheSet(CACHE_CONTACTS(), contacts);
-  // Push to cloud
   try {
     const { ok } = await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
     if (!ok) throw new Error('save failed');
   } catch(e) {
     // Retry once after 3 seconds
     setTimeout(async () => {
-      try { await api('PUT', '/playlist', { playlist, promoPlaylists, contacts }); } catch(e2) {}
+      try {
+        const { ok } = await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+        if (!ok) notify('⚠️', 'Sync failed — check connection');
+      } catch(e2) {
+        notify('⚠️', 'Could not reach server');
+      }
     }, 3000);
   }
 }
