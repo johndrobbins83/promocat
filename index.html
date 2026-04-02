@@ -77,6 +77,7 @@ body {
   padding: 0;
   font-family: 'VT323', monospace;
   overflow-x: hidden;
+  overflow-y: auto;
   background-image:
     radial-gradient(ellipse at 20% 20%, rgba(68,221,136,.07) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 80%, rgba(68,221,136,.04) 0%, transparent 50%),
@@ -1888,19 +1889,18 @@ body.rave-mode .lcd-art img {
   font-family: 'Press Start 2P', monospace; font-size: 6px;
   color: var(--border-lo); text-align: center; padding: 24px 16px; line-height: 2.5;
 }
-  position:fixed; bottom:20px; right:20px;
-  background:#1a0d04; border:2px solid var(--cat-orange);
-  box-shadow:0 0 20px rgba(255,140,66,.35);
+  position:fixed; bottom:20px; left:50%;
+  transform:translateX(-50%) translateY(120px);
+  background:#061410; border:2px solid var(--cat-orange);
+  box-shadow:0 0 20px rgba(68,221,136,.25);
   padding:10px 16px; z-index:9999;
   font-family:'Press Start 2P',monospace; font-size:7px;
-  color:var(--cat-orange); text-shadow:0 0 6px rgba(255,140,66,.6);
-  max-width:260px; line-height:2;
-  transform:translateY(120px);
-  opacity:0;
-  pointer-events:none;
+  color:var(--cat-orange); text-shadow:0 0 6px rgba(68,221,136,.6);
+  max-width:300px; line-height:2; white-space:nowrap;
+  opacity:0; pointer-events:none;
   transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
 }
-.notif.show { transform:translateY(0); opacity:1; pointer-events:auto; }
+.notif.show { transform:translateX(-50%) translateY(0); opacity:1; pointer-events:auto; }
 .notif-icon { font-size:16px; margin-right:6px; }
 </style>
 </head>
@@ -2768,6 +2768,11 @@ function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
+  // Clear any stale status messages when leaving upload tab
+  if (name !== 'upload') {
+    const st = document.getElementById('audio-url-status');
+    if (st) { st.textContent = ''; st.className = 'audio-url-status'; }
+  }
 }
 
 // ═══════════════════════════════════════════════
