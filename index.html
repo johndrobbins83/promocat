@@ -1834,11 +1834,12 @@ body.rave-mode .lcd-art img {
 .notif-bell-badge.show { display: flex; }
 
 .notif-panel {
-  position: fixed; top: 80px; right: 16px; z-index: 9991;
-  width: 300px; max-height: 420px;
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+  z-index: 9991;
+  width: min(300px, 90vw); max-height: 420px;
   background: var(--win-bg);
   border: 2px solid var(--border-lo);
-  box-shadow: 0 0 30px rgba(0,0,0,.8), 0 0 10px rgba(255,140,66,.2);
+  box-shadow: 0 0 30px rgba(0,0,0,.8), 0 0 10px rgba(68,221,136,.15);
   display: none; flex-direction: column;
   overflow: hidden;
 }
@@ -1889,6 +1890,8 @@ body.rave-mode .lcd-art img {
   font-family: 'Press Start 2P', monospace; font-size: 6px;
   color: var(--border-lo); text-align: center; padding: 24px 16px; line-height: 2.5;
 }
+
+.notif {
   position:fixed; bottom:20px; left:50%;
   transform:translateX(-50%) translateY(120px);
   background:#061410; border:2px solid var(--cat-orange);
