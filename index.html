@@ -2767,6 +2767,7 @@ function applyUnlock(username, role, token) {
   document.querySelectorAll('.admin-only-section').forEach(s =>
     s.style.display = (role === 'admin') ? 'block' : 'none');
   loadUserData();
+  startBgSync();
   // Show notification bell for admin, start polling
   if (role === 'admin') {
     const bellBtn = document.getElementById('wbtn-bell');
@@ -2801,6 +2802,7 @@ function logout() {
   const bellBtn = document.getElementById('wbtn-bell');
   if (bellBtn) { bellBtn.style.opacity = '0.25'; bellBtn.style.pointerEvents = 'none'; }
   document.getElementById('notif-panel').classList.remove('open');
+  stopBgSync();
   stopNotifPolling();
   notify('👋', 'Logged out');
 }
@@ -3494,27 +3496,16 @@ function cancelTrackEdit() {
 }
 
 // ─────────────── PLAYLIST PERSISTENCE ───────────────
-const PLAYLIST_STORAGE_KEY = 'promocat_playlist_v1';
+
 
 function savePlaylist() {
+  if (!currentUser) return; // never write to anonymous cache
   scheduleSyncToCloud();
 }
 
 function loadPlaylist() {
-  // Playlist loading is handled by loadCloudPlaylist() after login.
-  // On first visit before login, restore from anonymous local cache.
-  if (currentUser) return;
-  try {
-    const stored = localStorage.getItem('promocat_playlist_v1');
-    if (stored) {
-      const loaded = JSON.parse(stored);
-      if (Array.isArray(loaded) && loaded.length) {
-        playlist = loaded;
-        renderPlaylist();
-        loadTrack(0);
-      }
-    }
-  } catch(e) {}
+  // Pre-login: don't load anything — cloud will load after login
+  // This prevents stale or cross-user data from appearing
 }
 
 // ─────────────── FULL PLAYLIST URL ───────────────
@@ -4965,10 +4956,48 @@ function blankProfile() {
 // CLOUD SYNC — playlist + profiles via Worker
 // Falls back to localStorage cache when offline
 // ═══════════════════════════════════════════════
-const CACHE_PLAYLIST = () => 'promocat_playlist_' + (currentUser?.username || '_');
-const CACHE_PROFILES = () => 'promocat_profiles_' + (currentUser?.username || '_');
-const CACHE_PROMO_PL = () => 'promocat_promopl_'  + (currentUser?.username || '_');
-const CACHE_CONTACTS = () => 'promocat_contacts_' + (currentUser?.username || '_');
+// ── Per-user cache keys — never share between users or with anonymous cache ──
+const CACHE_PLAYLIST = () => currentUser ? 'pc_pl_'  + currentUser.username : null;
+const CACHE_PROFILES = () => currentUser ? 'pc_prf_' + currentUser.username : null;
+const CACHE_PROMO_PL = () => currentUser ? 'pc_ppl_' + currentUser.username : null;
+const CACHE_CONTACTS = () => currentUser ? 'pc_ct_'  + currentUser.username : null;
+
+function cacheSet(key, val) { if (key) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} } }
+function cacheGet(key)      { if (!key) return null; try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
+
+// ── Background sync — poll cloud every 60s while logged in ──
+let _bgSyncTimer = null;
+function startBgSync() {
+  stopBgSync();
+  _bgSyncTimer = setInterval(async () => {
+    if (!currentUser || !document.hasFocus()) return; // only sync when tab is active
+    try {
+      const { ok, data } = await api('GET', '/playlist', null);
+      if (!ok) return;
+      // Only update if cloud has MORE tracks than local (another device added tracks)
+      if (Array.isArray(data.playlist) && data.playlist.length > playlist.length) {
+        playlist = data.playlist;
+        cacheSet(CACHE_PLAYLIST(), playlist);
+        renderPlaylist();
+        notify('☁️', 'Playlist updated from cloud!');
+      }
+      if (Array.isArray(data.promoPlaylists) && data.promoPlaylists.length !== promoPlaylists.length) {
+        promoPlaylists = data.promoPlaylists;
+        cacheSet(CACHE_PROMO_PL(), promoPlaylists);
+      }
+      if (Array.isArray(data.contacts) && data.contacts.length !== contacts.length) {
+        contacts = data.contacts;
+        cacheSet(CACHE_CONTACTS(), contacts);
+        selectedContacts = new Set(contacts.map((_,i) => i));
+        renderContacts();
+      }
+    } catch(e) { /* offline — ignore */ }
+  }, 60000); // every 60 seconds
+}
+function stopBgSync() {
+  clearInterval(_bgSyncTimer);
+  _bgSyncTimer = null;
+}
 
 // Called once after login — pulls everything from the Worker
 async function loadUserData() {
@@ -4986,13 +5015,11 @@ async function loadUserProfiles() {
     const { ok, data } = await api('GET', '/profiles', null);
     if (ok && Array.isArray(data.profiles)) {
       artistProfiles = data.profiles;
-      localStorage.setItem(CACHE_PROFILES(), JSON.stringify(artistProfiles));
-    } else {
-      throw new Error('bad response');
-    }
+      cacheSet(CACHE_PROFILES(), artistProfiles);
+    } else throw new Error('bad response');
   } catch(e) {
-    // Offline: restore from cache
-    try { artistProfiles = JSON.parse(localStorage.getItem(CACHE_PROFILES()) || '[]'); } catch(e2) {}
+    const cached = cacheGet(CACHE_PROFILES());
+    if (cached) artistProfiles = cached;
   }
   renderRoster(); renderSettingsRoster();
   if (artistProfiles.length) { activeProfileIdx = 0; renderArtistProfile(artistProfiles[0]); }
@@ -5002,7 +5029,7 @@ function loadArtistProfileFromStorage() { /* no-op — handled by loadUserData *
 
 async function saveProfilesToStorage() {
   if (!currentUser) return;
-  localStorage.setItem(CACHE_PROFILES(), JSON.stringify(artistProfiles));
+  cacheSet(CACHE_PROFILES(), artistProfiles);
   try {
     await api('PUT', '/profiles', { profiles: artistProfiles });
   } catch(e) {
@@ -5015,44 +5042,53 @@ async function loadCloudPlaylist() {
   if (!currentUser) return;
   try {
     const { ok, data } = await api('GET', '/playlist', null);
-    if (ok) {
-      if (Array.isArray(data.playlist) && data.playlist.length) {
-        // Always take cloud as source of truth — merge by preserving current playback position
+    if (!ok) throw new Error('bad response');
+
+    // Cloud is always source of truth for this user's data
+    if (Array.isArray(data.playlist)) {
+      if (data.playlist.length > 0) {
         playlist = data.playlist;
-        localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
       } else {
-        // Cloud empty — push local cache up to cloud (first-time sync)
-        const cached = localStorage.getItem(CACHE_PLAYLIST());
-        if (cached) {
-          try {
-            playlist = JSON.parse(cached);
-            await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
-            notify('☁️', 'Local tracks synced to cloud!');
-          } catch(e2) {}
+        // Cloud empty for this user — check if we have a local cache for THIS user
+        const cached = cacheGet(CACHE_PLAYLIST());
+        if (cached && cached.length > 0) {
+          playlist = cached;
+          // Push this user's local tracks up to cloud now
+          await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+          notify('☁️', playlist.length + ' tracks synced to cloud!');
+        } else {
+          playlist = [];
         }
       }
-      if (Array.isArray(data.promoPlaylists)) {
-        promoPlaylists = data.promoPlaylists;
-        localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
-      }
-      if (Array.isArray(data.contacts)) {
-        contacts = data.contacts;
-        localStorage.setItem(CACHE_CONTACTS(), JSON.stringify(contacts));
-        selectedContacts = new Set(contacts.map((_, i) => i));
-        renderContacts();
-      }
-    } else throw new Error('bad response');
-  } catch(e) {
-    // Offline: restore from cache
-    try { playlist = JSON.parse(localStorage.getItem(CACHE_PLAYLIST()) || '[]'); } catch(e2) {}
-    try { promoPlaylists = JSON.parse(localStorage.getItem(CACHE_PROMO_PL()) || '[]'); } catch(e2) {}
-    try {
-      contacts = JSON.parse(localStorage.getItem(CACHE_CONTACTS()) || '[]');
+      cacheSet(CACHE_PLAYLIST(), playlist);
+    }
+
+    if (Array.isArray(data.promoPlaylists)) {
+      promoPlaylists = data.promoPlaylists;
+      cacheSet(CACHE_PROMO_PL(), promoPlaylists);
+    }
+    if (Array.isArray(data.contacts)) {
+      contacts = data.contacts;
+      cacheSet(CACHE_CONTACTS(), contacts);
       selectedContacts = new Set(contacts.map((_, i) => i));
       renderContacts();
-    } catch(e2) {}
+    }
+
+  } catch(e) {
+    // Offline — restore from THIS user's cache only
+    const cachedPl   = cacheGet(CACHE_PLAYLIST());
+    const cachedPpl  = cacheGet(CACHE_PROMO_PL());
+    const cachedCt   = cacheGet(CACHE_CONTACTS());
+    if (cachedPl)  playlist       = cachedPl;
+    if (cachedPpl) promoPlaylists = cachedPpl;
+    if (cachedCt)  {
+      contacts = cachedCt;
+      selectedContacts = new Set(contacts.map((_, i) => i));
+      renderContacts();
+    }
+    notify('⚠️', 'Offline — showing cached data');
   }
-  // Load first track only if nothing is playing yet
+
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
 }
@@ -5083,13 +5119,19 @@ function scheduleSyncToCloud() {
 
 async function syncPlaylistToCloud() {
   if (!currentUser) return;
-  localStorage.setItem(CACHE_PLAYLIST(), JSON.stringify(playlist));
-  localStorage.setItem(CACHE_PROMO_PL(), JSON.stringify(promoPlaylists));
-  localStorage.setItem(CACHE_CONTACTS(), JSON.stringify(contacts));
+  // Save to this user's local cache
+  cacheSet(CACHE_PLAYLIST(), playlist);
+  cacheSet(CACHE_PROMO_PL(), promoPlaylists);
+  cacheSet(CACHE_CONTACTS(), contacts);
+  // Push to cloud
   try {
-    await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+    const { ok } = await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+    if (!ok) throw new Error('save failed');
   } catch(e) {
-    // Silently cached — will retry next save
+    // Retry once after 3 seconds
+    setTimeout(async () => {
+      try { await api('PUT', '/playlist', { playlist, promoPlaylists, contacts }); } catch(e2) {}
+    }, 3000);
   }
 }
 
