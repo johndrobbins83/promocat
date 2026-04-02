@@ -2852,8 +2852,8 @@ function applyUnlock(username, role, token) {
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
-  document.getElementById('tab-promo').style.display = 'block';
-  document.getElementById('tab-settings').style.display = 'block';
+  document.getElementById('tab-promo').style.display = 'flex';
+  document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
   // Update titlebar to show logged-in user
