@@ -3001,7 +3001,7 @@ async function doRegister() {
       if (username) {
         currentUser = { username, role, token };
         applyUnlock(username, role, token);
-        notify('⚠️', 'Offline mode — changes cached locally');
+        // Silent offline restore — don't show toast on page load
       }
     } catch(e2) {}
   }
@@ -5313,9 +5313,8 @@ async function loadCloudPlaylist() {
       selectedContacts = new Set(contacts.map((_, i) => i));
       renderContacts();
     }
-    notify('⚠️', 'Offline — showing cached data');
+    // Silently use cache — don't interrupt the user with a toast on every network hiccup
   }
-
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
 }
