@@ -2982,26 +2982,24 @@ async function doRegister() {
   if (!stored) return;
   try {
     const { username, role, token } = JSON.parse(stored);
-    if (!token) { localStorage.removeItem(SESSION_KEY); return; }
-    // Verify token is still valid
-    const { ok } = await api('GET', '/verify', null);
-    // We need to set currentUser before api() can send auth header
+    if (!username || !token) { localStorage.removeItem(SESSION_KEY); return; }
+    // Set currentUser FIRST so api() sends the auth header
     currentUser = { username, role, token };
-    const verify = await api('GET', '/verify', null);
-    if (verify.ok) {
-      applyUnlock(username, verify.data.role || role, token);
+    const { ok, data } = await api('GET', '/verify', null);
+    if (ok) {
+      applyUnlock(username, data.role || role, token);
     } else {
+      // Token expired or invalid
       currentUser = null;
       localStorage.removeItem(SESSION_KEY);
     }
   } catch(e) {
-    // Server unreachable — restore from localStorage cache so app still works
+    // Server unreachable — restore from localStorage session silently
     try {
       const { username, role, token } = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
-      if (username) {
+      if (username && token) {
         currentUser = { username, role, token };
         applyUnlock(username, role, token);
-        // Silent offline restore — don't show toast on page load
       }
     } catch(e2) {}
   }
@@ -5268,28 +5266,27 @@ async function saveProfilesToStorage() {
 async function loadCloudPlaylist() {
   if (!currentUser) return;
   try {
-    const { ok, data } = await api('GET', '/playlist', null);
-    if (!ok) throw new Error('bad response');
+    const { ok, data, status } = await api('GET', '/playlist', null);
+    if (!ok) {
+      if (status === 401) { notify('🔑', 'Session expired — please log in again'); logout(); return; }
+      throw new Error('status ' + status);
+    }
 
-    // Cloud is always source of truth for this user's data
     if (Array.isArray(data.playlist)) {
       if (data.playlist.length > 0) {
         playlist = data.playlist;
       } else {
-        // Cloud empty for this user — check if we have a local cache for THIS user
         const cached = cacheGet(CACHE_PLAYLIST());
         if (cached && cached.length > 0) {
           playlist = cached;
-          // Push this user's local tracks up to cloud now
           await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
-          notify('☁️', playlist.length + ' tracks synced to cloud!');
+          notify('☁️', playlist.length + ' tracks synced!');
         } else {
           playlist = [];
         }
       }
       cacheSet(CACHE_PLAYLIST(), playlist);
     }
-
     if (Array.isArray(data.promoPlaylists)) {
       promoPlaylists = data.promoPlaylists;
       cacheSet(CACHE_PROMO_PL(), promoPlaylists);
@@ -5300,20 +5297,13 @@ async function loadCloudPlaylist() {
       selectedContacts = new Set(contacts.map((_, i) => i));
       renderContacts();
     }
-
   } catch(e) {
-    // Offline — restore from THIS user's cache only
-    const cachedPl   = cacheGet(CACHE_PLAYLIST());
-    const cachedPpl  = cacheGet(CACHE_PROMO_PL());
-    const cachedCt   = cacheGet(CACHE_CONTACTS());
+    const cachedPl  = cacheGet(CACHE_PLAYLIST());
+    const cachedPpl = cacheGet(CACHE_PROMO_PL());
+    const cachedCt  = cacheGet(CACHE_CONTACTS());
     if (cachedPl)  playlist       = cachedPl;
     if (cachedPpl) promoPlaylists = cachedPpl;
-    if (cachedCt)  {
-      contacts = cachedCt;
-      selectedContacts = new Set(contacts.map((_, i) => i));
-      renderContacts();
-    }
-    // Silently use cache — don't interrupt the user with a toast on every network hiccup
+    if (cachedCt)  { contacts = cachedCt; selectedContacts = new Set(contacts.map((_,i)=>i)); renderContacts(); }
   }
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
