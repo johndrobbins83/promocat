@@ -886,6 +886,32 @@ body {
   transform-origin: top center;
 }
 
+
+/* ── INFO PANEL INNER LAYOUT ── */
+.pl-info-panel-inner {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+}
+.pl-info-art {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-lo);
+  filter: saturate(0.8) brightness(0.85);
+}
+@media (min-width: 900px) {
+  .pl-info-art { width: 90px; height: 90px; }
+}
+.pl-info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+  flex: 1;
+}
 /* ── AVAILABILITY BADGES ── */
 .avail-badge { font-family:'Press Start 2P',monospace; font-size:5px; padding:2px 4px; white-space:nowrap;
   border-radius:1px; display:block; width:100%; text-align:center; }
@@ -2452,8 +2478,10 @@ body.rave-mode .lcd-art img {
                 </div>
                 <label class="art-drop-zone" id="art-drop-zone" for="f-art-file">
                   <span id="art-drop-label">📁 TAP TO UPLOAD IMAGE</span>
-                  <input type="file" id="f-art-file" accept="image/*" style="display:none" onchange="handleArtUpload(this)">
                 </label>
+                <input type="file" id="f-art-file" accept="image/*"
+                       style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
+                       onchange="handleArtUpload(this)">
               </div>
               <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
                 <button class="pl-act-btn" style="font-size:9px;width:auto;padding:4px 8px;height:auto;" onclick="toggleArtUrl()" id="art-url-toggle">🔗 USE URL INSTEAD</button>
@@ -4086,9 +4114,6 @@ function renderPlaylist() {
 
       <!-- RIGHT: actions -->
       <div class="pl-right" onclick="event.stopPropagation()">
-        <!-- Availability badge -->
-        <span class="pl-avail-pill" style="border-color:${ac};color:${ac};">${(t.avail||'?').toUpperCase()}</span>
-
         <!-- Star rating -->
         <div class="star-rating pl-stars" onmouseleave="hoverStars(${origIdx},0)">
           ${[1,2,3,4,5].map(s => `<span class="star${(t.rating||0)>=s?' lit':''}"
@@ -4109,9 +4134,13 @@ function renderPlaylist() {
 
       <!-- INFO PANEL (hidden by default, toggled by ℹ button) -->
       <div class="pl-info-panel" id="track-info-${origIdx}" style="display:none;">
-        ${t.bpm    ? `<span class="pl-tag">🥁 ${t.bpm} BPM</span>` : ''}
+        <div class="pl-info-panel-inner">
+          ${t.artUrl ? `<img class="pl-info-art" src="${esc(t.artUrl)}" alt="art" onerror="this.style.display='none'">` : ''}
+          <div class="pl-info-tags">
+            <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
+            ${t.status ? `<span class="pl-tag">◈ ${t.status.toUpperCase()}</span>` : ''}
+            ${t.bpm    ? `<span class="pl-tag">🥁 ${t.bpm} BPM</span>` : ''}
         ${t.year   ? `<span class="pl-tag">📅 ${t.year}</span>` : ''}
-        ${t.status ? `<span class="pl-tag">◈ ${t.status.toUpperCase()}</span>` : ''}
         ${t.category ? `<span class="pl-tag">◈ ${t.category.toUpperCase()}</span>` : ''}
         ${t.genre  ? `<span class="pl-tag">🎛 ${esc(t.genre.replace(/-/g,' ').toUpperCase())}</span>` : ''}
         ${t.buyLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY LINK</a>` : ''}
@@ -4123,6 +4152,8 @@ function renderPlaylist() {
         ${t.booking  ? `<span class="pl-tag">📅 ${esc(t.booking)}</span>` : ''}
         ${t.label    ? `<span class="pl-tag">🏷️ ${esc(t.label)}</span>` : ''}
         ${t.url     ? `<span class="pl-tag pl-tag-url" title="${esc(t.url)}">🔗 ${esc(t.url.length>50?t.url.slice(0,50)+'…':t.url)}</span>` : '<span class="pl-tag" style="color:#553322;">⚠ NO AUDIO URL</span>'}
+          </div>
+        </div>
       </div>
     </div>`;
   }).join('');
