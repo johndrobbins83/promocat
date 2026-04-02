@@ -3016,7 +3016,8 @@ const SESSION_KEY = 'promocat_session';
 
 // ── AUTH STATE ──
 let unlocked    = false;
-let currentUser = null;   // { username, role, token }
+let currentUser = null;
+let isSharedView = false; // true when viewing a shared #p= link — read-only   // { username, role, token }
 
 // ── API helper — wraps fetch with auth header + localStorage fallback ──
 async function api(method, path, body, opts = {}) {
@@ -4123,12 +4124,10 @@ function renderPlaylist() {
 
         <!-- Action buttons -->
         <div class="pl-actions">
-          ${t.wavLink ? `<a class="pl-act-btn pl-act-dl" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'});event.stopPropagation();" title="Download WAV">WAV</a>` : ''}
-          ${t.mp3Link ? `<a class="pl-act-btn pl-act-dl" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'});event.stopPropagation();" title="Download MP3">MP3</a>` : ''}
-          <button class="pl-act-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo">📤</button>
+          ${!isSharedView ? `<button class="pl-act-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo">📤</button>` : ''}
           <button class="pl-act-btn" onclick="toggleTrackInfo(event,${origIdx})" title="Track info">ℹ</button>
-          <button class="pl-act-btn" onclick="editTrack(event,${origIdx})" title="Edit">✏️</button>
-          <button class="pl-act-btn pl-act-del" onclick="delTrack(event,${origIdx})" title="Delete">✕</button>
+          ${!isSharedView ? `<button class="pl-act-btn" onclick="editTrack(event,${origIdx})" title="Edit">✏️</button>` : ''}
+          ${!isSharedView ? `<button class="pl-act-btn pl-act-del" onclick="delTrack(event,${origIdx})" title="Delete">✕</button>` : ''}
         </div>
       </div>
 
@@ -5442,6 +5441,14 @@ async function checkPromoHash() {
 
   if (!tracks || !tracks.length) return;
 
+  isSharedView = true;
+  // Hide controls that shouldn't be available to shared-link viewers
+  const uploadTab = document.getElementById('tab-upload');
+  if (uploadTab) uploadTab.style.display = 'none';
+  const promoTab = document.getElementById('tab-promo');
+  if (promoTab) promoTab.style.display = 'none';
+  const plAddBtn = document.querySelector('.pl-add-btn');
+  if (plAddBtn) plAddBtn.style.display = 'none';
   playlist = tracks.map(t => ({
     url:      t.url      || null,
     title:    t.title    || 'Unknown',
