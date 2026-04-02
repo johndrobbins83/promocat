@@ -577,21 +577,27 @@ body {
 /* Info panel — full width row below the track */
 .pl-info-panel {
   width: 100%; flex-basis: 100%;
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 8px 10px 6px 40px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 10px 12px 10px 44px;
   border-top: 1px solid #0a1a0a;
-  background: rgba(0,0,0,.3);
-  margin-top: 4px;
+  background: rgba(0,10,0,.5);
 }
 .pl-tag {
-  font-family: 'Press Start 2P', monospace; font-size: 5px;
-  color: #2a6633; background: rgba(68,221,136,.06);
-  border: 1px solid #0d2010;
-  padding: 4px 8px; white-space: nowrap; letter-spacing: .3px;
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: #88ffbb; background: rgba(68,221,136,.08);
+  border: 1px solid #1a4422;
+  padding: 4px 10px; white-space: nowrap;
+  line-height: 1.2;
 }
-.pl-tag-link { color: var(--cat-orange); border-color: #2a1a0a; text-decoration: none; cursor: pointer; }
-.pl-tag-link:hover { color: var(--lcd-green); border-color: var(--lcd-green); }
-.pl-tag-url { color: #1a4422; font-size: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.pl-tag-link {
+  color: #44aaff; border-color: #0a1a2a;
+  text-decoration: none; cursor: pointer;
+}
+.pl-tag-link:hover { color: #88ccff; border-color: #44aaff; background: rgba(68,170,255,.1); }
+.pl-tag-url {
+  color: #2a5533; font-size: 14px;
+  max-width: 240px; overflow: hidden; text-overflow: ellipsis;
+}
 
 .pl-num {
   font-family: 'Press Start 2P', monospace; font-size: 7px;
@@ -3846,13 +3852,14 @@ function renderPlaylist() {
       <div class="pl-info-panel" id="track-info-${origIdx}" style="display:none;">
         ${t.bpm    ? `<span class="pl-tag">🥁 ${t.bpm} BPM</span>` : ''}
         ${t.year   ? `<span class="pl-tag">📅 ${t.year}</span>` : ''}
-        ${t.status ? `<span class="pl-tag">${t.status.toUpperCase()}</span>` : ''}
-        ${t.category ? `<span class="pl-tag">${t.category.toUpperCase()}</span>` : ''}
-        ${t.buyLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.buyLink)}" target="_blank">🛒 BUY</a>` : ''}
-        ${t.wavLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'})">⬇ WAV</a>` : ''}
-        ${t.mp3Link ? `<a class="pl-tag pl-tag-link" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'})">⬇ MP3</a>` : ''}
-        ${t.email   ? `<a class="pl-tag pl-tag-link" href="mailto:${esc(t.email)}">✉ EMAIL</a>` : ''}
-        ${t.url     ? `<span class="pl-tag pl-tag-url" title="${esc(t.url)}">🔗 ${esc(t.url.length>40?t.url.slice(0,40)+'…':t.url)}</span>` : ''}
+        ${t.status ? `<span class="pl-tag">◈ ${t.status.toUpperCase()}</span>` : ''}
+        ${t.category ? `<span class="pl-tag">◈ ${t.category.toUpperCase()}</span>` : ''}
+        ${t.genre  ? `<span class="pl-tag">🎛 ${esc(t.genre.replace(/-/g,' ').toUpperCase())}</span>` : ''}
+        ${t.buyLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY LINK</a>` : ''}
+        ${t.wavLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'});event.stopPropagation();">⬇ DOWNLOAD WAV</a>` : ''}
+        ${t.mp3Link ? `<a class="pl-tag pl-tag-link" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'});event.stopPropagation();">⬇ DOWNLOAD MP3</a>` : ''}
+        ${t.email   ? `<a class="pl-tag pl-tag-link" href="mailto:${esc(t.email)}" onclick="event.stopPropagation()">✉ ${esc(t.email)}</a>` : ''}
+        ${t.url     ? `<span class="pl-tag pl-tag-url" title="${esc(t.url)}">🔗 ${esc(t.url.length>50?t.url.slice(0,50)+'…':t.url)}</span>` : '<span class="pl-tag" style="color:#553322;">⚠ NO AUDIO URL</span>'}
       </div>
     </div>`;
   }).join('');
