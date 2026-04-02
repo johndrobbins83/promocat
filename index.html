@@ -3663,16 +3663,19 @@ function savePlaylist() {
 // ── Purge ghost/empty tracks from playlist ──
 async function purgeGhostTracks() {
   const before = playlist.length;
-  playlist = playlist.filter(t =>
-    t.url && t.url.trim() !== '' &&
-    t.title && t.title !== 'Unknown' &&
-    t.artist && t.artist !== 'Unknown Artist'
-  );
+  playlist = playlist.filter(t => {
+    // Remove if: no URL, OR title is Unknown/blank, OR artist is Unknown Artist/blank
+    const hasUrl    = t.url && t.url.trim() !== '';
+    const hasTitle  = t.title && t.title.trim() !== '' && t.title !== 'Unknown';
+    const hasArtist = t.artist && t.artist.trim() !== '' && t.artist !== 'Unknown Artist';
+    return hasUrl && hasTitle && hasArtist;
+  });
   const removed = before - playlist.length;
   if (removed === 0) { notify('✅', 'No ghost tracks found'); return; }
   renderPlaylist();
+  if (playlist.length && curIdx >= playlist.length) curIdx = playlist.length - 1;
   await syncPlaylistToCloud();
-  notify('🗑️', removed + ' ghost track' + (removed !== 1 ? 's' : '') + ' removed!');
+  notify('🗑️', removed + ' ghost track' + (removed !== 1 ? 's' : '') + ' removed & saved!');
 }
 
 // ─────────────── FULL PLAYLIST URL ───────────────
@@ -5486,9 +5489,14 @@ function stopBgSync() {
 // Called once after login — pulls everything from the Worker
 async function loadUserData() {
   await Promise.all([ loadUserProfiles(), loadCloudPlaylist() ]);
-  // Silently remove any tracks with no URL or title (ghost tracks)
+  // Silently remove ghost tracks (no URL, or Unknown title/artist placeholders)
   const before = playlist.length;
-  playlist = playlist.filter(t => t.url && t.url.trim() !== '');
+  playlist = playlist.filter(t => {
+    const hasUrl    = t.url && t.url.trim() !== '';
+    const hasTitle  = t.title && t.title.trim() !== '' && t.title !== 'Unknown';
+    const hasArtist = t.artist && t.artist.trim() !== '' && t.artist !== 'Unknown Artist';
+    return hasUrl && hasTitle && hasArtist;
+  });
   if (playlist.length < before) {
     renderPlaylist();
     syncPlaylistToCloud();
