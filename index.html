@@ -86,11 +86,12 @@ body {
 /* ── SHELL ── */
 #shell {
   width: 100%;
-  max-width: 100%;   /* full width on mobile */
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 @media (min-width: 600px) {
   body  { padding: 24px 16px; align-items: flex-start; }
@@ -202,6 +203,9 @@ body {
               inset 1px 1px 0 rgba(255,200,100,.12), 0 0 40px rgba(255,140,66,.18);
   background: var(--win-bg);
   position: relative; z-index: 1;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .titlebar {
@@ -795,32 +799,62 @@ body {
 .lock-err.show { display:block; }
 
 /* ── UPLOAD PANEL ── */
-.upload-body { padding:10px 10px 12px; }
-.upload-title { font-family:'Press Start 2P',monospace; font-size:6px; color:#664422; letter-spacing:.5px; padding:4px 0 8px; border-bottom:1px solid #220d00; margin-bottom:10px; }
-
-.frow { margin-bottom:9px; }
-.flbl { font-family:'Press Start 2P',monospace; font-size:6px; color:#cc7722; display:block; margin-bottom:4px; letter-spacing:.5px; }
-.finput {
-  width:100%; background:#0d0803;
-  border:1px solid #330d00; border-bottom-color:#884400; border-right-color:#884400;
-  color:var(--lcd-green); font-family:'VT323',monospace; font-size:16px;
-  padding:4px 7px; outline:none;
-  box-shadow:inset 1px 1px 3px rgba(0,0,0,.8); transition:border-color .2s; caret-color:#33ff66;
+/* ── ALL PANEL BODIES — consistent mobile padding ── */
+.upload-body, .promo-body, .settings-body, .artist-body {
+  padding: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
-.finput::placeholder { color:#2a1008; }
-.finput:focus { border-color:#ff8800; border-bottom-color:#cc5500; border-right-color:#cc5500; box-shadow:inset 1px 1px 3px rgba(0,0,0,.8),0 0 5px rgba(255,136,0,.14); }
+@media (min-width: 900px) {
+  .upload-body, .promo-body, .settings-body { padding: 20px 24px 28px; }
+}
 
-.rgroup { display:flex; gap:14px; }
-.rlbl { font-family:'Press Start 2P',monospace; font-size:6px; color:#884422; display:flex; align-items:center; gap:7px; cursor:pointer; transition:color .2s; }
+/* ── FORM ROWS ── */
+.frow { margin-bottom: 12px; width: 100%; }
+.flbl {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px; color: var(--cat-orange);
+  display: block; margin-bottom: 5px; letter-spacing: .5px;
+}
+
+/* ── INPUTS — full width, large enough to tap ── */
+.finput {
+  width: 100%;
+  background: var(--vis-bg);
+  border: 1px solid var(--border-lo);
+  border-bottom-color: var(--cat-orange);
+  border-right-color: var(--cat-orange);
+  color: var(--lcd-green);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  padding: 8px 10px;
+  outline: none;
+  box-sizing: border-box;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,.8);
+  caret-color: var(--lcd-green);
+}
+.finput::placeholder { color: var(--border-lo); opacity: .6; }
+.finput:focus {
+  border-color: var(--cat-orange);
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,.8), 0 0 5px rgba(68,221,136,.2);
+}
+textarea.finput { resize: vertical; min-height: 100px; line-height: 1.5; }
+
+.upload-title { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--cat-orange); letter-spacing:.5px; padding:4px 0 8px; border-bottom:1px solid var(--border-lo); margin-bottom:10px; }
+
+.rgroup { display:flex; gap:8px; flex-wrap:wrap; }
+.rlbl { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--mbtn-color); display:flex; align-items:center; gap:6px; cursor:pointer; transition:color .2s; }
 .rlbl:hover { color:var(--cat-orange); }
 .rlbl input { display:none; }
 .rcust {
-  width:10px; height:10px;
-  border:1px solid #553311; border-bottom-color:#cc6600; border-right-color:#cc6600;
-  background:#0d0803; position:relative; flex-shrink:0;
+  width:12px; height:12px;
+  border:1px solid var(--border-lo); border-bottom-color:var(--cat-orange); border-right-color:var(--cat-orange);
+  background:var(--vis-bg); position:relative; flex-shrink:0;
 }
-.rlbl input:checked + .rcust::after { content:''; position:absolute; top:2px; left:2px; width:4px; height:4px; background:var(--cat-orange); box-shadow:0 0 4px rgba(255,140,66,.8); }
-.rlbl input:checked ~ .rtxt { color:var(--cat-orange); text-shadow:0 0 4px rgba(255,140,66,.5); }
+.rlbl input:checked + .rcust::after { content:''; position:absolute; top:2px; left:2px; width:6px; height:6px; background:var(--cat-orange); box-shadow:0 0 4px rgba(68,221,136,.8); }
+.rlbl input:checked ~ .rtxt { color:var(--cat-orange); text-shadow:0 0 4px rgba(68,221,136,.5); }
+
 
 .audio-url-status {
   font-family:'VT323',monospace; font-size:14px;
@@ -854,7 +888,6 @@ body {
 
 
 /* ── PROMO TAB ── */
-.promo-body { padding: 10px; }
 
 .promo-section {
   margin-bottom: 14px;
@@ -1393,7 +1426,6 @@ body.rave-mode .lcd-art img {
 
 
 /* ── ARTIST PROFILE TAB ── */
-.artist-body { padding: 0; }
 
 .artist-hero {
   position: relative;
@@ -1489,26 +1521,32 @@ body.rave-mode .lcd-art img {
 }
 
 /* ── SETTINGS TAB ── */
-.settings-body { padding: 10px 12px 20px; }
-@media (min-width:900px) { .settings-body { padding: 16px 20px 28px; } }
 
 .settings-section {
   margin-bottom: 18px;
   border: 1px solid var(--border-lo);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .settings-hdr {
   background: var(--pl-bar-bg);
-  padding: 5px 8px;
+  padding: 7px 10px;
   font-family: 'Press Start 2P', monospace;
   font-size: 6px; color: var(--cat-orange);
   letter-spacing: .5px;
   border-bottom: 1px solid var(--border-lo);
 }
-@media (min-width:900px) { .settings-hdr { font-size: 8px !important; padding: 7px 12px !important; } }
+@media (min-width:900px) { .settings-hdr { font-size: 8px; padding: 7px 12px; } }
 
-.settings-content { padding: 8px; background: var(--win-bg); }
-@media (min-width:900px) { .settings-content { padding: 12px !important; } }
+.settings-content {
+  padding: 12px;
+  background: var(--win-bg);
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (min-width:900px) { .settings-content { padding: 16px; } }
 
 .settings-save-btn {
   width: 100%; margin-top: 8px; padding: 8px;
@@ -2606,24 +2644,29 @@ Listen here: {link}
             </div>
           </div>
           <div class="promo-section-body">
+
+            <!-- Name field — REQUIRED before anything else -->
+            <div style="margin-bottom:10px;">
+              <label class="flbl" style="margin-bottom:5px;">🏷️ PLAYLIST NAME <span style="color:#ff4444;">*REQUIRED</span></label>
+              <input class="finput" type="text" id="promo-pl-name" placeholder="e.g. Summer DnB Promos..."
+                     style="font-size:16px;padding:6px 10px;"
+                     oninput="updatePromoNameStatus()">
+              <div id="promo-name-status" style="font-family:'VT323',monospace;font-size:13px;color:#556655;margin-top:3px;height:16px;"></div>
+            </div>
+
             <div class="flbl" style="margin-bottom:6px;">PICK TRACKS TO INCLUDE:</div>
             <div class="track-picker" id="promo-track-picker">
               <div class="contact-empty">NO TRACKS IN PLAYLIST YET</div>
             </div>
 
-            <div style="display:flex;gap:6px;align-items:center;margin:8px 0 4px;">
-              <input class="finput" type="text" id="promo-pl-name" placeholder="Playlist name..." style="flex:1;font-size:14px;padding:3px 7px;">
-              <button class="promo-btn" style="flex:0;padding:3px 8px;font-size:5px;" onclick="savePromoPlaylist()">💾 SAVE</button>
-            </div>
-
-            <div class="promo-actions">
-              <button class="promo-btn" onclick="genPromoLink()">🔗 GENERATE LINK</button>
+            <div class="promo-actions" style="margin-top:10px;">
+              <button class="promo-btn" onclick="saveAndGenerateLink()" id="btn-save-generate">💾 SAVE & GET LINK</button>
               <button class="promo-btn primary" onclick="firePromo()">🚀 SEND TO PROMO LIST</button>
             </div>
 
             <div class="promo-link-box" id="promo-link-box">
               <span class="promo-link-label">🔗 SHAREABLE LINK — CLICK TO COPY</span>
-              <div id="promo-link-text" onclick="copyPromoLink()" style="cursor:pointer;"></div>
+              <div id="promo-link-text" onclick="copyPromoLink()" style="cursor:pointer;word-break:break-all;"></div>
             </div>
           </div>
         </div>
@@ -4351,24 +4394,109 @@ function newPromoPlaylist() {
   activePromoPlIdx = -1;
   pickedTracks.clear();
   document.getElementById('promo-pl-name').value = '';
-  document.getElementById('active-promo-name').textContent = '— NEW —';
+  document.getElementById('active-promo-name').textContent = '';
+  document.getElementById('promo-link-box').classList.remove('show');
+  const status = document.getElementById('promo-name-status');
+  if (status) status.textContent = '';
   renderPromoPicker();
   renderSavedPromoList();
-  notify('➕', 'Select tracks then name & save!');
+  document.getElementById('promo-pl-name').focus();
+  notify('➕', 'Name it, pick tracks, then Save & Get Link!');
+}
+
+function updatePromoNameStatus() {
+  const name = document.getElementById('promo-pl-name').value.trim();
+  const status = document.getElementById('promo-name-status');
+  if (!status) return;
+  if (!name) {
+    status.textContent = '';
+  } else if (activePromoPlIdx >= 0 && promoPlaylists[activePromoPlIdx]?.name === name) {
+    status.textContent = '✓ Editing: ' + name;
+    status.style.color = 'var(--lcd-green)';
+  } else {
+    status.textContent = '↵ New playlist: ' + name;
+    status.style.color = 'var(--cat-orange)';
+  }
+}
+
+// Combined: require name → save → generate short link
+async function saveAndGenerateLink() {
+  const name = document.getElementById('promo-pl-name').value.trim();
+  if (!name) {
+    notify('😾', 'Give the playlist a name first!');
+    document.getElementById('promo-pl-name').focus();
+    return;
+  }
+  if (!pickedTracks.size) {
+    notify('😾', 'Pick at least one track!');
+    return;
+  }
+
+  const trackIndices = [...pickedTracks];
+  const tracks = trackIndices.filter(idx => idx < playlist.length).map(idx => playlist[idx]);
+
+  // Save locally
+  if (activePromoPlIdx >= 0) {
+    promoPlaylists[activePromoPlIdx] = { ...promoPlaylists[activePromoPlIdx], name, trackIndices };
+  } else {
+    promoPlaylists.push({ id: Date.now(), name, trackIndices, slug: null });
+    activePromoPlIdx = promoPlaylists.length - 1;
+  }
+
+  // Show generating state
+  const btn = document.getElementById('btn-save-generate');
+  if (btn) { btn.textContent = '⏳ SAVING...'; btn.disabled = true; }
+  document.getElementById('active-promo-name').textContent = name;
+
+  try {
+    // Generate short link via Worker
+    const { ok, data } = await api('POST', '/share', { name, tracks });
+    if (ok && data.slug) {
+      promoPlaylists[activePromoPlIdx].slug = data.slug;
+      const link = window.location.origin + window.location.pathname + '#p=' + data.slug;
+      window._promoLink = link;
+
+      // Show the link
+      const box = document.getElementById('promo-link-box');
+      document.getElementById('promo-link-text').textContent = link;
+      box.classList.add('show');
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Copy to clipboard automatically
+      navigator.clipboard.writeText(link)
+        .then(() => notify('🔗', '"' + name + '" saved & link copied!'))
+        .catch(() => notify('💾', '"' + name + '" saved! Click link to copy.'));
+    } else throw new Error('no slug');
+  } catch(e) {
+    // Fallback to long URL
+    const encoded = encodePlaylistToUrl(tracks);
+    const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+    window._promoLink = link;
+    document.getElementById('promo-link-text').textContent = link;
+    document.getElementById('promo-link-box').classList.add('show');
+    notify('💾', '"' + name + '" saved!');
+  }
+
+  savePromoPlaylists();
+  renderSavedPromoList();
+  if (btn) { btn.textContent = '💾 SAVE & GET LINK'; btn.disabled = false; }
+}
+
+// Keep genPromoLink as alias for backwards compat / fire promo flow
+async function genPromoLink() {
+  return saveAndGenerateLink();
 }
 
 function savePromoPlaylist() {
-  if (!pickedTracks.size) { notify('😾', 'Pick at least one track first!'); return; }
+  // Called from other places — just save without generating link
   const name = document.getElementById('promo-pl-name').value.trim();
   if (!name) { notify('😾', 'Give the playlist a name!'); return; }
-
-  // Resolve picked indices to stable track IDs by URL (so order changes don't break them)
+  if (!pickedTracks.size) { notify('😾', 'Pick at least one track first!'); return; }
   const trackIndices = [...pickedTracks];
-
   if (activePromoPlIdx >= 0) {
-    promoPlaylists[activePromoPlIdx] = { id: promoPlaylists[activePromoPlIdx].id, name, trackIndices };
+    promoPlaylists[activePromoPlIdx] = { ...promoPlaylists[activePromoPlIdx], name, trackIndices };
   } else {
-    promoPlaylists.push({ id: Date.now(), name, trackIndices });
+    promoPlaylists.push({ id: Date.now(), name, trackIndices, slug: null });
     activePromoPlIdx = promoPlaylists.length - 1;
   }
   savePromoPlaylists();
@@ -4383,6 +4511,17 @@ function loadPromoPlaylist(i) {
   pickedTracks = new Set(pl.trackIndices.filter(idx => idx < playlist.length));
   document.getElementById('promo-pl-name').value = pl.name;
   document.getElementById('active-promo-name').textContent = pl.name;
+  updatePromoNameStatus();
+  // Show existing link if we have a slug
+  if (pl.slug) {
+    const link = window.location.origin + window.location.pathname + '#p=' + pl.slug;
+    const box = document.getElementById('promo-link-box');
+    document.getElementById('promo-link-text').textContent = link;
+    box.classList.add('show');
+    window._promoLink = link;
+  } else {
+    document.getElementById('promo-link-box').classList.remove('show');
+  }
   renderPromoPicker();
   renderSavedPromoList();
   notify('📋', '"' + pl.name + '" loaded!');
@@ -4397,15 +4536,39 @@ function deletePromoPlaylist(i) {
   notify('🗑️', 'Playlist deleted');
 }
 
-function copyPromoPlaylistUrl(i) {
+async function copyPromoPlaylistUrl(i) {
   const pl = promoPlaylists[i];
   const tracks = pl.trackIndices.filter(idx => idx < playlist.length).map(idx => playlist[idx]);
   if (!tracks.length) { notify('😾', 'No valid tracks in this playlist!'); return; }
-  const encoded = encodePlaylistToUrl(tracks);
-  const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
-  navigator.clipboard.writeText(link).then(() => {
-    notify('🔗', '"' + pl.name + '" URL copied!');
-  }).catch(() => { prompt('Copy this link:', link); });
+
+  // Use stored slug if available, otherwise generate a new one
+  if (pl.slug) {
+    const link = window.location.origin + window.location.pathname + '#p=' + pl.slug;
+    navigator.clipboard.writeText(link)
+      .then(() => notify('🔗', '"' + pl.name + '" link copied!'))
+      .catch(() => prompt('Copy this link:', link));
+    return;
+  }
+
+  // Generate new short link
+  notify('⏳', 'Generating link...');
+  try {
+    const { ok, data } = await api('POST', '/share', { name: pl.name, tracks });
+    if (ok && data.slug) {
+      promoPlaylists[i].slug = data.slug;
+      savePromoPlaylists();
+      const link = window.location.origin + window.location.pathname + '#p=' + data.slug;
+      navigator.clipboard.writeText(link)
+        .then(() => notify('🔗', '"' + pl.name + '" link copied!'))
+        .catch(() => prompt('Copy this link:', link));
+    }
+  } catch(e) {
+    const encoded = encodePlaylistToUrl(tracks);
+    const link = window.location.origin + window.location.pathname + '#playlist=' + encoded;
+    navigator.clipboard.writeText(link)
+      .then(() => notify('🔗', '"' + pl.name + '" URL copied!'))
+      .catch(() => prompt('Copy this link:', link));
+  }
 }
 
 function clearPromoSelection() {
