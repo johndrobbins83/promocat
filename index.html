@@ -293,6 +293,45 @@ body {
 /* NO hover animation — it re-triggers slide-in on desktop */
 .cat-svg.bobbing { filter: drop-shadow(0 0 12px rgba(255,180,80,.85)) drop-shadow(0 0 4px rgba(255,255,100,.3)); }
 
+
+.promocat-text-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+}
+.promocat-the {
+  font-family: 'Righteous', cursive;
+  font-size: 10px;
+  color: var(--cat-orange);
+  position: absolute;
+  top: -10px;
+  left: -6px;
+  letter-spacing: 1px;
+  opacity: .85;
+  text-shadow: 0 0 6px rgba(68,221,136,.5);
+}
+@media (min-width: 900px) {
+  .promocat-the { font-size: 18px; top: -18px; left: -10px; }
+}
+
+/* ── CAT-DECO TEXTURE ── */
+.cat-deco {
+  position: relative;
+  overflow: hidden;
+}
+#cat-deco-texture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+.cat-deco > * {
+  position: relative;
+  z-index: 1;
+}
 .cat-deco { display:flex; justify-content:center; align-items:center; gap:10px; padding: 6px 0 20px; position:relative; overflow:visible; }
 .promocat-text {
   font-family: 'Righteous', cursive;
@@ -1482,6 +1521,59 @@ body.rave-mode #shine-l,
 body.rave-mode #shine-r { opacity: 0; }
 
 
+/* ── COLLAPSIBLE FORM SECTIONS ── */
+.form-section { border: 1px solid var(--border-lo); margin-bottom: 12px; }
+.form-section-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--pl-bar-bg);
+  border-bottom: 1px solid var(--border-lo);
+  cursor: pointer; user-select: none;
+  transition: background .1s;
+}
+.form-section-hdr:hover { background: rgba(68,221,136,.06); }
+.form-section-title {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--cat-orange); letter-spacing: .5px;
+}
+.form-section-arrow {
+  font-size: 10px; color: var(--border-lo);
+  transition: transform .2s;
+}
+.form-section.open .form-section-arrow { transform: rotate(180deg); }
+.form-section-body { padding: 12px; display: none; }
+.form-section.open .form-section-body { display: block; }
+
+/* ── ART UPLOAD WIDGET ── */
+.art-upload-wrap { width: 100%; }
+.art-drop-zone {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 80px;
+  border: 2px dashed var(--border-lo);
+  background: var(--vis-bg);
+  cursor: pointer; transition: border-color .2s, background .2s;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--border-lo); letter-spacing: .5px;
+  text-align: center;
+}
+.art-drop-zone:hover { border-color: var(--cat-orange); color: var(--cat-orange); background: rgba(68,221,136,.04); }
+.art-preview {
+  position: relative; width: 100%; height: 120px;
+  border: 1px solid var(--border-lo);
+}
+.art-preview img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.art-clear-btn {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,.7); border: 1px solid #ff4444;
+  color: #ff4444; width: 22px; height: 22px;
+  cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.art-clear-btn:hover { background: rgba(255,50,50,.3); }
+
 /* ── LCD ALBUM ART ── */
 .lcd-art {
   position: absolute;
@@ -2000,7 +2092,7 @@ body.rave-mode .lcd-art img {
 
     <!-- TITLE BAR -->
     <div class="titlebar">
-      <span class="titlebar-text" id="titlebar-text">PromoCat v1.0 — Purrfect Tunes</span>
+      <span class="titlebar-text" id="titlebar-text">The Promo Cat V1 — Purrfect Tunes</span>
       <div class="wbtns">
         <div class="wbtn" id="wbtn-bell" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;font-size:12px;">
           &#9993;
@@ -2017,8 +2109,8 @@ body.rave-mode .lcd-art img {
       <div class="player-body">
 
         <!-- Cat face -->
-        <div class="cat-deco">
-          <span class="promocat-text">PromoCat</span>
+        <div class="cat-deco"><canvas id="cat-deco-texture"></canvas>
+          <span class="promocat-text-wrap"><span class="promocat-the">The</span><span class="promocat-text">PromoCat</span></span>
           <span class="cat-svg-wrap"><svg class="cat-svg" viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg">
             <!-- Ears outer -->
             <polygon points="6,18 1,2 18,12" fill="#3a3a3a" stroke="#555555" stroke-width=".5"/>
@@ -2316,6 +2408,7 @@ body.rave-mode .lcd-art img {
 
         <div class="upload-title" id="upload-title">🎵 ADD TRACK TO CATAMP</div>
 
+        <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
           <label class="flbl" for="f-audio-url">🎧 AUDIO STREAM LINK</label>
           <input class="finput" type="url" id="f-audio-url"
@@ -2324,138 +2417,161 @@ body.rave-mode .lcd-art img {
           <div class="audio-url-status" id="audio-url-status"></div>
         </div>
 
-        <div class="frow">
-          <label class="flbl" for="f-title">🎼 TRACK TITLE</label>
-          <input class="finput" type="text" id="f-title" placeholder="Track title...">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-artist">🎤 ARTIST</label>
-          <input class="finput" type="text" id="f-artist" placeholder="Artist name...">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-album">💿 ALBUM</label>
-          <input class="finput" type="text" id="f-album" placeholder="Album name...">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-year">📅 YEAR</label>
-          <input class="finput" type="text" id="f-year" placeholder="e.g. 2024" maxlength="4">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-bpm">🥁 BPM <span style="color:#553311;font-size:5px;">(OPTIONAL — CAT BOBS TO THE BEAT)</span></label>
-          <input class="finput" type="number" id="f-bpm" placeholder="e.g. 140" min="40" max="300">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-genre">🎛️ GENRE</label>
-          <select class="finput" id="f-genre" style="cursor:pointer;">
-            <option value="">— Select Genre —</option>
-              <option value="ambient">Ambient</option>
-              <option value="breaks">Breaks</option>
-              <option value="chill-out">Chill Out</option>
-              <option value="disco-house">Disco House</option>
-              <option value="drum-and-bass">Drum and Bass</option>
-              <option value="dubstep">Dubstep</option>
-              <option value="edm">EDM</option>
-              <option value="electro">Electro</option>
-              <option value="glitch-hop">Glitch Hop</option>
-              <option value="hardcore">Hardcore</option>
-              <option value="hardstyle">Hardstyle</option>
-              <option value="house">House</option>
-              <option value="idm">IDM</option>
-              <option value="jungle">Jungle</option>
-              <option value="metal-rock">Metal/Rock</option>
-              <option value="techno">Techno</option>
-              <option value="trance">Trance</option>
-              <option value="trip-hop">Trip Hop</option>
-          </select>
-        </div>
-        <div class="frow">
-          <label class="flbl">🎛️ CATEGORY</label>
-          <div class="rgroup" style="flex-wrap:wrap;gap:8px 14px;">
-            <label class="rlbl">
-              <input type="radio" name="category" value="dj" checked>
-              <span class="rcust"></span>
-              <span class="rtxt">DJ STUFF</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="category" value="listen">
-              <span class="rcust"></span>
-              <span class="rtxt">LISTENING STUFF</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="category" value="nonelec">
-              <span class="rcust"></span>
-              <span class="rtxt">NON ELECTRONIC</span>
-            </label>
+        <!-- ── SECTION 1: TRACK INFO (open by default) ── -->
+        <div class="form-section open" id="fs-info">
+          <div class="form-section-hdr" onclick="toggleSection('fs-info')">
+            <span class="form-section-title">🎼 TRACK INFO</span>
+            <span class="form-section-arrow">▼</span>
+          </div>
+          <div class="form-section-body">
+
+            <div class="frow">
+              <label class="flbl" for="f-title">🎼 TITLE</label>
+              <input class="finput" type="text" id="f-title" placeholder="Track title...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-artist">🎤 ARTIST</label>
+              <input class="finput" type="text" id="f-artist" placeholder="Artist name...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-album">💿 ALBUM</label>
+              <input class="finput" type="text" id="f-album" placeholder="Album name...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-year">📅 YEAR</label>
+              <input class="finput" type="text" id="f-year" placeholder="e.g. 2024" maxlength="4">
+            </div>
+
+            <!-- Album art here -->
+            <div class="frow">
+              <label class="flbl">🖼️ ALBUM ART <span style="color:var(--border-lo);font-size:5px;">(OPTIONAL)</span></label>
+              <div class="art-upload-wrap" id="art-upload-wrap">
+                <div class="art-preview" id="art-preview" style="display:none;">
+                  <img id="art-preview-img" src="" alt="Art preview">
+                  <button class="art-clear-btn" onclick="clearArtUpload()" title="Remove">✕</button>
+                </div>
+                <label class="art-drop-zone" id="art-drop-zone" for="f-art-file">
+                  <span id="art-drop-label">📁 TAP TO UPLOAD IMAGE</span>
+                  <input type="file" id="f-art-file" accept="image/*" style="display:none" onchange="handleArtUpload(this)">
+                </label>
+              </div>
+              <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+                <button class="pl-act-btn" style="font-size:9px;width:auto;padding:4px 8px;height:auto;" onclick="toggleArtUrl()" id="art-url-toggle">🔗 USE URL INSTEAD</button>
+                <span id="art-url-status-label" style="font-family:'VT323',monospace;font-size:14px;color:var(--border-lo);"></span>
+              </div>
+              <div id="art-url-row" style="display:none;margin-top:6px;">
+                <input class="finput" type="url" id="f-art" placeholder="https://... link to image" oninput="handleArtUrlInput()">
+              </div>
+              <input type="hidden" id="f-art-data">
+            </div>
+
+            <div class="frow">
+              <label class="flbl" for="f-bpm">🥁 BPM <span style="color:var(--border-lo);font-size:5px;">(CAT BOBS TO THE BEAT)</span></label>
+              <input class="finput" type="number" id="f-bpm" placeholder="e.g. 140" min="40" max="300">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-genre">🎛️ GENRE</label>
+              <select class="finput" id="f-genre" style="cursor:pointer;">
+                <option value="">— Select Genre —</option>
+                <option value="ambient">Ambient</option>
+                <option value="breaks">Breaks</option>
+                <option value="chill-out">Chill Out</option>
+                <option value="disco-house">Disco House</option>
+                <option value="drum-and-bass">Drum and Bass</option>
+                <option value="dubstep">Dubstep</option>
+                <option value="edm">EDM</option>
+                <option value="electro">Electro</option>
+                <option value="glitch-hop">Glitch Hop</option>
+                <option value="hardcore">Hardcore</option>
+                <option value="hardstyle">Hardstyle</option>
+                <option value="house">House</option>
+                <option value="idm">IDM</option>
+                <option value="jungle">Jungle</option>
+                <option value="metal-rock">Metal/Rock</option>
+                <option value="techno">Techno</option>
+                <option value="trance">Trance</option>
+                <option value="trip-hop">Trip Hop</option>
+              </select>
+            </div>
+            <div class="frow">
+              <label class="flbl">🎛️ CATEGORY</label>
+              <div class="rgroup">
+                <label class="rlbl"><input type="radio" name="category" value="dj" checked><span class="rcust"></span><span class="rtxt">DJ STUFF</span></label>
+                <label class="rlbl"><input type="radio" name="category" value="listen"><span class="rcust"></span><span class="rtxt">LISTENING</span></label>
+                <label class="rlbl"><input type="radio" name="category" value="nonelec"><span class="rcust"></span><span class="rtxt">NON ELECTRONIC</span></label>
+              </div>
+            </div>
+            <div class="frow">
+              <label class="flbl">🔓 STATUS</label>
+              <div class="rgroup">
+                <label class="rlbl"><input type="radio" name="status" value="released" checked><span class="rcust"></span><span class="rtxt">RELEASED</span></label>
+                <label class="rlbl"><input type="radio" name="status" value="unreleased"><span class="rcust"></span><span class="rtxt">UNRELEASED</span></label>
+                <label class="rlbl"><input type="radio" name="status" value="unfinished"><span class="rcust"></span><span class="rtxt" style="color:#dddd44;">UNFINISHED</span></label>
+              </div>
+            </div>
+            <div class="frow">
+              <label class="flbl">📋 AVAILABILITY</label>
+              <div class="rgroup" style="flex-wrap:wrap;gap:8px 14px;">
+                <label class="rlbl"><input type="radio" name="avail" value="available" checked><span class="rcust"></span><span class="rtxt" style="color:#44ff88;">AVAILABLE</span></label>
+                <label class="rlbl"><input type="radio" name="avail" value="signed"><span class="rcust"></span><span class="rtxt" style="color:#8888ff;">SIGNED</span></label>
+                <label class="rlbl"><input type="radio" name="avail" value="freebie"><span class="rcust"></span><span class="rtxt" style="color:#ffdd44;">FREEBIE</span></label>
+                <label class="rlbl"><input type="radio" name="avail" value="bootleg"><span class="rcust"></span><span class="rtxt" style="color:#ff7744;">BOOTLEG</span></label>
+                <label class="rlbl"><input type="radio" name="avail" value="undecided"><span class="rcust"></span><span class="rtxt" style="color:#aaaaaa;">UNDECIDED</span></label>
+              </div>
+            </div>
+
           </div>
         </div>
-        <div class="frow">
-          <label class="flbl" for="f-buy">🛒 BUY LINK <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
-          <input class="finput" type="url" id="f-buy" placeholder="https://beatport.com/...">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-art">🖼️ ALBUM ART URL <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
-          <input class="finput" type="url" id="f-art" placeholder="https://... link to image (JPG, PNG, WEBP)">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-email">✉️ CONTACT EMAIL <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
-          <input class="finput" type="email" id="f-email" placeholder="pplprsnproject@gmail.com">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-wav">🎵 WAV DOWNLOAD LINK <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
-          <input class="finput" type="url" id="f-wav" placeholder="https://... link to WAV file">
-        </div>
-        <div class="frow">
-          <label class="flbl" for="f-mp3">🎵 MP3 DOWNLOAD LINK <span style="color:#553311;font-size:5px;">(OPTIONAL)</span></label>
-          <input class="finput" type="url" id="f-mp3" placeholder="https://... link to MP3 file">
-        </div>
-        <div class="frow">
-          <label class="flbl">🔓 STATUS</label>
-          <div class="rgroup">
-            <label class="rlbl">
-              <input type="radio" name="status" value="released" checked>
-              <span class="rcust"></span>
-              <span class="rtxt">RELEASED</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="status" value="unreleased">
-              <span class="rcust"></span>
-              <span class="rtxt">UNRELEASED</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="status" value="unfinished">
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#dddd44;">UNFINISHED</span>
-            </label>
+
+        <!-- ── SECTION 2: LINKS (collapsed by default) ── -->
+        <div class="form-section" id="fs-links">
+          <div class="form-section-hdr" onclick="toggleSection('fs-links')">
+            <span class="form-section-title">🔗 LINKS</span>
+            <span class="form-section-arrow">▼</span>
+          </div>
+          <div class="form-section-body">
+            <div class="frow">
+              <label class="flbl" for="f-buy">🛒 BUY LINK</label>
+              <input class="finput" type="url" id="f-buy" placeholder="https://beatport.com/...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-wav">⬇️ WAV DOWNLOAD</label>
+              <input class="finput" type="url" id="f-wav" placeholder="https://... link to WAV file">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-mp3">⬇️ MP3 DOWNLOAD</label>
+              <input class="finput" type="url" id="f-mp3" placeholder="https://... link to MP3 file">
+            </div>
           </div>
         </div>
-        <div class="frow">
-          <label class="flbl">📋 AVAILABILITY</label>
-          <div class="rgroup" style="flex-wrap:wrap;gap:8px 14px;">
-            <label class="rlbl">
-              <input type="radio" name="avail" value="available" checked>
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#44ff88;">AVAILABLE</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="avail" value="signed">
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#8888ff;">SIGNED</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="avail" value="freebie">
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#ffdd44;">FREEBIE</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="avail" value="bootleg">
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#ff7744;">BOOTLEG</span>
-            </label>
-            <label class="rlbl">
-              <input type="radio" name="avail" value="undecided">
-              <span class="rcust"></span>
-              <span class="rtxt" style="color:#aaaaaa;">UNDECIDED</span>
-            </label>
+
+        <!-- ── SECTION 3: CONTACT INFO (collapsed by default) ── -->
+        <div class="form-section" id="fs-contact">
+          <div class="form-section-hdr" onclick="toggleSection('fs-contact')">
+            <span class="form-section-title">📇 CONTACT INFO</span>
+            <span class="form-section-arrow">▼</span>
+          </div>
+          <div class="form-section-body">
+            <div class="frow">
+              <label class="flbl" for="f-email">✉️ CONTACT EMAIL</label>
+              <input class="finput" type="email" id="f-email" placeholder="artist@email.com">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-mgmt">🤝 MANAGEMENT</label>
+              <input class="finput" type="text" id="f-mgmt" placeholder="Manager name / agency...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-mgmt-email">✉️ MGMT EMAIL</label>
+              <input class="finput" type="email" id="f-mgmt-email" placeholder="manager@agency.com">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-booking">📅 BOOKING AGENT</label>
+              <input class="finput" type="text" id="f-booking" placeholder="Booking agent / agency...">
+            </div>
+            <div class="frow">
+              <label class="flbl" for="f-label">🏷️ LABEL</label>
+              <input class="finput" type="text" id="f-label" placeholder="Record label...">
+            </div>
           </div>
         </div>
 
@@ -2836,6 +2952,21 @@ function wbtnClose() {
 }
 
 // ─────────────── TAB SWITCHING ───────────────
+function updateTitlebar() {
+  const tb = document.getElementById('titlebar-text');
+  if (!tb) return;
+  if (!unlocked || !currentUser) {
+    tb.textContent = 'The Promo Cat V1 — Purrfect Tunes';
+    return;
+  }
+  // Figure out which playlist name to show
+  let plName = 'MAIN';
+  if (activePromoPlIdx >= 0 && promoPlaylists[activePromoPlIdx]) {
+    plName = promoPlaylists[activePromoPlIdx].name.toUpperCase();
+  }
+  tb.textContent = currentUser.username.toUpperCase() + ' · ' + plName + ' — Purrfect Tunes';
+}
+
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -2908,8 +3039,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
   // Update titlebar to show logged-in user
-  const tb = document.getElementById('titlebar-text');
-  if (tb) tb.textContent = username.toUpperCase() + ' — Purrfect Tunes';
+  updateTitlebar();
   // Update wbtn tooltips
   const wClose = document.getElementById('wbtn-close');
   if (wClose) wClose.title = 'Log Out';
@@ -2943,8 +3073,7 @@ function logout() {
   localStorage.removeItem(SESSION_KEY);
   document.body.classList.remove('admin-unlocked');
   document.getElementById('user-bar').classList.remove('show');
-  const tb2 = document.getElementById('titlebar-text');
-  if (tb2) tb2.textContent = 'PromoCat v1.0 — Purrfect Tunes';
+  updateTitlebar();
   const wClose2 = document.getElementById('wbtn-close');
   if (wClose2) wClose2.title = 'Login';
   const pill = document.getElementById('tab-user-pill');
@@ -3365,6 +3494,108 @@ function stopBob() {
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(catIntro, 100);
 });
+// ─────────────── COLLAPSIBLE FORM SECTIONS ───────────────
+function toggleSection(id) {
+  const section = document.getElementById(id);
+  if (section) section.classList.toggle('open');
+}
+
+// Open a section if it's closed (used when editing to show populated sections)
+function openSection(id) {
+  const s = document.getElementById(id);
+  if (s && !s.classList.contains('open')) s.classList.add('open');
+}
+
+function handleArtUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { notify('😾', 'Please select an image file'); return; }
+  if (file.size > 2 * 1024 * 1024) { notify('😾', 'Image too large — max 2MB'); return; }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result; // data:image/...;base64,...
+    document.getElementById('f-art-data').value = base64;
+    document.getElementById('f-art').value = ''; // clear URL field
+
+    // Show preview
+    const preview = document.getElementById('art-preview');
+    const img     = document.getElementById('art-preview-img');
+    img.src = base64;
+    preview.style.display = 'block';
+    document.getElementById('art-drop-zone').style.display = 'none';
+    document.getElementById('art-url-row').style.display = 'none';
+    document.getElementById('art-url-toggle').textContent = '🔗 USE URL INSTEAD';
+    document.getElementById('art-url-status-label').textContent = '✓ ' + file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleArtUrlInput() {
+  const url = document.getElementById('f-art').value.trim();
+  document.getElementById('f-art-data').value = url; // store URL as the art value
+  if (url) {
+    // Show small preview from URL
+    const preview = document.getElementById('art-preview');
+    const img     = document.getElementById('art-preview-img');
+    img.src = url;
+    img.onerror = () => { preview.style.display = 'none'; };
+    img.onload  = () => { preview.style.display = 'block'; document.getElementById('art-drop-zone').style.display = 'none'; };
+  }
+}
+
+function toggleArtUrl() {
+  const row = document.getElementById('art-url-row');
+  const btn = document.getElementById('art-url-toggle');
+  const isOpen = row.style.display !== 'none';
+  if (isOpen) {
+    row.style.display = 'none';
+    btn.textContent = '🔗 USE URL INSTEAD';
+  } else {
+    row.style.display = 'block';
+    btn.textContent = '✕ HIDE URL';
+    document.getElementById('f-art').focus();
+  }
+}
+
+function clearArtUpload() {
+  document.getElementById('f-art-data').value = '';
+  document.getElementById('f-art').value = '';
+  document.getElementById('f-art-file').value = '';
+  document.getElementById('art-preview').style.display = 'none';
+  document.getElementById('art-drop-zone').style.display = 'flex';
+  document.getElementById('art-url-status-label').textContent = '';
+}
+
+function resetArtField() {
+  clearArtUpload();
+  document.getElementById('art-url-row').style.display = 'none';
+  document.getElementById('art-url-toggle').textContent = '🔗 USE URL INSTEAD';
+}
+
+function getArtValue() {
+  return document.getElementById('f-art-data').value.trim() ||
+         document.getElementById('f-art').value.trim() || '';
+}
+
+function setArtValue(val) {
+  if (!val) { resetArtField(); return; }
+  document.getElementById('f-art-data').value = val;
+  if (val.startsWith('data:')) {
+    // Base64 — show in preview
+    const preview = document.getElementById('art-preview');
+    document.getElementById('art-preview-img').src = val;
+    preview.style.display = 'block';
+    document.getElementById('art-drop-zone').style.display = 'none';
+    document.getElementById('art-url-status-label').textContent = '✓ uploaded image';
+  } else {
+    // URL — show in URL field
+    document.getElementById('f-art').value = val;
+    document.getElementById('art-url-row').style.display = 'block';
+    document.getElementById('art-url-toggle').textContent = '✕ HIDE URL';
+  }
+}
+
 function checkAudioUrl() {
   const url = document.getElementById('f-audio-url').value.trim();
   const st  = document.getElementById('audio-url-status');
@@ -3397,8 +3628,12 @@ function addTrack() {
     category: document.querySelector('input[name="category"]:checked').value,
     buyLink:  document.getElementById('f-buy').value.trim(),
     avail:    document.querySelector('input[name="avail"]:checked').value,
-    artUrl:   document.getElementById('f-art').value.trim(),
+    artUrl:   getArtValue(),
     email:    document.getElementById('f-email').value.trim(),
+    mgmt:     document.getElementById('f-mgmt').value.trim(),
+    mgmtEmail:document.getElementById('f-mgmt-email').value.trim(),
+    booking:  document.getElementById('f-booking').value.trim(),
+    label:    document.getElementById('f-label').value.trim(),
     wavLink:  document.getElementById('f-wav').value.trim(),
     mp3Link:  document.getElementById('f-mp3').value.trim(),
     rating:   0
@@ -3419,8 +3654,12 @@ function addTrack() {
   document.querySelector('input[name="category"][value="dj"]').checked = true;
   document.querySelector('input[name="avail"][value="available"]').checked = true;
   document.getElementById('f-buy').value = '';
-  document.getElementById('f-art').value = '';
+  resetArtField();
   document.getElementById('f-email').value = '';
+  document.getElementById('f-mgmt').value = '';
+  document.getElementById('f-mgmt-email').value = '';
+  document.getElementById('f-booking').value = '';
+  document.getElementById('f-label').value = '';
   document.getElementById('f-wav').value = '';
   document.getElementById('f-mp3').value = '';
   document.getElementById('f-audio-url').value = '';
@@ -3577,11 +3816,19 @@ function editTrack(e, i) {
   document.getElementById('f-year').value      = t.year   || '';
   document.getElementById('f-bpm').value       = t.bpm    || '';
   document.getElementById('f-genre').value     = t.genre  || '';
-  document.getElementById('f-buy').value       = t.buyLink || '';
-  document.getElementById('f-art').value       = t.artUrl  || '';
-  document.getElementById('f-email').value     = t.email   || '';
-  document.getElementById('f-wav').value       = t.wavLink || '';
-  document.getElementById('f-mp3').value       = t.mp3Link || '';
+  setArtValue(t.artUrl || '');
+
+  // Links section
+  document.getElementById('f-buy').value   = t.buyLink || '';
+  document.getElementById('f-wav').value   = t.wavLink || '';
+  document.getElementById('f-mp3').value   = t.mp3Link || '';
+
+  // Contact section
+  document.getElementById('f-email').value      = t.email    || '';
+  document.getElementById('f-mgmt').value       = t.mgmt     || '';
+  document.getElementById('f-mgmt-email').value = t.mgmtEmail|| '';
+  document.getElementById('f-booking').value    = t.booking  || '';
+  document.getElementById('f-label').value      = t.label    || '';
 
   // Set radio buttons
   const statusRadio = document.querySelector(`input[name="status"][value="${t.status||'released'}"]`);
@@ -3590,6 +3837,11 @@ function editTrack(e, i) {
   if (catRadio) catRadio.checked = true;
   const availRadio = document.querySelector(`input[name="avail"][value="${t.avail||'undecided'}"]`);
   if (availRadio) availRadio.checked = true;
+
+  // Open sections that have data
+  document.getElementById('fs-info').classList.add('open');
+  if (t.buyLink || t.wavLink || t.mp3Link) openSection('fs-links');
+  if (t.email || t.mgmt || t.booking || t.label) openSection('fs-contact');
 
   // Update UI to show edit mode
   document.getElementById('upload-title').textContent     = '✏️ EDIT TRACK';
@@ -3621,8 +3873,12 @@ function saveTrackEdit() {
   t.bpm     = parseInt(document.getElementById('f-bpm').value)    || 0;
   t.genre   = document.getElementById('f-genre').value;
   t.buyLink = document.getElementById('f-buy').value.trim();
-  t.artUrl  = document.getElementById('f-art').value.trim();
+  t.artUrl  = getArtValue();
   t.email   = document.getElementById('f-email').value.trim();
+  t.mgmt     = document.getElementById('f-mgmt').value.trim();
+  t.mgmtEmail= document.getElementById('f-mgmt-email').value.trim();
+  t.booking  = document.getElementById('f-booking').value.trim();
+  t.label    = document.getElementById('f-label').value.trim();
   t.wavLink = document.getElementById('f-wav').value.trim();
   t.mp3Link = document.getElementById('f-mp3').value.trim();
   t.status  = document.querySelector('input[name="status"]:checked')?.value   || t.status;
@@ -3862,6 +4118,10 @@ function renderPlaylist() {
         ${t.wavLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'});event.stopPropagation();">⬇ DOWNLOAD WAV</a>` : ''}
         ${t.mp3Link ? `<a class="pl-tag pl-tag-link" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'});event.stopPropagation();">⬇ DOWNLOAD MP3</a>` : ''}
         ${t.email   ? `<a class="pl-tag pl-tag-link" href="mailto:${esc(t.email)}" onclick="event.stopPropagation()">✉ ${esc(t.email)}</a>` : ''}
+        ${t.mgmt    ? `<span class="pl-tag">🤝 ${esc(t.mgmt)}</span>` : ''}
+        ${t.mgmtEmail ? `<a class="pl-tag pl-tag-link" href="mailto:${esc(t.mgmtEmail)}" onclick="event.stopPropagation()">✉ MGMT: ${esc(t.mgmtEmail)}</a>` : ''}
+        ${t.booking  ? `<span class="pl-tag">📅 ${esc(t.booking)}</span>` : ''}
+        ${t.label    ? `<span class="pl-tag">🏷️ ${esc(t.label)}</span>` : ''}
         ${t.url     ? `<span class="pl-tag pl-tag-url" title="${esc(t.url)}">🔗 ${esc(t.url.length>50?t.url.slice(0,50)+'…':t.url)}</span>` : '<span class="pl-tag" style="color:#553322;">⚠ NO AUDIO URL</span>'}
       </div>
     </div>`;
@@ -4511,7 +4771,19 @@ function applyTheme(th) {
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  // Update cat-deco texture
+  if (window.catTexture) {
+    if (th.rave) {
+      window.catTexture.setRave(true);
+    } else {
+      window.catTexture.setRave(false);
+      window.catTexture.setColor(th.orange);
+      const pi = window.catTexture.patternForTheme(th.name);
+      window.catTexture.setPattern(pi);
+    }
+  }
 }
+
 
 
 // ═══════════════════════════════════════════════
@@ -4691,6 +4963,7 @@ function loadPromoPlaylist(i) {
   renderPromoPicker();
   renderSavedPromoList();
   notify('📋', '"' + pl.name + '" loaded!');
+  updateTitlebar();
 }
 
 function deletePromoPlaylist(i) {
@@ -4744,6 +5017,7 @@ function clearPromoSelection() {
   document.getElementById('promo-pl-name').value = '';
   renderPromoPicker();
   renderSavedPromoList();
+  updateTitlebar();
 }
 
 // ── CONTACTS ──
@@ -6130,6 +6404,283 @@ function notify(icon, msg) {
   clearTimeout(notifT);
   notifT = setTimeout(() => document.getElementById('notif').classList.remove('show'), 3000);
 }
+// ─────────────── STOP ON CLOSE / HIDE ───────────────
+
+// Stop playback when tab/window is closed or navigated away
+window.addEventListener('beforeunload', () => {
+  if (isPlaying) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+});
+
+// Stop playback when tab becomes hidden (switched away, minimised, phone locks)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isPlaying) {
+    audio.pause();
+    isPlaying = false;
+    stopBob();
+    setSt('⏸ PAUSE', false);
+    document.querySelector('.cat-svg')?.classList.remove('bobbing');
+  }
+});
+
+// pagehide covers iOS Safari which doesn't reliably fire beforeunload
+window.addEventListener('pagehide', () => {
+  if (isPlaying) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+});
+
+
+// ─────────────── CAT-DECO TEXTURE ───────────────
+(function() {
+  const PATTERNS = [
+    'grid', 'dots', 'waves', 'diagonals', 'hexagons', 'scanlines', 'circuit', 'noise'
+  ];
+  let _canvas, _ctx, _color = '#44dd88', _patIdx = 0, _rave = false, _raveHue = 0, _frame = null;
+
+  function init() {
+    _canvas = document.getElementById('cat-deco-texture');
+    if (!_canvas) return;
+    _ctx = _canvas.getContext('2d');
+    resize();
+    window.addEventListener('resize', resize);
+    draw();
+  }
+
+  function resize() {
+    if (!_canvas) return;
+    const deco = _canvas.parentElement;
+    _canvas.width  = deco.offsetWidth  * (window.devicePixelRatio || 1);
+    _canvas.height = deco.offsetHeight * (window.devicePixelRatio || 1);
+    _canvas.style.width  = deco.offsetWidth  + 'px';
+    _canvas.style.height = deco.offsetHeight + 'px';
+    draw();
+  }
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return [r,g,b];
+  }
+
+  function raveColor() {
+    // HSL cycle
+    const h = (_raveHue % 360);
+    return `hsl(${h},100%,60%)`;
+  }
+
+  function draw() {
+    if (!_ctx) return;
+    const W = _canvas.width, H = _canvas.height;
+    _ctx.clearRect(0, 0, W, H);
+
+    const col = _rave ? raveColor() : _color;
+    const pat = PATTERNS[_patIdx % PATTERNS.length];
+
+    _ctx.strokeStyle = col;
+    _ctx.fillStyle   = col;
+    _ctx.lineWidth   = Math.max(1, W / 400);
+
+    if (pat === 'grid') drawGrid(W, H);
+    else if (pat === 'dots') drawDots(W, H);
+    else if (pat === 'waves') drawWaves(W, H);
+    else if (pat === 'diagonals') drawDiagonals(W, H);
+    else if (pat === 'hexagons') drawHexagons(W, H);
+    else if (pat === 'scanlines') drawScanlines(W, H);
+    else if (pat === 'circuit') drawCircuit(W, H);
+    else drawNoise(W, H);
+  }
+
+  function drawGrid(W, H) {
+    const step = Math.round(W / 14);
+    _ctx.globalAlpha = 0.35;
+    _ctx.lineWidth = 1;
+    for (let x = 0; x <= W; x += step) { _ctx.beginPath(); _ctx.moveTo(x,0); _ctx.lineTo(x,H); _ctx.stroke(); }
+    for (let y = 0; y <= H; y += step) { _ctx.beginPath(); _ctx.moveTo(0,y); _ctx.lineTo(W,y); _ctx.stroke(); }
+    // Corner dots
+    _ctx.globalAlpha = 0.6;
+    for (let x = 0; x <= W; x += step)
+      for (let y = 0; y <= H; y += step) {
+        _ctx.beginPath(); _ctx.arc(x, y, 1.5, 0, Math.PI*2); _ctx.fill();
+      }
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawDots(W, H) {
+    const step = Math.round(W / 12);
+    const r = step * 0.12;
+    for (let x = step/2; x < W; x += step)
+      for (let y = step/2; y < H; y += step) {
+        const dist = Math.hypot(x - W/2, y - H/2) / Math.hypot(W/2, H/2);
+        _ctx.globalAlpha = 0.15 + 0.5 * (1 - dist);
+        _ctx.beginPath(); _ctx.arc(x, y, r, 0, Math.PI*2); _ctx.fill();
+      }
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawWaves(W, H) {
+    const waves = 6;
+    const amp   = H / (waves * 2.5);
+    _ctx.lineWidth = 1.5;
+    for (let i = 0; i < waves; i++) {
+      const yBase = (H / waves) * (i + 0.5);
+      const phase = (i / waves) * Math.PI;
+      _ctx.globalAlpha = 0.12 + 0.28 * (i / waves);
+      _ctx.beginPath();
+      for (let x = 0; x <= W; x += 3) {
+        const y = yBase + Math.sin((x / W) * Math.PI * 4 + phase) * amp;
+        x === 0 ? _ctx.moveTo(x, y) : _ctx.lineTo(x, y);
+      }
+      _ctx.stroke();
+    }
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawDiagonals(W, H) {
+    const step = Math.round(W / 10);
+    _ctx.lineWidth = 1;
+    for (let i = -H; i < W + H; i += step) {
+      const dist = Math.abs(i - W/2) / (W/2 + H);
+      _ctx.globalAlpha = 0.08 + 0.3 * (1 - dist);
+      _ctx.beginPath(); _ctx.moveTo(i, 0); _ctx.lineTo(i - H, H); _ctx.stroke();
+    }
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawHexagons(W, H) {
+    const r = Math.round(W / 11);
+    const dx = r * 1.732, dy = r * 1.5;
+    _ctx.lineWidth = 1;
+    for (let row = -1; row * dy < H + dy; row++) {
+      const offset = row % 2 === 0 ? 0 : dx / 2;
+      for (let col = -1; col * dx < W + dx; col++) {
+        const cx = col * dx + offset, cy = row * dy;
+        const dist = Math.hypot(cx - W/2, cy - H/2) / Math.hypot(W/2, H/2);
+        _ctx.globalAlpha = 0.08 + 0.3 * Math.max(0, 1 - dist * 1.2);
+        _ctx.beginPath();
+        for (let a = 0; a < 6; a++) {
+          const ang = (Math.PI / 3) * a - Math.PI / 6;
+          const px = cx + r * Math.cos(ang), py = cy + r * Math.sin(ang);
+          a === 0 ? _ctx.moveTo(px, py) : _ctx.lineTo(px, py);
+        }
+        _ctx.closePath(); _ctx.stroke();
+      }
+    }
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawScanlines(W, H) {
+    const step = Math.max(3, Math.round(H / 22));
+    for (let y = 0; y < H; y += step) {
+      const dist = Math.abs(y - H/2) / (H/2);
+      _ctx.globalAlpha = 0.08 + 0.25 * (1 - dist);
+      _ctx.fillRect(0, y, W, Math.max(1, step * 0.4));
+    }
+    // vertical CRT-ish pillars
+    const vstep = Math.round(W / 60);
+    _ctx.globalAlpha = 0.04;
+    for (let x = 0; x < W; x += vstep * 3) _ctx.fillRect(x, 0, 1, H);
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawCircuit(W, H) {
+    // Deterministic pseudo-random circuit traces
+    const seed = 42;
+    const rand = (n) => { let x = Math.sin(n * seed) * 10000; return x - Math.floor(x); };
+    const nodes = 18;
+    const pts = Array.from({length: nodes}, (_, i) => ({
+      x: rand(i * 2)     * W,
+      y: rand(i * 2 + 1) * H
+    }));
+    _ctx.lineWidth = 1.5;
+    pts.forEach((p, i) => {
+      const next = pts[(i + 1) % nodes];
+      const dist = Math.hypot(p.x - W/2, p.y - H/2) / Math.hypot(W/2, H/2);
+      _ctx.globalAlpha = 0.1 + 0.35 * (1 - dist);
+      _ctx.beginPath();
+      _ctx.moveTo(p.x, p.y);
+      // Manhattan-style: go horizontal then vertical
+      _ctx.lineTo(next.x, p.y);
+      _ctx.lineTo(next.x, next.y);
+      _ctx.stroke();
+      // node dot
+      _ctx.globalAlpha = 0.5 + 0.4 * (1 - dist);
+      _ctx.beginPath(); _ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); _ctx.fill();
+    });
+    _ctx.globalAlpha = 1;
+  }
+
+  function drawNoise(W, H) {
+    // Soft radial blobs
+    const blobs = 5;
+    for (let i = 0; i < blobs; i++) {
+      const seed = i + 1;
+      const bx = (Math.sin(seed * 3.1) * 0.5 + 0.5) * W;
+      const by = (Math.cos(seed * 2.7) * 0.5 + 0.5) * H;
+      const br = (W + H) / (3 + i);
+      const grad = _ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      const [r,g,b] = _rave ? [200, 0, 255] : hexToRgb(_color);
+      grad.addColorStop(0,   `rgba(${r},${g},${b},0.18)`);
+      grad.addColorStop(0.5, `rgba(${r},${g},${b},0.06)`);
+      grad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+      _ctx.fillStyle = grad;
+      _ctx.beginPath(); _ctx.arc(bx, by, br, 0, Math.PI*2); _ctx.fill();
+    }
+  }
+
+  // ── Public API ──
+  window.catTexture = {
+    setColor(hex) { _color = hex; _rave = false; draw(); },
+    setPattern(idx) { _patIdx = idx; draw(); },
+    nextPattern() { _patIdx = (_patIdx + 1) % PATTERNS.length; draw(); },
+    setRave(on) {
+      _rave = on;
+      if (on) {
+        if (_frame) return;
+        (function tick() {
+          _raveHue = (_raveHue + 2.5) % 360;
+          draw();
+          _frame = requestAnimationFrame(tick);
+        })();
+      } else {
+        if (_frame) { cancelAnimationFrame(_frame); _frame = null; }
+        draw();
+      }
+    },
+    PATTERNS,
+    get patIdx() { return _patIdx; }
+  };
+
+  // Pick a pattern per theme by name
+  window.catTexture.patternForTheme = function(themeName) {
+    const map = {
+      'JUNGLE GREEN':  'hexagons',
+      'CLASSIC CAT':   'waves',
+      'DEEP PURPLE':   'noise',
+      'ARCTIC ICE':    'grid',
+      'SAKURA PINK':   'dots',
+      'DEEP OCEAN':    'waves',
+      'BLOOD MOON':    'diagonals',
+      'SOLAR GOLD':    'circuit',
+      'GHOST WHITE':   'scanlines',
+      'NEON SUNSET':   'diagonals',
+      'MIDNIGHT BLUE': 'grid',
+      'MATRIX GREEN':  'scanlines',
+      'RAVE MODE':     'noise',
+    };
+    for (const [key, pat] of Object.entries(map)) {
+      if (themeName.toUpperCase().includes(key)) return PATTERNS.indexOf(pat);
+    }
+    return 0;
+  };
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+
 </script>
 
 <!-- ── LOGIN MODAL ── -->
