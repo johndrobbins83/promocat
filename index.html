@@ -2167,6 +2167,7 @@ body.rave-mode .lcd-art img {
           <span class="pl-count" id="pl-count">0 TRACKS</span>
           <button class="pl-bar-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
           <button class="pl-bar-btn" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud" style="margin-left:4px;">↻</button>
+          <button class="pl-bar-btn" id="debug-btn" onclick="debugSync()" title="Debug sync" style="margin-left:4px;color:#ff8844;">DBG</button>
         </div>
         <!-- FILTER BAR — compact dropdowns -->
         <div class="filter-bar">
@@ -5305,6 +5306,25 @@ async function loadCloudPlaylist() {
   }
   if (playlist.length && curIdx < 0) loadTrack(0);
   renderPlaylist();
+}
+
+// Debug — shows exactly what's in the cloud for this user
+async function debugSync() {
+  if (!currentUser) { notify('😾', 'Not logged in'); return; }
+  try {
+    const { ok, data } = await api('GET', '/debug', null);
+    if (!ok) { notify('😾', 'Debug failed'); return; }
+    const msg = [
+      'USER: ' + data.username,
+      'NEW KEY: ' + (data.newKeyExists ? '✓' : '✗') + ' (' + data.newKeyTracks + ' tracks)',
+      'LEGACY KEY: ' + (data.legacyKeyExists ? '✓' : '✗') + ' (' + data.legacyTracks + ' tracks)',
+      'LOCAL: ' + playlist.length + ' tracks',
+      data.updatedAt ? 'SAVED: ' + new Date(data.updatedAt).toLocaleTimeString() : 'NEVER SAVED'
+    ].join('\n');
+    alert(msg);
+  } catch(e) {
+    notify('😾', 'Debug error: ' + e.message);
+  }
 }
 
 // Manual refresh — pulls fresh data from cloud right now
