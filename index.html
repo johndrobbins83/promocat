@@ -109,8 +109,8 @@ body {
   display: flex;
   align-items: stretch;
   flex-wrap: wrap;
-  gap: 2px;
-  padding: 2px 2px 0;
+  gap: 3px;
+  padding: 4px 4px 0;
   position: relative;
   z-index: 2;
   background: var(--body-bg);
@@ -119,9 +119,9 @@ body {
 
 .tab {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
-  letter-spacing: .3px;
-  padding: 8px 10px 7px;
+  font-size: 7px;
+  letter-spacing: .5px;
+  padding: 11px 14px 10px;
   border: 2px solid var(--border-lo);
   border-bottom: none;
   background: var(--tab-inactive-bg);
@@ -130,16 +130,24 @@ body {
   user-select: none;
   position: relative;
   top: 2px;
-  transition: color .1s, background .1s;
+  transition: color .15s, background .15s;
   white-space: nowrap;
   flex-shrink: 0;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
 }
-.tab:hover { color: var(--tab-hover-color); background: var(--win-bg); }
+.tab:hover { color: var(--cat-orange); background: var(--win-bg); }
 .tab.active {
-  background: var(--win-bg); color: var(--border-hi);
-  text-shadow: 0 0 6px rgba(68,221,136,.6);
+  background: var(--win-bg);
+  color: var(--cat-orange);
+  text-shadow: 0 0 8px rgba(68,221,136,.8), 0 0 2px rgba(68,221,136,.4);
+  border-color: var(--border-hi);
   box-shadow: 2px 0 0 var(--border-hi), -1px 0 0 var(--border-hi), 0 -2px 0 var(--border-hi);
   top: 0; z-index: 3;
+}
+@media (min-width: 900px) {
+  .tab { font-size: 8px; padding: 10px 16px 9px; }
 }
 
 
