@@ -519,55 +519,94 @@ body {
 
 .pl-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 10px 8px;
+  padding: 10px 10px;
   cursor: pointer;
-  gap: 8px;
   border-bottom: 1px solid #0d1a0d;
   transition: background .1s;
-  min-height: 52px;
+  gap: 0;
 }
-.pl-item:hover { background:rgba(34,100,34,.2); }
-.pl-item.cur { background:rgba(34,150,34,.22); border-left:3px solid var(--lcd-green); padding-left:5px; }
-@media (min-width:900px) { .pl-item { padding:8px 16px; gap:12px; min-height: auto; } }
+.pl-item:hover { background: rgba(68,221,136,.06); }
+.pl-item.cur   { background: rgba(68,221,136,.12); border-left: 3px solid var(--lcd-green); }
+@media (min-width:900px) { .pl-item { padding: 10px 14px; } }
+
+/* LEFT side — number + title/artist, takes remaining space */
+.pl-left {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; min-width: 0; cursor: pointer;
+  padding-right: 10px;
+}
+
+/* RIGHT side — badges + stars + action buttons */
+.pl-right {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Availability pill */
+.pl-avail-pill {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  border: 1px solid; padding: 3px 6px; white-space: nowrap;
+  letter-spacing: .5px; flex-shrink: 0;
+}
+
+/* Stars on right side */
+.pl-stars { display: flex; gap: 1px; flex-shrink: 0; }
+
+/* Action button group */
+.pl-actions { display: flex; gap: 3px; flex-shrink: 0; }
+.pl-act-btn {
+  background: none; border: 1px solid #0d2010;
+  color: #2a6633; cursor: pointer;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all .15s; flex-shrink: 0;
+}
+.pl-act-btn:hover { background: rgba(68,221,136,.15); border-color: var(--cat-orange); color: var(--cat-orange); }
+.pl-act-btn.pl-act-del:hover { background: rgba(255,50,50,.15); border-color: #ff4444; color: #ff4444; }
+.pl-act-btn.pl-promo-add:hover { background: rgba(68,221,136,.2); border-color: var(--lcd-green); color: var(--lcd-green); }
+
+/* Info panel — full width row below the track */
+.pl-info-panel {
+  width: 100%; flex-basis: 100%;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 8px 10px 6px 40px;
+  border-top: 1px solid #0a1a0a;
+  background: rgba(0,0,0,.3);
+  margin-top: 4px;
+}
+.pl-tag {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: #2a6633; background: rgba(68,221,136,.06);
+  border: 1px solid #0d2010;
+  padding: 4px 8px; white-space: nowrap; letter-spacing: .3px;
+}
+.pl-tag-link { color: var(--cat-orange); border-color: #2a1a0a; text-decoration: none; cursor: pointer; }
+.pl-tag-link:hover { color: var(--lcd-green); border-color: var(--lcd-green); }
+.pl-tag-url { color: #1a4422; font-size: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 
 .pl-num {
-  font-family:'Press Start 2P',monospace; font-size:7px;
-  color:#1a5522; min-width:22px; text-align:right; flex-shrink:0;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #1a5522; min-width: 22px; text-align: right; flex-shrink: 0;
 }
-.pl-num.cur { color:var(--lcd-green); text-shadow:0 0 4px rgba(51,255,102,.8); }
-
-.pl-info { flex:1; overflow:hidden; min-width:0; }
-
+.pl-num.cur { color: var(--lcd-green); text-shadow: 0 0 4px rgba(51,255,102,.8); }
+.pl-info { flex: 1; overflow: hidden; min-width: 0; }
 .pl-title {
-  font-family:'VT323',monospace; font-size:22px;
+  font-family: 'VT323', monospace; font-size: 22px;
   color: var(--lcd-green);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  line-height:1.1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1;
 }
-.pl-item.cur .pl-title { color:#88ffaa; text-shadow:0 0 6px rgba(102,255,136,.5); }
-
+.pl-item.cur .pl-title { color: #88ffaa; text-shadow: 0 0 6px rgba(102,255,136,.5); }
 .pl-artist {
-  font-family:'VT323',monospace; font-size:17px;
-  color:#3a8844;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-family: 'VT323', monospace; font-size: 16px;
+  color: #3a8844; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
-.pl-bpm {
-  font-family:'Press Start 2P',monospace; font-size:5px;
-  color:var(--border-lo); margin-top:2px; letter-spacing:.3px;
-}
+.pl-bpm { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--border-lo); margin-top:2px; }
 @media (min-width:900px) {
-  .pl-title  { font-size:18px; }
-  .pl-artist { font-size:14px; }
-  .pl-bpm    { font-size:7px !important; margin-top:2px !important; }
+  .pl-title  { font-size: 20px; }
+  .pl-artist { font-size: 15px; }
 }
-
-.pl-del  { background:none; border:none; color:#1a3318; cursor:pointer; font-size:16px; padding:4px; line-height:1; transition:color .1s; flex-shrink:0; }
-.pl-del:hover  { color:#ff4444; }
-.pl-edit { background:none; border:none; color:#1a3318; cursor:pointer; font-size:14px; padding:4px; line-height:1; transition:color .1s; flex-shrink:0; }
-.pl-edit:hover { color:#88ff44; }
-
 .pl-empty { font-family:'Press Start 2P',monospace; font-size:7px; color:#1a3d1a; text-align:center; padding:24px 10px; line-height:2.5; }
 .pl-empty-icon { font-size:28px; display:block; margin-bottom:8px; opacity:.4; }
 
@@ -2167,6 +2206,7 @@ body.rave-mode .lcd-art img {
           <span class="pl-count" id="pl-count">0 TRACKS</span>
           <button class="pl-bar-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
           <button class="pl-bar-btn" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud" style="margin-left:4px;">↻</button>
+          <button class="pl-bar-btn admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;margin-left:4px;color:#ff8844;">🧹</button>
           <button class="pl-bar-btn" id="debug-btn" onclick="debugSync()" title="Debug sync" style="margin-left:4px;color:#ff8844;">DBG</button>
         </div>
         <!-- FILTER BAR — compact dropdowns -->
@@ -2871,6 +2911,8 @@ function applyUnlock(username, role, token) {
   if (pillName) pillName.textContent = username.toUpperCase();
   document.querySelectorAll('.admin-only-section').forEach(s =>
     s.style.display = (role === 'admin') ? 'block' : 'none');
+  document.querySelectorAll('.admin-only-btn').forEach(b =>
+    b.style.display = (role === 'admin') ? 'inline-flex' : 'none');
   loadUserData();
   startBgSync();
   // Show notification bell for admin, start polling
@@ -3605,9 +3647,19 @@ function savePlaylist() {
   scheduleSyncToCloud();
 }
 
-function loadPlaylist() {
-  // Pre-login: don't load anything — cloud will load after login
-  // This prevents stale or cross-user data from appearing
+// ── Purge ghost/empty tracks from playlist ──
+async function purgeGhostTracks() {
+  const before = playlist.length;
+  playlist = playlist.filter(t =>
+    t.url && t.url.trim() !== '' &&
+    t.title && t.title !== 'Unknown' &&
+    t.artist && t.artist !== 'Unknown Artist'
+  );
+  const removed = before - playlist.length;
+  if (removed === 0) { notify('✅', 'No ghost tracks found'); return; }
+  renderPlaylist();
+  await syncPlaylistToCloud();
+  notify('🗑️', removed + ' ghost track' + (removed !== 1 ? 's' : '') + ' removed!');
 }
 
 // ─────────────── FULL PLAYLIST URL ───────────────
@@ -3746,31 +3798,65 @@ function renderPlaylist() {
     return;
   }
 
-  list.innerHTML = filtered.map(({ t, origIdx }, dispIdx) => `
-    <div class="pl-item${origIdx===curIdx?' cur':''}" data-genre="${t.genre||''}" onclick="loadTrack(${origIdx})">
-      <span class="pl-num${origIdx===curIdx?' cur':''}">${String(dispIdx+1).padStart(2,'0')}</span>
-      <div class="star-rating" onclick="event.stopPropagation()"
-           onmouseleave="hoverStars(${origIdx},0)" style="margin-right:6px;">
-        ${[1,2,3,4,5].map(s => `<span class="star${(t.rating||0)>=s?' lit':''}"
-          onclick="setRating(${origIdx},${s})"
-          onmouseenter="hoverStars(${origIdx},${s})">★</span>`).join('')}
+  list.innerHTML = filtered.map(({ t, origIdx }, dispIdx) => {
+    const availCol = { available:'#44dd88', freebie:'#44aaff', bootleg:'#ffaa22', signed:'#ff5544', undecided:'#445544' };
+    const ac = availCol[t.avail||'undecided'] || '#445544';
+    return `
+    <div class="pl-item${origIdx===curIdx?' cur':''}" data-genre="${t.genre||''}">
+      <!-- LEFT: number + stars + info (clickable to play) -->
+      <div class="pl-left" onclick="loadTrack(${origIdx})">
+        <span class="pl-num${origIdx===curIdx?' cur':''}">${String(dispIdx+1).padStart(2,'0')}</span>
+        <div class="pl-info">
+          <div class="pl-title">${esc(t.title)}</div>
+          <div class="pl-artist">${esc(t.artist)}${t.album&&t.album!=='Unknown Album'?' · '+esc(t.album):''}${t.genre?' · '+esc(t.genre.replace(/-/g,' ')):''}</div>
+        </div>
       </div>
-      <div class="pl-info">
-        <div class="pl-title">${esc(t.title)}</div>
-        <div class="pl-artist">${esc(t.artist)}${t.album?' · '+esc(t.album):''}${t.year?' ('+esc(t.year)+')':''}${t.genre?' — '+esc(t.genre.replace(/-/g,' ')):''}</div>
-        ${t.bpm ? `<div class="pl-bpm">🥁 ${t.bpm} BPM</div>` : ''}
+
+      <!-- RIGHT: actions -->
+      <div class="pl-right" onclick="event.stopPropagation()">
+        <!-- Availability badge -->
+        <span class="pl-avail-pill" style="border-color:${ac};color:${ac};">${(t.avail||'?').toUpperCase()}</span>
+
+        <!-- Star rating -->
+        <div class="star-rating pl-stars" onmouseleave="hoverStars(${origIdx},0)">
+          ${[1,2,3,4,5].map(s => `<span class="star${(t.rating||0)>=s?' lit':''}"
+            onclick="setRating(${origIdx},${s})"
+            onmouseenter="hoverStars(${origIdx},${s})">★</span>`).join('')}
+        </div>
+
+        <!-- Action buttons -->
+        <div class="pl-actions">
+          <button class="pl-act-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo">📤</button>
+          <button class="pl-act-btn" onclick="toggleTrackInfo(event,${origIdx})" title="Track info">ℹ</button>
+          <button class="pl-act-btn" onclick="editTrack(event,${origIdx})" title="Edit">✏️</button>
+          <button class="pl-act-btn pl-act-del" onclick="delTrack(event,${origIdx})" title="Delete">✕</button>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:2px;min-width:52px;margin-left:8px;">
-        <span class="avail-badge ${t.avail||'undecided'}">${(t.avail||'UNDECIDED').toUpperCase()}</span>
-        <span class="pl-badge ${t.status}">${t.status.toUpperCase()}</span>
+
+      <!-- INFO PANEL (hidden by default, toggled by ℹ button) -->
+      <div class="pl-info-panel" id="track-info-${origIdx}" style="display:none;">
+        ${t.bpm    ? `<span class="pl-tag">🥁 ${t.bpm} BPM</span>` : ''}
+        ${t.year   ? `<span class="pl-tag">📅 ${t.year}</span>` : ''}
+        ${t.status ? `<span class="pl-tag">${t.status.toUpperCase()}</span>` : ''}
+        ${t.category ? `<span class="pl-tag">${t.category.toUpperCase()}</span>` : ''}
+        ${t.buyLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.buyLink)}" target="_blank">🛒 BUY</a>` : ''}
+        ${t.wavLink ? `<a class="pl-tag pl-tag-link" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'})">⬇ WAV</a>` : ''}
+        ${t.mp3Link ? `<a class="pl-tag pl-tag-link" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'})">⬇ MP3</a>` : ''}
+        ${t.email   ? `<a class="pl-tag pl-tag-link" href="mailto:${esc(t.email)}">✉ EMAIL</a>` : ''}
+        ${t.url     ? `<span class="pl-tag pl-tag-url" title="${esc(t.url)}">🔗 ${esc(t.url.length>40?t.url.slice(0,40)+'…':t.url)}</span>` : ''}
       </div>
-      ${t.buyLink ? `<a class="pl-btn pl-buy" href="${esc(t.buyLink)}" target="_blank" onclick="event.stopPropagation()">🛒 BUY</a>` : ''}
-      ${(t.wavLink||t.mp3Link) ? `<div class="pl-btn pl-dl" onclick="event.stopPropagation()">⬇ DL<div class="pl-dl-menu">${t.wavLink?`<a class="pl-dl-opt" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'})">WAV</a>`:''}${t.mp3Link?`<a class="pl-dl-opt" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'})">MP3</a>`:''}</div></div>` : ''}
-      ${t.email ? `<a class="pl-btn pl-email" href="mailto:${esc(t.email)}?subject=${encodeURIComponent(t.title + ' - ' + t.artist)}" onclick="event.stopPropagation()">✉️ EMAIL</a>` : ''}
-      <button class="pl-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo playlist">📤 PROMO</button>
-      <button class="pl-edit" onclick="editTrack(event,${origIdx})" title="Edit track info">✏️</button>
-      <button class="pl-del" onclick="delTrack(event,${origIdx})">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+function toggleTrackInfo(e, origIdx) {
+  e.stopPropagation();
+  const panel = document.getElementById('track-info-' + origIdx);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  // Close all others first
+  document.querySelectorAll('.pl-info-panel').forEach(p => p.style.display = 'none');
+  if (!isOpen) panel.style.display = 'flex';
 }
 
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -4807,6 +4893,103 @@ function buildTracklistText() {
   }).join('\n');
 }
 
+function buildHtmlEmail(name, tracklist, link, profileName, profileTagline) {
+  const trackRows = [...pickedTracks].map((i, n) => {
+    const t = playlist[i];
+    const avail = t.avail ? t.avail.toUpperCase() : 'AVAILABLE';
+    const availColor = {
+      'AVAILABLE': '#44dd88', 'FREEBIE': '#44aaff',
+      'BOOTLEG': '#ffaa22', 'SIGNED': '#ff5544', 'UNDECIDED': '#888888'
+    }[avail] || '#44dd88';
+    return `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #0d2010;font-family:Courier New,monospace;font-size:13px;color:#44dd88;">
+          <span style="color:#1a5522;margin-right:8px;">${String(n+1).padStart(2,'0')}</span>
+          <strong style="color:#88ffbb;">${t.title}</strong>
+          <span style="color:#3a8844;"> — ${t.artist}</span>
+          ${t.bpm ? `<span style="color:#225533;font-size:10px;"> · ${t.bpm}BPM</span>` : ''}
+        </td>
+        <td style="padding:8px 12px;border-bottom:1px solid #0d2010;text-align:right;white-space:nowrap;">
+          <span style="background:${availColor}22;color:${availColor};border:1px solid ${availColor}44;font-family:Courier New,monospace;font-size:9px;padding:2px 6px;">${avail}</span>
+        </td>
+      </tr>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PromoCat — New Music</title></head>
+<body style="margin:0;padding:0;background:#010805;font-family:Courier New,monospace;">
+<div style="max-width:580px;margin:0 auto;padding:20px;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(180deg,#88ffbb,#44dd88 30%,#004422 60%,#44dd88 80%,#66ffaa);padding:10px 16px;margin-bottom:2px;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td style="font-family:Courier New,monospace;font-size:11px;font-weight:bold;color:#010805;letter-spacing:1px;">
+        PromoCat v1.0 &mdash; Purrfect Tunes
+      </td>
+      <td align="right" style="font-family:Courier New,monospace;font-size:10px;color:#010805;">
+        &#128062; &#9881; &times;
+      </td>
+    </tr></table>
+  </div>
+
+  <!-- Window -->
+  <div style="border:2px solid #004422;background:#030e06;box-shadow:0 0 30px rgba(68,221,136,0.15);">
+
+    <!-- Cat + title section -->
+    <div style="padding:24px;text-align:center;border-bottom:1px solid #0d2010;">
+      <!-- Pixel cat SVG -->
+      <div style="margin-bottom:12px;font-size:48px;line-height:1;">&#128049;</div>
+      <div style="font-family:Courier New,monospace;font-size:28px;font-weight:bold;color:#44dd88;letter-spacing:3px;text-shadow:0 0 10px rgba(68,221,136,0.8);">
+        PromoCat
+      </div>
+      ${profileName ? `<div style="font-family:Courier New,monospace;font-size:13px;color:#3a8844;margin-top:6px;letter-spacing:1px;">${profileName.toUpperCase()}${profileTagline ? ' &mdash; ' + profileTagline : ''}</div>` : ''}
+    </div>
+
+    <!-- LCD display -->
+    <div style="background:#020e06;border:2px solid #0a1a0a;margin:16px;padding:12px 16px;position:relative;">
+      <div style="font-family:Courier New,monospace;font-size:10px;color:#1a5522;margin-bottom:6px;letter-spacing:1px;">NEW MUSIC FROM ${(profileName || 'PROMOCAT').toUpperCase()}</div>
+      <div style="font-family:Courier New,monospace;font-size:22px;color:#44dd88;text-shadow:0 0 8px rgba(68,221,136,0.9);letter-spacing:2px;">
+        Hey ${name},
+      </div>
+      <div style="font-family:Courier New,monospace;font-size:14px;color:#3a8844;margin-top:6px;line-height:1.8;">
+        Got some new music to share with you. Check out the tracks below.
+      </div>
+    </div>
+
+    <!-- Track listing -->
+    <div style="margin:0 16px 16px;">
+      <div style="background:#020e06;border:1px solid #004422;border-bottom:none;padding:6px 12px;">
+        <span style="font-family:Courier New,monospace;font-size:9px;color:#1a5522;letter-spacing:2px;">&#127908; PLAYLIST &mdash; ${[...pickedTracks].length} TRACK${[...pickedTracks].length !== 1 ? 'S' : ''}</span>
+      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #004422;">
+        ${trackRows}
+      </table>
+    </div>
+
+    <!-- CTA Button -->
+    <div style="text-align:center;padding:8px 16px 24px;">
+      <a href="${link}" style="display:inline-block;background:linear-gradient(180deg,#0e3020,#004422);border-top:2px solid #44dd88;border-left:2px solid #44dd88;border-bottom:2px solid #001a08;border-right:2px solid #001a08;color:#44dd88;font-family:Courier New,monospace;font-size:13px;font-weight:bold;letter-spacing:2px;padding:14px 32px;text-decoration:none;text-shadow:0 0 8px rgba(68,221,136,0.8);">
+        &#9654; LISTEN NOW
+      </a>
+      <div style="font-family:Courier New,monospace;font-size:10px;color:#1a5522;margin-top:8px;">
+        ${link}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top:1px solid #0d2010;padding:12px 16px;background:#020e06;">
+      <div style="font-family:Courier New,monospace;font-size:9px;color:#1a5522;text-align:center;letter-spacing:1px;line-height:2;">
+        SENT VIA PROMOCAT v1.0 &mdash; PURRFECT TUNES<br>
+        &#128049; POWERED BY CATAMP
+      </div>
+    </div>
+
+  </div><!-- /window -->
+</div>
+</body></html>`;
+}
+
 // ── FIRE PROMO ──
 function firePromo() {
   const toSend = contacts.filter((_, i) => selectedContacts.has(i));
@@ -4814,30 +4997,92 @@ function firePromo() {
   if (!pickedTracks.size) { notify('😾', 'Pick at least one track!');           return; }
 
   saveTemplate();
-  const link      = window._promoLink || genPromoLink();
+  const link      = window._promoLink || '';
   const tracklist = buildTracklistText();
   const subject   = promoTemplate.subject;
+  const profile   = artistProfiles[activeProfileIdx];
+  const profileName    = profile?.name    || '';
+  const profileTagline = profile?.tagline || '';
 
-  if (toSend.length === 1) {
-    const body = promoTemplate.body
-      .replace(/{name}/g,      toSend[0].name)
-      .replace(/{tracklist}/g, tracklist)
-      .replace(/{link}/g,      link);
-    window.location.href = 'mailto:' + encodeURIComponent(toSend[0].email) +
-      '?subject=' + encodeURIComponent(subject) +
-      '&body='    + encodeURIComponent(body);
-  } else {
-    const bcc  = toSend.map(c => c.email).join(',');
-    const body = promoTemplate.body
-      .replace(/{name}/g,      'there')
-      .replace(/{tracklist}/g, tracklist)
-      .replace(/{link}/g,      link);
-    window.location.href = 'mailto:' +
-      '?bcc='     + encodeURIComponent(bcc) +
-      '&subject=' + encodeURIComponent(subject) +
-      '&body='    + encodeURIComponent(body);
+  // Show HTML email preview modal
+  showEmailPreview(toSend, subject, link, tracklist, profileName, profileTagline);
+}
+
+function showEmailPreview(toSend, subject, link, tracklist, profileName, profileTagline) {
+  // Build HTML for first recipient (personalised) or generic
+  const firstName = toSend.length === 1 ? toSend[0].name : 'there';
+  const htmlEmail = buildHtmlEmail(firstName, tracklist, link, profileName, profileTagline);
+
+  // Plain text fallback
+  const plainBody = promoTemplate.body
+    .replace(/{name}/g,      firstName)
+    .replace(/{tracklist}/g, tracklist)
+    .replace(/{link}/g,      link);
+
+  // Show modal with copy button
+  let modal = document.getElementById('email-preview-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'email-preview-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99999;display:flex;flex-direction:column;overflow:hidden;';
+    document.body.appendChild(modal);
   }
-  notify('🚀', 'Opening mail client for ' + toSend.length + ' contact' + (toSend.length !== 1 ? 's' : '') + '!');
+
+  modal.innerHTML = `
+    <div style="background:linear-gradient(180deg,#88ffbb,#44dd88 30%,#004422 60%,#44dd88 80%,#66ffaa);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#010805;letter-spacing:1px;">📧 EMAIL PREVIEW</span>
+      <div style="display:flex;gap:6px;">
+        <button onclick="copyHtmlEmail()" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#44dd88;border:1px solid #44dd88;padding:5px 10px;cursor:pointer;">📋 COPY HTML</button>
+        <button onclick="openMailto()" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#44dd88;border:1px solid #44dd88;padding:5px 10px;cursor:pointer;">✉️ OPEN MAIL</button>
+        <button onclick="document.getElementById('email-preview-modal').style.display='none'" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#ff4444;border:1px solid #ff4444;padding:5px 10px;cursor:pointer;">✕ CLOSE</button>
+      </div>
+    </div>
+    <div style="padding:8px 14px;background:#020e06;border-bottom:1px solid #004422;flex-shrink:0;">
+      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1a5522;">TO: </span>
+      <span style="font-family:'VT323',monospace;font-size:16px;color:#44dd88;">${toSend.map(c=>c.email).join(', ')}</span>
+    </div>
+    <div style="flex:1;overflow:auto;">
+      <iframe id="email-preview-iframe" style="width:100%;height:100%;border:none;background:#fff;"></iframe>
+    </div>`;
+
+  modal.style.display = 'flex';
+
+  // Write HTML into iframe
+  const iframe = document.getElementById('email-preview-iframe');
+  iframe.srcdoc = htmlEmail;
+
+  // Store for copy/send
+  window._pendingHtmlEmail = htmlEmail;
+  window._pendingPlainEmail = plainBody;
+  window._pendingToSend = toSend;
+  window._pendingSubject = subject;
+}
+
+function copyHtmlEmail() {
+  navigator.clipboard.writeText(window._pendingHtmlEmail || '')
+    .then(() => notify('📋', 'HTML copied! Paste into Mailchimp/Gmail etc.'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = window._pendingHtmlEmail;
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      notify('📋', 'HTML copied!');
+    });
+}
+
+function openMailto() {
+  const toSend  = window._pendingToSend || [];
+  const subject = window._pendingSubject || '';
+  const body    = window._pendingPlainEmail || '';
+  if (toSend.length === 1) {
+    window.location.href = 'mailto:' + encodeURIComponent(toSend[0].email) +
+      '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  } else {
+    const bcc = toSend.map(c => c.email).join(',');
+    window.location.href = 'mailto:?bcc=' + encodeURIComponent(bcc) +
+      '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  }
+  notify('🚀', 'Opening mail client!');
 }
 
 // ── PROMO VIEW MODE: if URL has #playlist=... or legacy #promo=... load tracks ──
@@ -4902,10 +5147,9 @@ async function checkPromoHash() {
 window.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash;
   if (hash.startsWith('#playlist=') || hash.startsWith('#promo=') || hash.startsWith('#p=')) {
-    checkPromoHash(); // async — URL takes priority
-  } else {
-    loadPlaylist();
+    checkPromoHash();
   }
+  // No pre-login playlist load — cloud loads after login
   loadPromoPlaylists();
   loadTemplate();
 });
@@ -5226,6 +5470,13 @@ function stopBgSync() {
 // Called once after login — pulls everything from the Worker
 async function loadUserData() {
   await Promise.all([ loadUserProfiles(), loadCloudPlaylist() ]);
+  // Silently remove any tracks with no URL or title (ghost tracks)
+  const before = playlist.length;
+  playlist = playlist.filter(t => t.url && t.url.trim() !== '');
+  if (playlist.length < before) {
+    renderPlaylist();
+    syncPlaylistToCloud();
+  }
   if (currentUser?.role === 'admin') {
     renderInviteCodes();
     renderUserList();
