@@ -566,6 +566,13 @@ body {
 .pl-act-btn:hover { background: rgba(68,221,136,.15); border-color: var(--cat-orange); color: var(--cat-orange); }
 .pl-act-btn.pl-act-del:hover { background: rgba(255,50,50,.15); border-color: #ff4444; color: #ff4444; }
 .pl-act-btn.pl-promo-add:hover { background: rgba(68,221,136,.2); border-color: var(--lcd-green); color: var(--lcd-green); }
+.pl-act-btn.pl-act-dl {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  text-decoration: none; letter-spacing: .3px;
+  color: #44aaff; border-color: #0a1a2a;
+  width: auto; padding: 0 7px;
+}
+.pl-act-btn.pl-act-dl:hover { background: rgba(68,170,255,.15); border-color: #44aaff; color: #88ccff; }
 
 /* Info panel — full width row below the track */
 .pl-info-panel {
@@ -3826,6 +3833,8 @@ function renderPlaylist() {
 
         <!-- Action buttons -->
         <div class="pl-actions">
+          ${t.wavLink ? `<a class="pl-act-btn pl-act-dl" href="${esc(t.wavLink)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'WAV'});event.stopPropagation();" title="Download WAV">WAV</a>` : ''}
+          ${t.mp3Link ? `<a class="pl-act-btn pl-act-dl" href="${esc(t.mp3Link)}" target="_blank" download onclick="fireTrackEvent('download',playlist[${origIdx}],{format:'MP3'});event.stopPropagation();" title="Download MP3">MP3</a>` : ''}
           <button class="pl-act-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo">📤</button>
           <button class="pl-act-btn" onclick="toggleTrackInfo(event,${origIdx})" title="Track info">ℹ</button>
           <button class="pl-act-btn" onclick="editTrack(event,${origIdx})" title="Edit">✏️</button>
