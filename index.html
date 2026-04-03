@@ -551,7 +551,7 @@ body {
 .pl-bar-title { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--cat-orange); letter-spacing:.5px; }
 .pl-count { font-family:'Press Start 2P',monospace; font-size:7px; color:#2a6633; }
 
-.pl-list { background:var(--pl-list-bg); min-height:120px; max-height:calc(100dvh - 540px); overflow-y:auto; }
+.pl-list { background:var(--pl-list-bg); min-height:120px; max-height:calc(100dvh - 490px); overflow-y:auto; }
 @media (min-width: 900px) { .pl-list { max-height:420px; }
   .pl-title  { font-size:20px !important; }
   .pl-artist { font-size:16px !important; }
@@ -2435,17 +2435,23 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn" data-genre="trip-hop" onclick="setGenre('trip-hop');closeFilters()">TRIP HOP</button>
             </div>
           </div>
+          <!-- Sort -->
+          <div class="filter-group" id="fg-sort">
+            <button class="filter-toggle has-filter" id="ft-sort" onclick="toggleFilter('sort')">
+              <span class="active-dot" style="display:inline-block;"></span>SORT <span class="arrow">&#9660;</span>
+            </button>
+            <div class="filter-dropdown" id="fd-sort">
+              <button class="cat-btn on" data-sort="title-az" onclick="setSort('title-az');closeFilters()">A &#8594; Z</button>
+              <button class="cat-btn"    data-sort="title-za" onclick="setSort('title-za');closeFilters()">Z &#8594; A</button>
+              <button class="cat-btn"    data-sort="artist"   onclick="setSort('artist');closeFilters()">ARTIST</button>
+              <button class="cat-btn"    data-sort="album"    onclick="setSort('album');closeFilters()">ALBUM</button>
+              <button class="cat-btn"    data-sort="genre"    onclick="setSort('genre');closeFilters()">GENRE</button>
+              <button class="cat-btn"    data-sort="avail"    onclick="setSort('avail');closeFilters()">STATUS</button>
+              <button class="cat-btn"    data-sort="rating"   onclick="setSort('rating');closeFilters()">&#9733; RATING</button>
+            </div>
+          </div>
         </div>
-        <!-- SORT BAR — always visible -->
-        <div class="sort-bar">
-          <span class="sort-bar-label">SORT:</span>
-          <button class="sort-btn on" data-sort="default" onclick="setSort('default')">DEFAULT</button>
-          <button class="sort-btn"    data-sort="artist"  onclick="setSort('artist')">ARTIST</button>
-          <button class="sort-btn"    data-sort="album"   onclick="setSort('album')">ALBUM</button>
-          <button class="sort-btn"    data-sort="avail"   onclick="setSort('avail')">STATUS</button>
-          <button class="sort-btn"    data-sort="rating"  onclick="setSort('rating')">★ RATING</button>
-          <button class="sort-btn"    data-sort="genre"   onclick="setSort('genre')">GENRE</button>
-        </div>
+
         <div class="pl-list" id="pl-list">
           <div class="pl-empty">
             <span class="pl-empty-icon">🎵😾🎵</span>
@@ -4112,7 +4118,7 @@ function addToPromo(e, origIdx) {
 
 
 let activeCat   = 'all';
-let activeSort  = 'default';
+let activeSort  = 'title-az';
 let activeAvail = 'all';
 let activeGenre = 'all';
 
@@ -4166,7 +4172,11 @@ function renderPlaylist() {
 
   // Sort
   const availOrder = { available:0, freebie:1, bootleg:2, undecided:3, signed:4 };
-  if (activeSort === 'artist') {
+  if (activeSort === 'title-az') {
+    filtered.sort((a, b) => a.t.title.localeCompare(b.t.title));
+  } else if (activeSort === 'title-za') {
+    filtered.sort((a, b) => b.t.title.localeCompare(a.t.title));
+  } else if (activeSort === 'artist') {
     filtered.sort((a, b) => a.t.artist.localeCompare(b.t.artist));
   } else if (activeSort === 'album') {
     filtered.sort((a, b) => a.t.album.localeCompare(b.t.album));
