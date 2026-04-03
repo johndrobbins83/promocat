@@ -777,6 +777,8 @@ body {
   transition:background .1s,color .1s,opacity .3s;
 }
 .pl-bar-btn:hover { background:rgba(0,120,40,.5); color:#88ffcc; }
+.pl-bar-btn-copy { font-size:8px !important; padding:6px 14px !important; border-color:var(--lcd-green) !important; color:var(--lcd-green) !important; letter-spacing:.5px !important; }
+@media (min-width:900px) { .pl-bar-btn-copy { font-size:9px !important; padding:7px 18px !important; } }
 #refresh-btn { font-size:10px; padding:1px 5px; letter-spacing:0; }
 #refresh-btn:hover { animation: spin 0.6s linear; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -891,10 +893,9 @@ body {
 
 
 /* Cat eye squint — eyelid rects controlled by JS setAttribute */
-#eyelid-l, #eyelid-r {
-  transition: transform 0.4s ease;
+#eyelid-l, #eyelid-r, #eyelid-bl, #eyelid-br {
+  transition: transform 0.3s ease;
   transform-box: fill-box;
-  transform-origin: top center;
 }
 
 
@@ -2200,8 +2201,11 @@ body.rave-mode .lcd-art img {
             <circle cx="22" cy="21" r=".7" fill="white" opacity=".7"/>
             <circle cx="40" cy="21" r=".7" fill="white" opacity=".7"/>
             <!-- Eyelids (squint overlays — animated by JS class + CSS) -->
-            <rect id="eyelid-l" x="16" y="16" width="10" height="6" rx="1" fill="#4a4a4a" style="transform-origin:16px 16px;transform:scaleY(0);"/>
-            <rect id="eyelid-r" x="34" y="16" width="10" height="6" rx="1" fill="#4a4a4a" style="transform-origin:34px 16px;transform:scaleY(0);"/>
+            <rect id="eyelid-l"     x="16" y="16" width="10" height="7" rx="1" fill="#4a4a4a" style="transform-box:fill-box;transform-origin:top center;transform:scaleY(0);"/>
+            <rect id="eyelid-r"     x="34" y="16" width="10" height="7" rx="1" fill="#4a4a4a" style="transform-box:fill-box;transform-origin:top center;transform:scaleY(0);"/>
+            <!-- Bottom eyelids — rise up from bottom (angry/intense squint) -->
+            <rect id="eyelid-bl"    x="16" y="22" width="10" height="7" rx="1" fill="#4a4a4a" style="transform-box:fill-box;transform-origin:bottom center;transform:scaleY(0);"/>
+            <rect id="eyelid-br"    x="34" y="22" width="10" height="7" rx="1" fill="#4a4a4a" style="transform-box:fill-box;transform-origin:bottom center;transform:scaleY(0);"/>
             <!-- Nose -->
             <polygon points="30,28 27.5,31 32.5,31" fill="#cc7799"/>
             <!-- Mouth — dynamic via JS -->
@@ -2375,10 +2379,11 @@ body.rave-mode .lcd-art img {
         <div class="pl-bar">
           <span class="pl-bar-title">🐾 PLAYLIST</span>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
-          <button class="pl-bar-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
-          <button class="pl-bar-btn" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud" style="margin-left:4px;">↻</button>
-          <button class="pl-bar-btn admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;margin-left:4px;color:#ff8844;">🧹</button>
-          <button class="pl-bar-btn" id="debug-btn" onclick="debugSync()" title="Debug sync" style="margin-left:4px;color:#ff8844;">DBG</button>
+          <div style="display:flex;gap:4px;align-items:center;margin-left:auto;">
+            <button class="pl-bar-btn pl-bar-btn-copy" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud">↻</button>
+            <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;color:#ff8844;">🧹</button>
+          </div>
         </div>
         <!-- FILTER BAR — compact dropdowns -->
         <div class="filter-bar">
@@ -2841,6 +2846,7 @@ body.rave-mode .lcd-art img {
         </div>
 
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+        <button class="back-btn" id="debug-btn" onclick="debugSync()" style="color:#ff8844;border-color:#662200;margin-top:6px;">🔧 DEBUG SYNC</button>
 
         <!-- ══ ADMIN ONLY: INVITE CODES & USERS ══ -->
         <div class="admin-only-section" style="display:none;">
@@ -4276,13 +4282,45 @@ function delTrack(e, i) {
 }
 
 // ─────────────── PLAYBACK ───────────────
-function setEyeSquint(scale) {
-  const el = document.getElementById('eyelid-l');
-  const er = document.getElementById('eyelid-r');
-  if (!el || !er) return;
-  const s = parseFloat(scale) || 0;
-  el.style.transform = `scaleY(${s})`;
-  er.style.transform = `scaleY(${s})`;
+function setEyeSquint(bpm) {
+  const tl  = document.getElementById('eyelid-l');
+  const tr  = document.getElementById('eyelid-r');
+  const bl  = document.getElementById('eyelid-bl');
+  const br  = document.getElementById('eyelid-br');
+  if (!tl || !tr) return;
+
+  // Reset all
+  tl.style.transform = 'scaleY(0)';
+  tr.style.transform = 'scaleY(0)';
+  if (bl) bl.style.transform = 'scaleY(0)';
+  if (br) br.style.transform = 'scaleY(0)';
+
+  if (!bpm || bpm <= 0) return; // no track — eyes open
+
+  if (bpm < 90) {
+    // 0–89 BPM: half closed from TOP — lazy/sleepy
+    tl.style.transform = 'scaleY(0.55)';
+    tr.style.transform = 'scaleY(0.55)';
+  } else if (bpm < 136) {
+    // 90–135 BPM: eyes fully open — normal/alert
+    // (all already at scaleY(0))
+  } else if (bpm < 166) {
+    // 136–165 BPM: half shut from BOTTOM — focused
+    if (bl) bl.style.transform = 'scaleY(0.5)';
+    if (br) br.style.transform = 'scaleY(0.5)';
+  } else if (bpm < 191) {
+    // 166–190 BPM: tightly squinted — angry/intense
+    tl.style.transform = 'scaleY(0.35)';
+    tr.style.transform = 'scaleY(0.35)';
+    if (bl) bl.style.transform = 'scaleY(0.65)';
+    if (br) br.style.transform = 'scaleY(0.65)';
+  } else {
+    // 191+ BPM: eyes shut tight
+    tl.style.transform = 'scaleY(1)';
+    tr.style.transform = 'scaleY(1)';
+    if (bl) bl.style.transform = 'scaleY(1)';
+    if (br) br.style.transform = 'scaleY(1)';
+  }
 }
 
 function setCatMouth(bpm) {
@@ -4372,9 +4410,7 @@ function loadTrack(i) {
     catSvg.style.setProperty('--bob-dur', dur);
     document.documentElement.style.setProperty('--bob-dur', dur);
     document.getElementById('lcd-bpm').textContent = bpm + ' BPM';
-    const t_val = Math.min(1, Math.max(0, (bpm - 40) / 260));
-    const squintScale = (0.05 + t_val * 0.85).toFixed(2);
-    setEyeSquint(squintScale);
+    setEyeSquint(bpm);
     setCatMouth(bpm);
   } else {
     catSvg.style.setProperty('--bob-dur', '0.5s');
@@ -4556,6 +4592,7 @@ const THEMES = [
   { name:'🧡 NEON SUNSET',    orange:'#ff6600', hi:'#ff9933',  borderLo:'#882200', borderHi:'#ff8800', winBg:'#1a0800', lcdBg:'#100500', lcdGreen:'#ffaa00', btnBg:'#3a1500', btnSh:'#550d00', visBg:'#080200', bodyBg:'#0e0400' },
   { name:'🌙 MIDNIGHT BLUE',  orange:'#6688ff', hi:'#99aaff',  borderLo:'#223388', borderHi:'#8899ff', winBg:'#080c1e', lcdBg:'#040814', lcdGreen:'#4466ff', btnBg:'#121830', btnSh:'#040c28', visBg:'#020408', bodyBg:'#040810' },
   { name:'🍀 MATRIX GREEN',   orange:'#00ff44', hi:'#66ff88',  borderLo:'#006622', borderHi:'#00ff66', winBg:'#010e04', lcdBg:'#000a02', lcdGreen:'#00ff44', btnBg:'#051a08', btnSh:'#003010', visBg:'#000600', bodyBg:'#010802' },
+  { name:'🕺 DISCO FUNK',     orange:'#e8821a', hi:'#5fbbaa',  borderLo:'#4a3728', borderHi:'#f0a830', winBg:'#2a1e14', lcdBg:'#1a0e08', lcdGreen:'#5fbbaa', btnBg:'#3d2614', btnSh:'#1a0e06', visBg:'#100800', bodyBg:'#1e1008' },
   { name:'🪩 RAVE MODE',         orange:'#ff00ff', hi:'#00ffff',  borderLo:'#660066', borderHi:'#ff00ff', winBg:'#050005', lcdBg:'#000505', lcdGreen:'#00ffff', btnBg:'#1a0020', btnSh:'#200010', visBg:'#020002', bodyBg:'#000000', rave:true },
 ];
 
@@ -6801,6 +6838,7 @@ window.addEventListener('pagehide', () => {
       'NEON SUNSET':   'diagonals',
       'MIDNIGHT BLUE': 'grid',
       'MATRIX GREEN':  'scanlines',
+      'DISCO FUNK':    'hexagons',
       'RAVE MODE':     'noise',
     };
     for (const [key, pat] of Object.entries(map)) {
