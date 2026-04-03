@@ -264,7 +264,18 @@ body {
 
 /* ── PANELS ── */
 .tab-panel { display: none; }
-.tab-panel.active { display: block; }
+.tab-panel.active {
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+@media (max-width: 599px) {
+  .tab-panel.active {
+    /* On mobile, cap height so content doesn't push off-screen */
+    max-height: calc(100dvh - 80px); /* 80px = tab bar + title bar */
+  }
+}
 
 /* ── PLAYER BODY ── */
 .player-body { padding: 10px; }
@@ -995,7 +1006,8 @@ body {
   border-color: var(--cat-orange);
   box-shadow: inset 1px 1px 3px rgba(0,0,0,.8), 0 0 8px rgba(68,221,136,.2);
 }
-textarea.finput { resize: vertical; min-height: 120px; line-height: 1.6; }
+textarea.finput { resize: none; min-height: 120px; line-height: 1.6; }
+@media (min-width: 600px) { textarea.finput { resize: vertical; } }
 select.finput { cursor: pointer; }
 
 .upload-title {
@@ -1150,7 +1162,7 @@ select.finput { cursor: pointer; }
   background: var(--vis-bg); border: 1px solid var(--border-lo);
   border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
   color: var(--lcd-green); font-family: 'VT323', monospace; font-size: 15px;
-  padding: 6px 8px; outline: none; resize: vertical;
+  padding: 6px 8px; outline: none; resize: none;
   box-shadow: inset 1px 1px 3px rgba(0,0,0,.8);
   caret-color: var(--lcd-green);
   line-height: 1.5;
@@ -1165,10 +1177,6 @@ select.finput { cursor: pointer; }
 /* Track picker */
 
 /* ── PROMO PANEL MOBILE FIXES ── */
-#panel-promo {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
 @media (max-width: 599px) {
   .track-picker { max-height: 180px; }
   .contact-list { max-height: 140px; }
@@ -2873,6 +2881,7 @@ body.rave-mode .lcd-art img {
             <div class="contact-add-row">
               <input class="finput" type="text" id="c-name" placeholder="Name...">
               <input class="finput" type="email" id="c-email" placeholder="email@example.com"
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
                      onkeydown="if(event.key==='Enter')addContact()">
               <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
             </div>
