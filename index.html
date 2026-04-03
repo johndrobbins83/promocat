@@ -1163,6 +1163,18 @@ select.finput { cursor: pointer; }
 .template-hints span { color: var(--cat-orange); }
 
 /* Track picker */
+
+/* ── PROMO PANEL MOBILE FIXES ── */
+#panel-promo {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 599px) {
+  .track-picker { max-height: 180px; }
+  .contact-list { max-height: 140px; }
+  #saved-promo-list { max-height: 120px; }
+  .promo-body { padding-bottom: 40px; }
+}
 .track-picker { max-height: 260px; overflow-y: auto; margin-bottom: 8px; border: 1px solid var(--border-lo); background: var(--pl-list-bg); }
 .track-picker::-webkit-scrollbar { width: 6px; }
 .track-picker::-webkit-scrollbar-track { background: var(--vis-bg); }
@@ -3026,12 +3038,21 @@ function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   const tabEl = document.getElementById('tab-' + name);
   if (tabEl && tabEl.classList.contains('tab')) tabEl.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
+  const panel = document.getElementById('panel-' + name);
+  if (panel) {
+    panel.classList.add('active');
+    panel.scrollTop = 0; // always scroll to top when switching tabs
+  }
   // Clear any stale status messages when leaving upload tab
   if (name !== 'upload') {
     const st = document.getElementById('audio-url-status');
     if (st) { st.textContent = ''; st.className = 'audio-url-status'; }
   }
+  // Defer heavy promo render so tab paint completes first
+  if (name === 'promo') {
+    setTimeout(() => { renderPromoPicker(); renderSavedPromoList(); }, 80);
+  }
+  updateTitlebar();
 }
 
 // ═══════════════════════════════════════════════
@@ -5183,6 +5204,12 @@ function loadTemplate() {
 }
 
 // ── TRACK PICKER ──
+
+let _promoPickerTimer = null;
+function renderPromoPickerDebounced() {
+  clearTimeout(_promoPickerTimer);
+  _promoPickerTimer = setTimeout(renderPromoPicker, 60);
+}
 function renderPromoPicker() {
   const el = document.getElementById('promo-track-picker');
   if (!playlist.length) {
@@ -5206,7 +5233,7 @@ function renderPromoPicker() {
 function togglePick(i) {
   if (pickedTracks.has(i)) pickedTracks.delete(i);
   else pickedTracks.add(i);
-  renderPromoPicker();
+  renderPromoPickerDebounced();
 }
 
 function selectAllTracks() {
