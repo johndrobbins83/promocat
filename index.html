@@ -1571,7 +1571,26 @@ body.rave-mode #shine-r { opacity: 0; }
 .form-section.open .form-section-body { display: block; }
 
 /* ── ART UPLOAD WIDGET ── */
-.art-upload-wrap { width: 100%; }
+.art-upload-wrap { width: 100%; position: relative; }
+/* Mobile art upload — simple button instead of drop zone */
+.art-drop-zone       { display: none; }   /* hidden on mobile */
+.art-upload-btn-mob  { display: flex; }   /* shown on mobile */
+@media (min-width: 600px) {
+  .art-drop-zone      { display: flex; }  /* drop zone on desktop */
+  .art-upload-btn-mob { display: none; }  /* hide mobile btn on desktop */
+}
+.art-upload-btn-mob {
+  align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 10px 0;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--cat-orange); letter-spacing: .5px;
+  background: var(--vis-bg);
+  border: 1px solid var(--border-lo);
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.art-upload-btn-mob:hover { border-color: var(--cat-orange); }
+
 .art-drop-zone {
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 80px;
@@ -2477,9 +2496,14 @@ body.rave-mode .lcd-art img {
                   <img id="art-preview-img" src="" alt="Art preview">
                   <button class="art-clear-btn" onclick="clearArtUpload()" title="Remove">✕</button>
                 </div>
+                <!-- Desktop: dashed drop zone -->
                 <label class="art-drop-zone" id="art-drop-zone" for="f-art-file">
-                  <span id="art-drop-label">📁 TAP TO UPLOAD IMAGE</span>
+                  <span id="art-drop-label">📁 CLICK TO UPLOAD IMAGE</span>
                 </label>
+                <!-- Mobile: simple button (no label/input link which causes iOS freeze) -->
+                <button type="button" class="art-upload-btn-mob" onclick="document.getElementById('f-art-file').click()">
+                  📁 UPLOAD IMAGE
+                </button>
                 <input type="file" id="f-art-file" accept="image/*"
                        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
                        onchange="handleArtUpload(this)">
@@ -3541,25 +3565,49 @@ function handleArtUpload(input) {
   const file = input.files[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) { notify('😾', 'Please select an image file'); return; }
-  if (file.size > 2 * 1024 * 1024) { notify('😾', 'Image too large — max 2MB'); return; }
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    const base64 = e.target.result; // data:image/...;base64,...
-    document.getElementById('f-art-data').value = base64;
-    document.getElementById('f-art').value = ''; // clear URL field
+  // Show preview instantly via object URL — no encoding, no freeze
+  const preview  = document.getElementById('art-preview');
+  const imgEl    = document.getElementById('art-preview-img');
+  const objUrl   = URL.createObjectURL(file);
+  imgEl.src      = objUrl;
+  preview.style.display = 'block';
+  document.getElementById('art-drop-zone').style.display = 'none';
+  document.getElementById('art-url-row').style.display   = 'none';
+  document.getElementById('art-url-toggle').textContent  = '🔗 USE URL INSTEAD';
+  document.getElementById('art-url-status-label').textContent = '⏳ ' + file.name;
 
-    // Show preview
-    const preview = document.getElementById('art-preview');
-    const img     = document.getElementById('art-preview-img');
-    img.src = base64;
-    preview.style.display = 'block';
-    document.getElementById('art-drop-zone').style.display = 'none';
-    document.getElementById('art-url-row').style.display = 'none';
-    document.getElementById('art-url-toggle').textContent = '🔗 USE URL INSTEAD';
-    document.getElementById('art-url-status-label').textContent = '✓ ' + file.name;
-  };
-  reader.readAsDataURL(file);
+  // Resize + encode off the main thread via setTimeout so UI stays responsive
+  setTimeout(() => {
+    const MAX = 800; // max dimension in px
+    const canvas = document.createElement('canvas');
+    const ctx    = canvas.getContext('2d');
+    const img    = new Image();
+    img.onload = () => {
+      // Revoke object URL now that image is loaded
+      URL.revokeObjectURL(objUrl);
+      // Scale down if needed
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else       { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      canvas.width  = w;
+      canvas.height = h;
+      ctx.drawImage(img, 0, 0, w, h);
+      const base64 = canvas.toDataURL('image/jpeg', 0.82);
+      document.getElementById('f-art-data').value = base64;
+      document.getElementById('f-art').value = '';
+      // Update preview to use the compressed version
+      imgEl.src = base64;
+      document.getElementById('art-url-status-label').textContent = '✓ ' + file.name;
+    };
+    img.onerror = () => {
+      notify('😾', 'Could not read image');
+      URL.revokeObjectURL(objUrl);
+    };
+    img.src = objUrl;
+  }, 0);
 }
 
 function handleArtUrlInput() {
