@@ -5035,10 +5035,6 @@ async function saveAndGenerateLink() {
 }
 
 // Keep genPromoLink as alias for backwards compat / fire promo flow
-async function genPromoLink() {
-  return saveAndGenerateLink();
-}
-
 function savePromoPlaylist() {
   // Called from other places — just save without generating link
   const name = document.getElementById('promo-pl-name').value.trim();
@@ -5137,6 +5133,12 @@ function clearPromoSelection() {
 // ── CONTACTS ──
 let selectedContacts = new Set(); // indices of selected contacts
 
+let _contactSyncTimer = null;
+function debouncedContactSync() {
+  clearTimeout(_contactSyncTimer);
+  _contactSyncTimer = setTimeout(scheduleSyncToCloud, 2000);
+}
+
 function addContact() {
   const name  = document.getElementById('c-name').value.trim();
   const email = document.getElementById('c-email').value.trim();
@@ -5221,10 +5223,20 @@ function renderPromoPickerDebounced() {
 }
 function renderPromoPicker() {
   const el = document.getElementById('promo-track-picker');
+  if (!el) return;
   if (!playlist.length) {
     el.innerHTML = '<div class="contact-empty">NO TRACKS LOADED — ADD TRACKS FIRST</div>';
     return;
   }
+  // If list already built and same length, just update picked classes (no DOM rebuild)
+  const existing = el.querySelectorAll('.pick-item');
+  if (existing.length === playlist.length) {
+    existing.forEach((row, i) => {
+      row.classList.toggle('picked', pickedTracks.has(i));
+    });
+    return;
+  }
+  // Full build only when track count changes
   el.innerHTML = playlist.map((t, i) => `
     <div class="pick-item${pickedTracks.has(i) ? ' picked' : ''}" onclick="togglePick(${i})">
       <div class="pick-check"></div>
@@ -5254,42 +5266,7 @@ function selectAllTracks() {
   renderPromoPicker();
 }
 
-// ── LINK GENERATION ──
-// Encode picked tracks as a base64 JSON blob in the URL hash
-async function genPromoLink() {
-  if (!pickedTracks.size) { notify('😾', 'Pick at least one track!'); return; }
-
-  const picked = [...pickedTracks].map(i => playlist[i]);
-  const name   = document.getElementById('promo-pl-name').value.trim() ||
-                 (activePromoPlIdx >= 0 ? promoPlaylists[activePromoPlIdx].name : '') ||
-                 'promo';
-
-  const box     = document.getElementById('promo-link-box');
-  const textEl  = document.getElementById('promo-link-text');
-  textEl.textContent = '⏳ GENERATING LINK...';
-  box.classList.add('show');
-
-  try {
-    const { ok, data } = await api('POST', '/share', { name, tracks: picked });
-    if (ok && data.slug) {
-      const link = window.location.origin + window.location.pathname + '#p=' + data.slug;
-      textEl.textContent = link;
-      window._promoLink = link;
-      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      return link;
-    } else {
-      throw new Error('no slug');
-    }
-  } catch(e) {
-    // Fallback to long URL if Worker unreachable
-    const encoded = encodePlaylistToUrl(picked);
-    const link    = window.location.origin + window.location.pathname + '#playlist=' + encoded;
-    textEl.textContent = link;
-    window._promoLink = link;
-    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    return link;
-  }
-}
+// genPromoLink → now handled by saveAndGenerateLink()
 
 function copyPromoLink() {
   const txt = document.getElementById('promo-link-text').textContent;
