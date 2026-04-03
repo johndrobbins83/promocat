@@ -294,6 +294,8 @@ body {
 .cat-svg-wrap {
   display: inline-flex;
   will-change: transform;
+  position: relative;
+  z-index: 1;
 }
 .cat-svg {
   width:58px; height:44px;
@@ -309,6 +311,7 @@ body {
   position: relative;
   display: inline-block;
   line-height: 1;
+  z-index: 2;
 }
 .promocat-the {
   font-family: 'Righteous', cursive;
@@ -328,54 +331,20 @@ body {
 
 /* ══ RAVE CAT EFFECTS ══ */
 
-/* Smoke puff particles from ears */
-.rave-smoke {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 50%;
-  opacity: 0;
-  z-index: 10;
-  animation: rave-smoke-rise 1.4s ease-out forwards;
-}
-@keyframes rave-smoke-rise {
-  0%   { opacity: .85; transform: translateY(0)   scale(1)   rotate(0deg); }
-  40%  { opacity: .6;  transform: translateY(-18px) scale(1.4) rotate(20deg); }
-  100% { opacity: 0;   transform: translateY(-44px) scale(2.2) rotate(-15deg); }
+/* Exorcist head spin — one shot */
+@keyframes rave-head-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Star burst particles */
-.rave-star {
-  position: absolute;
-  pointer-events: none;
-  font-size: 14px;
-  opacity: 0;
-  z-index: 10;
-  animation: rave-star-fly 1s ease-out forwards;
-}
-@keyframes rave-star-fly {
-  0%   { opacity: 1;  transform: translate(0,0) scale(1) rotate(0deg); }
-  100% { opacity: 0;  transform: translate(var(--sx), var(--sy)) scale(0) rotate(360deg); }
-}
-
-/* Bounce animation — applied via JS inline style swap each beat */
-.cat-svg-wrap.rave-bounce {
-  animation: rave-cat-bounce var(--rave-beat, 0.5s) ease-in-out infinite;
-}
-@keyframes rave-cat-bounce {
-  0%, 100% { transform: translateY(0)    rotate(0deg)   scaleX(1); }
-  20%       { transform: translateY(-14px) rotate(-8deg)  scaleX(1.08); }
-  50%       { transform: translateY(-22px) rotate(6deg)   scaleX(0.94); }
-  70%       { transform: translateY(-8px)  rotate(-4deg)  scaleX(1.04); }
-}
-
-/* 360 spin burst — triggered as a one-shot class */
-.cat-svg-wrap.rave-spin {
-  animation: rave-cat-spin 0.4s cubic-bezier(.4,0,.2,1) forwards;
-}
-@keyframes rave-cat-spin {
-  0%   { transform: rotate(0deg)   scale(1); }
-  50%  { transform: rotate(200deg) scale(1.3); }
-  100% { transform: rotate(360deg) scale(1); }
+/* Brief bounce around — cat drifts behind the text then returns */
+@keyframes rave-cat-wander {
+  0%   { transform: translate(0px,    0px)   rotate(0deg); }
+  20%  { transform: translate(-28px, -12px)  rotate(-15deg); }
+  45%  { transform: translate(20px,  -20px)  rotate(12deg); }
+  65%  { transform: translate(-14px, -8px)   rotate(-8deg); }
+  85%  { transform: translate(10px,  -5px)   rotate(5deg); }
+  100% { transform: translate(0px,   0px)    rotate(0deg); }
 }
 /* ── CAT-DECO TEXTURE ── */
 .cat-deco {
@@ -4460,7 +4429,6 @@ function loadTrack(i) {
   if (bpm >= 40 && bpm <= 300) {
     const dur = (60 / bpm).toFixed(3) + 's';
     catSvg.style.setProperty('--bob-dur', dur);
-    document.querySelector('.cat-svg-wrap')?.style.setProperty('--rave-beat', dur);
     document.documentElement.style.setProperty('--bob-dur', dur);
     document.getElementById('lcd-bpm').textContent = bpm + ' BPM';
     setEyeSquint(bpm);
@@ -6631,138 +6599,55 @@ function notify(icon, msg) {
 // ══════════════════════════════════════════════
 // RAVE CAT — crazy visual effects during rave mode
 // ══════════════════════════════════════════════
-let _raveCatFrame   = null;
-let _raveCatBeat    = 0;
-let _raveCatLast    = 0;
-let _raveSmokeTimer = null;
-let _raveStarTimer  = null;
-let _raveSpinTimer  = null;
-
-const RAVE_SMOKE_COLORS = ['#ff00ff','#00ffff','#ffff00','#ff6600','#00ff66','#ff0066'];
-const RAVE_STARS = ['★','✦','✧','⚡','♪','♫','◆','●'];
+let _raveSpinTimer   = null;
+let _raveWanderTimer = null;
 
 function startRaveCat() {
   stopRaveCat();
-  const wrap = document.querySelector('.cat-svg-wrap');
-  if (wrap) wrap.classList.add('rave-bounce');
-
-  // Smoke from ears — every ~600ms
-  _raveSmokeTimer = setInterval(spawnRaveSmoke, 600);
-  spawnRaveSmoke();
-
-  // Star bursts — every ~900ms
-  _raveStarTimer = setInterval(spawnRaveStars, 900);
-
-  // 360 spin — every ~4 beats (random-ish)
-  scheduleSpin();
+  scheduleRaveSpin();
 }
 
 function stopRaveCat() {
-  const wrap = document.querySelector('.cat-svg-wrap');
-  if (wrap) {
-    wrap.classList.remove('rave-bounce');
-    wrap.classList.remove('rave-spin');
-    wrap.style.animation = '';
-  }
-  clearInterval(_raveSmokeTimer);
-  clearInterval(_raveStarTimer);
   clearTimeout(_raveSpinTimer);
-  // Clean up particles
-  document.querySelectorAll('.rave-smoke,.rave-star').forEach(e => e.remove());
+  clearTimeout(_raveWanderTimer);
+  const wrap = document.querySelector('.cat-svg-wrap');
+  if (wrap) { wrap.style.animation = ''; wrap.style.zIndex = ''; }
 }
 
-function scheduleSpin() {
+function scheduleRaveSpin() {
   if (!raveModeOn) return;
-  const delay = 2800 + Math.random() * 2000;
+  // Random interval 15–25 seconds
+  const delay = 15000 + Math.random() * 10000;
   _raveSpinTimer = setTimeout(() => {
     if (!raveModeOn) return;
-    doRaveSpin();
-    scheduleSpin();
+    doRaveSequence();
   }, delay);
 }
 
-function doRaveSpin() {
+function doRaveSequence() {
   const wrap = document.querySelector('.cat-svg-wrap');
-  if (!wrap) return;
-  wrap.classList.remove('rave-bounce');
-  wrap.classList.add('rave-spin');
-  // After spin completes, go back to bounce
+  if (!wrap || !raveModeOn) return;
+
+  // 1. Head spin — exorcist 360, takes ~700ms
+  wrap.style.animation = 'rave-head-spin 0.7s cubic-bezier(0.4,0,0.2,1) 1';
+  wrap.style.zIndex = '0'; // behind text
+
   setTimeout(() => {
-    if (!raveModeOn) return;
-    wrap.classList.remove('rave-spin');
-    wrap.classList.add('rave-bounce');
-  }, 420);
-}
+    if (!raveModeOn) { wrap.style.animation = ''; return; }
 
-function spawnRaveSmoke() {
-  if (!raveModeOn) return;
-  const deco = document.querySelector('.cat-deco');
-  if (!deco) return;
-  const wrap  = document.querySelector('.cat-svg-wrap');
-  const wRect = wrap ? wrap.getBoundingClientRect() : null;
-  const dRect = deco.getBoundingClientRect();
-  if (!wRect) return;
+    // 2. After spin — wander behind the text for ~2s
+    wrap.style.animation = 'rave-cat-wander 2s ease-in-out 1';
+    wrap.style.zIndex = '0'; // stays behind .promocat-text (z-index:1)
 
-  // Left ear position (~20% from left of cat, near top)
-  // Right ear position (~80% from left)
-  const earOffsets = [
-    { x: wRect.left - dRect.left + wRect.width * 0.18, y: wRect.top - dRect.top + 4 },
-    { x: wRect.left - dRect.left + wRect.width * 0.82, y: wRect.top - dRect.top + 4 },
-  ];
+    setTimeout(() => {
+      // 3. Snap back
+      wrap.style.animation = '';
+      wrap.style.zIndex = '';
+      // Schedule next event
+      scheduleRaveSpin();
+    }, 2000);
 
-  earOffsets.forEach(ear => {
-    for (let p = 0; p < 2; p++) {
-      const puff = document.createElement('div');
-      puff.className = 'rave-smoke';
-      const color = RAVE_SMOKE_COLORS[Math.floor(Math.random() * RAVE_SMOKE_COLORS.length)];
-      const size  = 6 + Math.random() * 8;
-      const jx    = (Math.random() - 0.5) * 10;
-      puff.style.cssText = `
-        left:${ear.x + jx - size/2}px;
-        top:${ear.y}px;
-        width:${size}px;
-        height:${size}px;
-        background:${color};
-        box-shadow:0 0 ${size}px ${color};
-        animation-delay:${p * 120}ms;
-      `;
-      deco.appendChild(puff);
-      setTimeout(() => puff.remove(), 1600);
-    }
-  });
-}
-
-function spawnRaveStars() {
-  if (!raveModeOn) return;
-  const deco = document.querySelector('.cat-deco');
-  if (!deco) return;
-  const wrap  = document.querySelector('.cat-svg-wrap');
-  const wRect = wrap ? wrap.getBoundingClientRect() : null;
-  const dRect = deco.getBoundingClientRect();
-  if (!wRect) return;
-
-  const cx = wRect.left - dRect.left + wRect.width / 2;
-  const cy = wRect.top  - dRect.top  + wRect.height / 2;
-
-  for (let i = 0; i < 5; i++) {
-    const star  = document.createElement('span');
-    star.className = 'rave-star';
-    star.textContent = RAVE_STARS[Math.floor(Math.random() * RAVE_STARS.length)];
-    const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.8;
-    const dist  = 30 + Math.random() * 50;
-    const sx    = Math.cos(angle) * dist + 'px';
-    const sy    = (Math.sin(angle) * dist - 20) + 'px';
-    const color = RAVE_SMOKE_COLORS[Math.floor(Math.random() * RAVE_SMOKE_COLORS.length)];
-    star.style.cssText = `
-      left:${cx}px; top:${cy}px;
-      color:${color};
-      text-shadow:0 0 6px ${color};
-      --sx:${sx}; --sy:${sy};
-      animation-delay:${i * 80}ms;
-    `;
-    deco.appendChild(star);
-    setTimeout(() => star.remove(), 1200);
-  }
+  }, 720);
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
