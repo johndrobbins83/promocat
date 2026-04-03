@@ -3059,7 +3059,7 @@ function switchTab(name) {
   }
   // Defer heavy promo render so tab paint completes first
   if (name === 'promo') {
-    setTimeout(() => { renderPromoPicker(); renderSavedPromoList(); }, 80);
+    setTimeout(renderPromoTab, 80);
   }
   updateTitlebar();
 }
@@ -4095,7 +4095,8 @@ async function copyFullPlaylistUrl() {
 function addToPromo(e, origIdx) {
   e.stopPropagation();
   pickedTracks.add(origIdx);
-  renderPromoPicker();
+  // Only re-render picker if promo tab is currently visible
+  if (document.getElementById('panel-promo').classList.contains('active')) renderPromoPickerDebounced();
   // Visual feedback on the button
   const btn = e.currentTarget;
   btn.classList.add('added');
@@ -4950,8 +4951,7 @@ function newPromoPlaylist() {
   document.getElementById('promo-link-box').classList.remove('show');
   const status = document.getElementById('promo-name-status');
   if (status) status.textContent = '';
-  renderPromoPicker();
-  renderSavedPromoList();
+  renderPromoTab();
   document.getElementById('promo-pl-name').focus();
   notify('➕', 'Name it, pick tracks, then Save & Get Link!');
 }
@@ -5070,8 +5070,7 @@ function loadPromoPlaylist(i) {
   } else {
     document.getElementById('promo-link-box').classList.remove('show');
   }
-  renderPromoPicker();
-  renderSavedPromoList();
+  renderPromoTab();
   notify('📋', '"' + pl.name + '" loaded!');
   updateTitlebar();
 }
@@ -5125,8 +5124,7 @@ function clearPromoSelection() {
   activePromoPlIdx = -1;
   document.getElementById('active-promo-name').textContent = '';
   document.getElementById('promo-pl-name').value = '';
-  renderPromoPicker();
-  renderSavedPromoList();
+  renderPromoTab();
   updateTitlebar();
 }
 
@@ -5220,6 +5218,10 @@ let _promoPickerTimer = null;
 function renderPromoPickerDebounced() {
   clearTimeout(_promoPickerTimer);
   _promoPickerTimer = setTimeout(renderPromoPicker, 60);
+}
+
+function renderPromoTab() {
+  renderPromoTab();
 }
 function renderPromoPicker() {
   const el = document.getElementById('promo-track-picker');
@@ -5554,8 +5556,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Refresh picker when promo tab is opened
 document.getElementById('tab-promo').addEventListener('click', () => {
-  renderPromoPicker();
-  renderSavedPromoList();
+  renderPromoTab();
   loadTemplate();
 });
 
@@ -5828,7 +5829,14 @@ const CACHE_PROFILES = () => currentUser ? 'pc_prf_' + currentUser.username : nu
 const CACHE_PROMO_PL = () => currentUser ? 'pc_ppl_' + currentUser.username : null;
 const CACHE_CONTACTS = () => currentUser ? 'pc_ct_'  + currentUser.username : null;
 
-function cacheSet(key, val) { if (key) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} } }
+function cacheSet(key, val) {
+  if (!key) return;
+  try {
+    // Never cache base64 art - too large, blocks main thread
+    const safe = Array.isArray(val) ? stripArtForSync(val) : val;
+    localStorage.setItem(key, JSON.stringify(safe));
+  } catch(e) {}
+}
 function cacheGet(key)      { if (!key) return null; try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
 
 // ── Background sync — poll cloud every 60s while logged in ──
@@ -6000,6 +6008,14 @@ async function refreshFromCloud() {
 
 // Debounced cloud save — batches rapid changes (ratings, add track, etc.)
 let _syncTimer = null;
+
+// Strip base64 art data before syncing/caching (keeps URLs, removes inline data)
+function stripArtForSync(tracks) {
+  return tracks.map(t => {
+    if (!t.artUrl || !t.artUrl.startsWith('data:')) return t;
+    return { ...t, artUrl: '' }; // drop base64, keep everything else
+  });
+}
 function scheduleSyncToCloud() {
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(syncPlaylistToCloud, 800);
@@ -6011,13 +6027,13 @@ async function syncPlaylistToCloud() {
   cacheSet(CACHE_PROMO_PL(), promoPlaylists);
   cacheSet(CACHE_CONTACTS(), contacts);
   try {
-    const { ok } = await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+    const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts });
     if (!ok) throw new Error('save failed');
   } catch(e) {
     // Retry once after 3 seconds
     setTimeout(async () => {
       try {
-        const { ok } = await api('PUT', '/playlist', { playlist, promoPlaylists, contacts });
+        const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts });
         if (!ok) notify('⚠️', 'Sync failed — check connection');
       } catch(e2) {
         notify('⚠️', 'Could not reach server');
