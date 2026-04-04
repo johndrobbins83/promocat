@@ -909,12 +909,14 @@ body.disco-mode .disco-ball-wrap { display: flex; }
 }
 .saved-promo-del-btn:hover { color:#ff4444; }
 
-/* ── THEME TRANSITIONS ── */
-*, *::before, *::after {
-  transition: background-color .4s ease, border-color .3s ease, color .3s ease, box-shadow .4s ease, text-shadow .3s ease;
-}
-/* Don't transition transforms/positions */
+/* ── THEME TRANSITIONS — only on elements that need it, not wildcard ── */
+/* Wildcard transition removed — caused DOM-wide recalc on every touch on Android */
 .seek-thumb, .sthumb, .seek-fill, .sfill { transition: none !important; }
+.win-window, .tab, .mbtn, .tbtn, .pl-item, .cat-btn, .sort-btn,
+.filter-toggle, .pl-bar-btn, .promo-btn, .wbtn, .settings-save-btn,
+.back-btn, .sub-btn, .lock-btn, .contact-item, .pick-item {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
 
 .theme-toast {
   position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
