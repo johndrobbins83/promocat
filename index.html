@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>PromoCat v1.0</title>
 
 <!-- Favicon — cat emoji as SVG data URI -->
@@ -91,7 +91,8 @@ body {
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100dvh; /* exact viewport — no page scroll on mobile */
+  height: 100dvh;
+  height: var(--app-height, 100dvh); /* JS updates this on keyboard open/close */
   overflow: hidden;
 }
 @media (min-width: 600px) {
@@ -216,12 +217,18 @@ body {
   background: var(--win-bg);
   position: relative; z-index: 1;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
+}
+/* Lock overflow only when player tab is active */
+.win-window:has(#panel-player.active) {
+  overflow: hidden;
 }
 
 .titlebar {
@@ -270,20 +277,15 @@ body {
 /* ── PANELS ── */
 .tab-panel { display: none; }
 .tab-panel.active {
+  display: block;
+}
+/* Player tab: flex column so playlist fills remaining space */
+#panel-player.active {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
-}
-/* Non-player tabs still scroll normally */
-.tab-panel.active:not(#panel-player) {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-@media (max-width: 599px) {
-  .tab-panel.active:not(#panel-player) {
-    max-height: calc(100dvh - 80px);
-  }
 }
 
 /* ── PLAYER BODY ── */
@@ -613,9 +615,6 @@ body.disco-mode .disco-ball-wrap { display: flex; }
 /* ── PLAYLIST ── */
 /* panel-player fills its tab-panel container */
 #panel-player {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   min-height: 0;
   overflow: hidden;
 }
@@ -1268,6 +1267,7 @@ select.finput { cursor: pointer; }
 /* Track picker */
 
 /* ── PROMO PANEL MOBILE FIXES ── */
+#panel-promo { overflow: visible; }
 @media (max-width: 599px) {
   .track-picker { max-height: 180px; }
   .contact-list { max-height: 140px; }
@@ -3061,7 +3061,7 @@ body.rave-mode .lcd-art img {
           </div>
           <div class="promo-section-body">
             <div class="contact-add-row">
-              <input class="finput" type="text" id="c-name" placeholder="Name...">
+              <input class="finput" type="text" id="c-name" placeholder="Name..." autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
               <input class="finput" type="email" id="c-email" placeholder="email@example.com"
                      autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
                      onkeydown="if(event.key==='Enter')addContact()">
@@ -3130,7 +3130,7 @@ Listen here: {link}
             <!-- Name field — REQUIRED before anything else -->
             <div style="margin-bottom:10px;">
               <label class="flbl" style="margin-bottom:5px;">🏷️ PLAYLIST NAME <span style="color:#ff4444;">*REQUIRED</span></label>
-              <input class="finput" type="text" id="promo-pl-name" placeholder="e.g. Summer DnB Promos..."
+              <input class="finput" type="text" id="promo-pl-name" placeholder="e.g. Summer DnB Promos..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                      style="font-size:16px;padding:6px 10px;"
                      oninput="updatePromoNameStatus()">
               <div id="promo-name-status" style="font-family:'VT323',monospace;font-size:13px;color:#556655;margin-top:3px;height:16px;"></div>
@@ -6798,6 +6798,37 @@ function doRaveSequence() {
 
   }, 720);
 }
+
+
+// ── ANDROID KEYBOARD / VIEWPORT FIX ──
+// Android Chrome shrinks window.innerHeight when keyboard opens.
+// We update --app-height so the layout reflows correctly.
+function setAppHeight() {
+  const h = window.visualViewport
+    ? window.visualViewport.height
+    : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', h + 'px');
+}
+
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', setAppHeight);
+}
+// Also refire on focus/blur of inputs — catches keyboard open/close on Android
+document.addEventListener('focusin',  () => setTimeout(setAppHeight, 100));
+document.addEventListener('focusout', () => setTimeout(setAppHeight, 100));
+
+
+// ── ANDROID: scroll focused input into view inside promo panel ──
+document.addEventListener('focusin', (e) => {
+  const el = e.target;
+  if (!el.matches('input, textarea, select')) return;
+  // Small delay to let keyboard finish opening and layout reflow
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 350);
+});
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
