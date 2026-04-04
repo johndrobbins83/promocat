@@ -3239,9 +3239,11 @@ function switchTab(name) {
     const st = document.getElementById('audio-url-status');
     if (st) { st.textContent = ''; st.className = 'audio-url-status'; }
   }
+  // Pause all canvas/animation loops when not on player tab — saves memory on mobile
+  _animPaused = (name !== 'player');
   // Defer heavy promo render so tab paint completes first
   if (name === 'promo') {
-    setTimeout(renderPromoTab, 80);
+    setTimeout(renderPromoTab, 100);
   }
   updateTitlebar();
 }
@@ -3255,7 +3257,8 @@ const SESSION_KEY = 'promocat_session';
 // ── AUTH STATE ──
 let unlocked    = false;
 let currentUser = null;
-let isSharedView = false; // true when viewing a shared #p= link — read-only   // { username, role, token }
+let isSharedView = false;
+let _animPaused = false; // true when not on player tab — pauses all rAF loops
 
 // ── API helper — wraps fetch with auth header + localStorage fallback ──
 async function api(method, path, body, opts = {}) {
@@ -3622,6 +3625,7 @@ function drawEQ() {
 }
 
 function tickEQ() {
+  if (_animPaused) { requestAnimationFrame(tickEQ); return; }
   if (isPlaying) {
     for (let i = 0; i < EQ_BANDS; i++) {
       // Target: randomised per band with frequency weighting + attack randomness
@@ -3707,6 +3711,7 @@ function getBobDurMs() {
 }
 
 function bobLoop(ts) {
+  if (_animPaused) { _bobFrame = requestAnimationFrame(bobLoop); return; }
   if (!_bobRunning) {
     const wrap = getCatWrap();
     if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
@@ -4965,6 +4970,7 @@ function lerpColor(hexA, hexB, t) {
 
 function raveLoop(ts) {
   if (!raveModeOn) return;
+  if (_animPaused) { _raveFrame = requestAnimationFrame(raveLoop); return; }
   const beatMs  = getRaveBeatMs();
   const elapsed = Math.min(ts - _raveLast, beatMs);
   _raveLast     = ts;
@@ -6062,7 +6068,7 @@ let _bgSyncTimer = null;
 function startBgSync() {
   stopBgSync();
   _bgSyncTimer = setInterval(async () => {
-    if (!currentUser?.token || !document.hasFocus()) return; // only sync when authed + active
+    if (!currentUser?.token || !document.hasFocus() || _animPaused) return; // skip when not on player tab
     try {
       const { ok, data } = await api('GET', '/playlist', null);
       if (!ok) return;
@@ -7068,8 +7074,8 @@ window.addEventListener('pagehide', () => {
       if (on) {
         if (_frame) return;
         (function tick() {
-          _raveHue = (_raveHue + 2.5) % 360;
-          draw();
+          if (!_rave) return;
+          if (!_animPaused) { _raveHue = (_raveHue + 2.5) % 360; draw(); }
           _frame = requestAnimationFrame(tick);
         })();
       } else {
