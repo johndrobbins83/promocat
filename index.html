@@ -2549,10 +2549,14 @@ body.rave-mode .lcd-art img {
       <!-- Playlist -->
       <div class="pl-section">
         <div class="pl-bar">
-          <span class="pl-bar-title">🐾 PLAYLIST</span>
+          <div class="pl-mode-btns">
+            <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')">🐾 MY TRACKS</button>
+            <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')">📬 INBOX <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
+          </div>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
           <div style="display:flex;gap:4px;align-items:center;margin-left:auto;">
-            <button class="pl-bar-btn pl-bar-btn-copy" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" title="Copy your submission link" style="display:none;">📬 SUBMIT LINK</button>
             <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud">↻</button>
             <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;color:#ff8844;">🧹</button>
           </div>
@@ -6101,6 +6105,14 @@ function startBgSync() {
         selectedContacts = new Set(contacts.map((_,i) => i));
         renderContacts();
       }
+      if (Array.isArray(data.inbox)) {
+        const newCount = data.inbox.filter(t => !t.listened).length;
+        const oldCount = inbox.filter(t => !t.listened).length;
+        inbox = data.inbox;
+        if (newCount > oldCount) { notify('📬', (newCount - oldCount) + ' new track' + (newCount-oldCount>1?'s':'') + ' in your inbox!'); }
+        updateInboxBadge();
+        if (playlistMode === 'inbox') renderInbox();
+      }
     } catch(e) { /* offline — ignore */ }
   }, 60000); // every 60 seconds
 }
@@ -6253,6 +6265,140 @@ function stripArtForSync(tracks) {
     return { ...t, artUrl: '' }; // drop base64, keep everything else
   });
 }
+
+// ═══════════════════════════════════════════════
+// INBOX — tracks submitted by others
+// ═══════════════════════════════════════════════
+let inbox = [];
+let playlistMode = 'my'; // 'my' or 'inbox'
+
+function setPlaylistMode(mode) {
+  playlistMode = mode;
+  document.getElementById('mode-btn-my').classList.toggle('active', mode === 'my');
+  document.getElementById('mode-btn-inbox').classList.toggle('active', mode === 'inbox');
+  // Show/hide relevant filter bar and buttons
+  const filterBar = document.querySelector('.filter-bar');
+  if (filterBar) filterBar.style.display = mode === 'my' ? '' : 'none';
+  document.getElementById('copy-url-btn').style.display   = mode === 'my'    ? '' : 'none';
+  document.getElementById('inbox-url-btn').style.display  = mode === 'inbox' ? '' : 'none';
+  if (mode === 'my') {
+    renderPlaylist();
+  } else {
+    renderInbox();
+  }
+}
+
+function renderInbox() {
+  const list = document.getElementById('pl-list');
+  const countEl = document.getElementById('pl-count');
+  if (!list) return;
+
+  const unread = inbox.filter(t => !t.listened).length;
+  countEl.textContent = inbox.length + ' TRACK' + (inbox.length !== 1 ? 'S' : '') +
+    (unread ? ' · ' + unread + ' NEW' : '');
+
+  if (!inbox.length) {
+    list.innerHTML = '<div class="inbox-empty">📭 INBOX IS EMPTY<br><br>SHARE YOUR SUBMIT LINK<br>SO PEOPLE CAN SEND YOU MUSIC</div>';
+    return;
+  }
+
+  list.innerHTML = inbox.map((t, i) => `
+    <div class="inbox-item${!t.listened ? ' unlistened' : ''}${i === curIdx && playlistMode === 'inbox' ? ' cur' : ''}"
+         onclick="loadInboxTrack(${i})">
+      <div class="inbox-title">${esc(t.title)}</div>
+      <div class="inbox-artist">${esc(t.artist)}${t.album ? ' · ' + esc(t.album) : ''}</div>
+      ${t.note ? `<div class="inbox-note">"${esc(t.note)}"</div>` : ''}
+      <div class="inbox-meta">
+        <span>FROM: ${esc(t.senderName || 'Anonymous')}</span>
+        ${t.senderEmail ? `<span>${esc(t.senderEmail)}</span>` : ''}
+        ${t.genre ? `<span>${esc(t.genre.toUpperCase())}</span>` : ''}
+        ${t.bpm ? `<span>${t.bpm} BPM</span>` : ''}
+        <span>${new Date(t.receivedAt || Date.now()).toLocaleDateString()}</span>
+      </div>
+      <div class="inbox-actions">
+        <button class="pl-bar-btn" style="font-size:5px;padding:2px 6px;"
+          onclick="event.stopPropagation();acceptInboxTrack(${i})">✅ ADD TO MY TRACKS</button>
+        <button class="pl-bar-btn" style="font-size:5px;padding:2px 6px;color:#ff4444;"
+          onclick="event.stopPropagation();deleteInboxTrack(${i})">✕ REMOVE</button>
+      </div>
+    </div>`).join('');
+}
+
+function loadInboxTrack(i) {
+  // Mark as listened
+  if (!inbox[i].listened) {
+    inbox[i].listened = true;
+    saveInbox();
+    updateInboxBadge();
+  }
+  // Load into player temporarily
+  const t = inbox[i];
+  const tempTrack = { ...t, category: t.category || 'listen' };
+  // Store current playlist, play inbox track
+  curIdx = -99; // sentinel so it doesn't interfere with main playlist index
+  audio.src = t.url;
+  audio.load();
+  document.getElementById('lcd-title-text').textContent = t.title;
+  document.getElementById('lcd-artist').textContent = t.artist;
+  document.getElementById('lcd-album').textContent = t.album || '';
+  document.getElementById('lcd-bpm').textContent = t.bpm ? t.bpm + ' BPM' : '';
+  setEyeSquint(t.bpm || 0);
+  setCatMouth(t.bpm || 0);
+  audio.play().catch(() => notify('😾', 'Could not play — check URL'));
+  isPlaying = true;
+  startBob();
+  setSt('▶ PLAY', true);
+  renderInbox();
+  notify('📬', 'Playing: ' + t.title);
+}
+
+function acceptInboxTrack(i) {
+  const t = inbox[i];
+  // Add to main playlist
+  playlist.push({
+    url: t.url, title: t.title, artist: t.artist,
+    album: t.album || '', year: t.year || '', bpm: t.bpm || 0,
+    genre: t.genre || '', category: t.category || 'listen',
+    status: t.status || 'unreleased', avail: t.avail || 'undecided',
+    artUrl: t.artUrl || '', email: t.senderEmail || '',
+    mgmt: '', mgmtEmail: '', booking: '', label: '',
+    wavLink: '', mp3Link: '', buyLink: '', rating: 0
+  });
+  inbox.splice(i, 1);
+  saveInbox();
+  savePlaylist();
+  renderInbox();
+  notify('✅', '"' + t.title + '" added to My Tracks!');
+}
+
+function deleteInboxTrack(i) {
+  inbox.splice(i, 1);
+  saveInbox();
+  renderInbox();
+  notify('🗑️', 'Track removed from inbox');
+}
+
+function saveInbox() {
+  // Inbox syncs as part of the playlist PUT
+  scheduleSyncToCloud();
+}
+
+function updateInboxBadge() {
+  const unread = inbox.filter(t => !t.listened).length;
+  const badge = document.getElementById('inbox-badge');
+  if (badge) badge.style.display = unread > 0 ? 'inline' : 'none';
+}
+
+function copyInboxUrl() {
+  if (!currentUser) return;
+  const url = 'https://promocat.johndrobbins83.workers.dev/submit-page/' + currentUser.username;
+  // We'll use the API base
+  const submitUrl = API_BASE + '/submit-page/' + currentUser.username;
+  navigator.clipboard.writeText(submitUrl)
+    .then(() => notify('📬', 'Submit link copied! Share it so people can send you tracks.'))
+    .catch(() => notify('📬', submitUrl));
+}
+
 function scheduleSyncToCloud() {
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(syncPlaylistToCloud, 800);
@@ -6264,13 +6410,13 @@ async function syncPlaylistToCloud() {
   cacheSet(CACHE_PROMO_PL(), promoPlaylists);
   cacheSet(CACHE_CONTACTS(), contacts);
   try {
-    const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts });
+    const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts, inbox });
     if (!ok) throw new Error('save failed');
   } catch(e) {
     // Retry once after 3 seconds
     setTimeout(async () => {
       try {
-        const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts });
+        const { ok } = await api('PUT', '/playlist', { playlist: stripArtForSync(playlist), promoPlaylists, contacts, inbox });
         if (!ok) notify('⚠️', 'Sync failed — check connection');
       } catch(e2) {
         notify('⚠️', 'Could not reach server');
