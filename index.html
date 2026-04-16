@@ -3241,8 +3241,16 @@ function switchTab(name) {
     const st = document.getElementById('audio-url-status');
     if (st) { st.textContent = ''; st.className = 'audio-url-status'; }
   }
-  // Pause all canvas/animation loops when not on player tab — saves memory on mobile
+  // Pause all animation loops when not on player tab
+  const wasAnimPaused = _animPaused;
   _animPaused = (name !== 'player');
+  // Restart loops when returning to player tab
+  if (wasAnimPaused && !_animPaused) {
+    requestAnimationFrame(tickEQ);
+    if (_bobRunning) requestAnimationFrame(bobLoop);
+    if (raveModeOn) { _raveFrame = requestAnimationFrame(raveLoop); }
+    if (window.catTexture) window.catTexture.setRave(raveModeOn);
+  }
   // Defer heavy promo render so tab paint completes first
   if (name === 'promo') {
     setTimeout(() => { renderPromoTab(); loadTemplate(); }, 150);
@@ -3559,11 +3567,16 @@ for (let i = 0; i < EQ_BANDS; i++) {
 }
 
 function resizeEQ() {
+  if (_animPaused) return;
   eqCanvas.width  = eqCanvas.offsetWidth;
   eqCanvas.height = eqCanvas.offsetHeight;
 }
 
-window.addEventListener('resize', resizeEQ);
+let _resizeEQTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeEQTimer);
+  _resizeEQTimer = setTimeout(() => { if (!_animPaused) resizeEQ(); }, 200);
+});
 resizeEQ();
 
 function drawEQ() {
@@ -3627,7 +3640,7 @@ function drawEQ() {
 }
 
 function tickEQ() {
-  if (_animPaused) { requestAnimationFrame(tickEQ); return; }
+  if (_animPaused) return; // stopped - resumeAnimations() will restart
   if (isPlaying) {
     for (let i = 0; i < EQ_BANDS; i++) {
       // Target: randomised per band with frequency weighting + attack randomness
@@ -3713,7 +3726,7 @@ function getBobDurMs() {
 }
 
 function bobLoop(ts) {
-  if (_animPaused) { _bobFrame = requestAnimationFrame(bobLoop); return; }
+  if (_animPaused) return; // stopped - resumeAnimations() will restart
   if (!_bobRunning) {
     const wrap = getCatWrap();
     if (wrap) wrap.style.transform = 'translateY(0) rotate(0deg) scaleX(1)';
@@ -4972,7 +4985,7 @@ function lerpColor(hexA, hexB, t) {
 
 function raveLoop(ts) {
   if (!raveModeOn) return;
-  if (_animPaused) { _raveFrame = requestAnimationFrame(raveLoop); return; }
+  if (_animPaused) return; // stopped - resumeAnimations() will restart
   const beatMs  = getRaveBeatMs();
   const elapsed = Math.min(ts - _raveLast, beatMs);
   _raveLast     = ts;
@@ -6872,11 +6885,16 @@ window.addEventListener('pagehide', () => {
     if (!_canvas) return;
     _ctx = _canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    let _resizeCatTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(_resizeCatTimer);
+      _resizeCatTimer = setTimeout(() => { if (!_animPaused) resize(); }, 200);
+    });
     draw();
   }
 
   function resize() {
+    if (_animPaused) return;
     if (!_canvas) return;
     const deco = _canvas.parentElement;
     _canvas.width  = deco.offsetWidth  * (window.devicePixelRatio || 1);
@@ -7068,8 +7086,9 @@ window.addEventListener('pagehide', () => {
       if (on) {
         if (_frame) return;
         (function tick() {
-          if (!_rave) return;
-          if (!_animPaused) { _raveHue = (_raveHue + 2.5) % 360; draw(); }
+          if (!_rave || _animPaused) { _frame = null; return; }
+          _raveHue = (_raveHue + 2.5) % 360;
+          draw();
           _frame = requestAnimationFrame(tick);
         })();
       } else {
