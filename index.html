@@ -278,6 +278,7 @@ body {
 .tab-panel { display: none; }
 .tab-panel.active {
   display: block;
+  height: 100%;
 }
 /* Player tab: flex column so playlist fills remaining space */
 #panel-player.active {
@@ -1269,12 +1270,18 @@ select.finput { cursor: pointer; }
 /* Track picker */
 
 /* ── PROMO PANEL MOBILE FIXES ── */
-#panel-promo { overflow: visible; }
+#panel-promo {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  height: 100%;
+  max-height: calc(100dvh - 90px); /* subtract tab bar + title bar */
+}
 @media (max-width: 599px) {
   .track-picker { max-height: 180px; }
   .contact-list { max-height: 140px; }
   #saved-promo-list { max-height: 120px; }
-  .promo-body { padding-bottom: 40px; }
+  .promo-body { padding-bottom: 80px; }
 }
 .track-picker { max-height: 260px; overflow-y: auto; margin-bottom: 8px; border: 1px solid var(--border-lo); background: var(--pl-list-bg); }
 .track-picker::-webkit-scrollbar { width: 6px; }
@@ -5464,7 +5471,8 @@ function renderPromoPickerDebounced() {
 }
 
 function renderPromoTab() {
-  renderPromoTab();
+  renderSavedPromoList();
+  renderPromoPicker();
 }
 function renderPromoPicker() {
   const el = document.getElementById('promo-track-picker');
