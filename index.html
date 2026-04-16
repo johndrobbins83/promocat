@@ -2233,6 +2233,154 @@ body.rave-mode .lcd-art img {
 }
 .notif.show { transform:translateX(-50%) translateY(0); opacity:1; pointer-events:auto; }
 .notif-icon { font-size:16px; margin-right:6px; }
+
+/* ── PLAYLIST / INBOX MODE BUTTONS ── */
+.pl-mode-btns {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+.pl-mode-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  padding: 6px 10px;
+  background: var(--mbtn-bg);
+  color: var(--border-lo);
+  border-top: 1px solid var(--mbtn-border-hi);
+  border-left: 1px solid var(--mbtn-border-hi);
+  border-bottom: 1px solid var(--mbtn-border-lo);
+  border-right: 1px solid var(--mbtn-border-lo);
+  cursor: pointer;
+  letter-spacing: .4px;
+  white-space: nowrap;
+}
+.pl-mode-btn:first-child { border-right: none; }
+.pl-mode-btn.active {
+  background: var(--mbtn-on-bg);
+  color: var(--cat-orange);
+  border-top: 1px solid var(--mbtn-border-lo);
+  border-left: 1px solid var(--mbtn-border-lo);
+  border-bottom: 1px solid var(--mbtn-border-hi);
+  border-right: 1px solid var(--mbtn-border-hi);
+  text-shadow: 0 0 8px var(--cat-orange);
+  box-shadow: 0 0 6px rgba(68,221,136,.2), inset 0 0 4px rgba(68,221,136,.1);
+}
+@media (min-width: 900px) {
+  .pl-mode-btn { font-size: 8px; padding: 7px 16px; }
+}
+
+/* ── INBOX ITEMS ── */
+.inbox-item {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-lo);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+.inbox-item.unlistened {
+  border-left: 3px solid var(--cat-orange);
+  background: rgba(68,221,136,.04);
+}
+.inbox-item.cur { background: rgba(68,221,136,.1); }
+.inbox-item:hover { background: rgba(68,221,136,.06); }
+.inbox-title {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  color: var(--lcd-green);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.inbox-artist {
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  color: var(--cat-orange);
+  opacity: .8;
+}
+.inbox-meta {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 4px;
+  color: var(--border-lo);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.inbox-note {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: #556655;
+  font-style: italic;
+}
+.inbox-actions { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.inbox-empty {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--border-lo);
+  text-align: center;
+  padding: 30px 10px;
+  line-height: 2.5;
+}
+
+/* ── SOCIAL / FOLLOWER SYSTEM ── */
+.follower-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border-lo);
+}
+.follower-name {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--lcd-green); flex: 1;
+}
+.follower-note {
+  font-family: 'VT323', monospace; font-size: 14px;
+  color: #556655; flex: 1; font-style: italic;
+}
+.follower-status {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  padding: 2px 5px; border: 1px solid;
+}
+.follower-status.pending  { color: #ffcc44; border-color: #664400; }
+.follower-status.accepted { color: #44ff88; border-color: #006622; }
+.follower-status.declined { color: #ff4444; border-color: #660000; }
+.follower-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.soc-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  padding: 3px 6px; border: 1px solid; cursor: pointer;
+  background: none; white-space: nowrap;
+}
+.soc-btn.accept  { color: #44ff88; border-color: #006622; }
+.soc-btn.decline { color: #ff4444; border-color: #660000; }
+.soc-btn.remove  { color: #ff8844; border-color: #662200; }
+.soc-btn.promo   { color: #88ddff; border-color: #005588; }
+.soc-btn.push    { color: var(--cat-orange); border-color: var(--border-lo); }
+.soc-empty {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); padding: 16px 10px; text-align: center;
+  line-height: 2.2;
+}
+.following-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border-lo);
+}
+.following-name {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--cat-orange); flex: 1;
+}
+/* Feedback modal */
+.feedback-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85);
+  z-index: 99998; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.feedback-overlay.show { display: flex; }
+.feedback-box {
+  background: var(--win-bg); border: 2px solid var(--border-hi);
+  padding: 18px; width: 100%; max-width: 420px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.feedback-title {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--cat-orange); letter-spacing: .5px;
+}
 </style>
 </head>
 <body>
@@ -3027,6 +3175,49 @@ body.rave-mode .lcd-art img {
             <button class="settings-save-btn" onclick="saveArtistProfile()">💾 SAVE LINKS</button>
           </div>
         </div>
+
+
+        <!-- ── FOLLOWERS (User sees who follows them) ── -->
+        <!-- ── CONNECTIONS — single section, both directions ── -->
+        <div class="settings-section" id="followers-section">
+          <div class="settings-hdr" style="display:flex;justify-content:space-between;align-items:center;">
+            🤝 CONNECTIONS
+            <button class="settings-save-btn" style="padding:3px 8px;font-size:5px;" onclick="loadSocialData()">↻ REFRESH</button>
+          </div>
+          <div class="settings-content">
+
+            <!-- ── WHO FOLLOWS ME (incoming) ── -->
+            <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;letter-spacing:.5px;">
+              📥 PEOPLE SUBMITTING TO ME
+            </div>
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
+              Other users who want to send you music. Accept to allow them to push tracks to your inbox. Add them to your promo list to include them in email blasts.
+            </div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:5px;">PENDING</div>
+            <div id="pending-followers-list"><div class="soc-empty">NO PENDING REQUESTS</div></div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin:10px 0 5px;">ACCEPTED</div>
+            <div id="accepted-followers-list"><div class="soc-empty">NONE YET</div></div>
+
+            <div style="border-top:1px solid var(--border-lo);margin:14px 0;"></div>
+
+            <!-- ── WHO I FOLLOW (outgoing) ── -->
+            <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;letter-spacing:.5px;">
+              📤 I'M SUBMITTING TO
+            </div>
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
+              Request access to push tracks directly to another user's inbox. They must accept before you can send.
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+              <input class="finput" type="text" id="follow-username-input"
+                     placeholder="Enter their username..." autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;">
+              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">📨 REQUEST ACCESS</button>
+            </div>
+            <div id="following-list"><div class="soc-empty">NOT CONNECTED TO ANYONE YET</div></div>
+
+          </div>
+        </div>
+        <div id="following-section" style="display:none;"></div>
 
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
         <button class="back-btn" id="debug-btn" onclick="debugSync()" style="color:#ff8844;border-color:#662200;margin-top:6px;">🔧 DEBUG SYNC</button>
@@ -5671,21 +5862,26 @@ function showEmailPreview(toSend, subject, link, tracklist, profileName, profile
     document.body.appendChild(modal);
   }
 
+  const btnStyle = "font-family:'Press Start 2P',monospace;font-size:7px;background:#010805;border:1px solid;padding:10px 14px;cursor:pointer;flex:1;min-width:0;text-align:center;";
   modal.innerHTML = `
+    <!-- Title bar -->
     <div style="background:linear-gradient(180deg,#88ffbb,#44dd88 30%,#004422 60%,#44dd88 80%,#66ffaa);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:#010805;letter-spacing:1px;">📧 EMAIL PREVIEW</span>
-      <div style="display:flex;gap:6px;">
-        <button onclick="copyHtmlEmail()" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#44dd88;border:1px solid #44dd88;padding:5px 10px;cursor:pointer;">📋 COPY HTML</button>
-        <button onclick="openMailto()" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#44dd88;border:1px solid #44dd88;padding:5px 10px;cursor:pointer;">✉️ OPEN MAIL</button>
-        <button onclick="document.getElementById('email-preview-modal').style.display='none'" style="font-family:'Press Start 2P',monospace;font-size:6px;background:#010805;color:#ff4444;border:1px solid #ff4444;padding:5px 10px;cursor:pointer;">✕ CLOSE</button>
-      </div>
+      <button onclick="document.getElementById('email-preview-modal').style.display='none'" style="font-family:'Press Start 2P',monospace;font-size:8px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:6px 12px;cursor:pointer;">✕</button>
     </div>
-    <div style="padding:8px 14px;background:#020e06;border-bottom:1px solid #004422;flex-shrink:0;">
+    <!-- To: line -->
+    <div style="padding:6px 14px;background:#020e06;border-bottom:1px solid #004422;flex-shrink:0;">
       <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:#1a5522;">TO: </span>
       <span style="font-family:'VT323',monospace;font-size:16px;color:#44dd88;">${toSend.map(c=>c.email).join(', ')}</span>
     </div>
-    <div style="flex:1;overflow:auto;">
-      <iframe id="email-preview-iframe" style="width:100%;height:100%;border:none;background:#fff;"></iframe>
+    <!-- Email preview iframe -->
+    <div style="flex:1;overflow:auto;min-height:0;">
+      <iframe id="email-preview-iframe" style="width:100%;height:100%;min-height:300px;border:none;background:#fff;"></iframe>
+    </div>
+    <!-- Action buttons — always visible at bottom -->
+    <div style="display:flex;gap:6px;padding:10px 12px;background:#010805;border-top:2px solid #004422;flex-shrink:0;flex-wrap:wrap;">
+      <button onclick="openMailto()" style="${btnStyle}color:#44ffaa;border-color:#00aa44;">✉️ OPEN MAIL APP</button>
+      <button onclick="copyHtmlEmail()" style="${btnStyle}color:#88ddff;border-color:#005588;">📋 COPY HTML</button>
     </div>`;
 
   modal.style.display = 'flex';
@@ -6888,6 +7084,38 @@ function downloadEPK() {
   </div>
 </div>
 
+
+<!-- ── FEEDBACK MODAL ── -->
+<div class="feedback-overlay" id="feedback-overlay">
+  <div class="feedback-box">
+    <div class="feedback-title">⭐ SEND FEEDBACK</div>
+    <div id="feedback-track-info" style="font-family:'VT323',monospace;font-size:16px;color:var(--lcd-green);"></div>
+    <div style="display:flex;gap:4px;" id="feedback-stars">
+      ${[1,2,3,4,5].map(s=>`<span class="star" style="font-size:24px;cursor:pointer;color:#334433;" onclick="setFeedbackStar(${s})">★</span>`).join('')}
+    </div>
+    <textarea class="finput" id="feedback-text" placeholder="Leave a note for the artist... (optional)"
+              style="font-size:16px;min-height:80px;" autocorrect="off" spellcheck="false"></textarea>
+    <div style="display:flex;gap:6px;">
+      <button class="settings-save-btn" onclick="submitFeedback()" style="flex:1;">💾 SEND FEEDBACK</button>
+      <button class="back-btn" onclick="closeFeedbackModal()" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PUSH TRACK MODAL ── -->
+<div class="feedback-overlay" id="push-track-overlay">
+  <div class="feedback-box">
+    <div class="feedback-title">📤 PUSH TRACK</div>
+    <div id="push-track-to" style="font-family:'VT323',monospace;font-size:16px;color:var(--cat-orange);margin-bottom:4px;"></div>
+    <select class="finput" id="push-track-select" style="font-size:16px;"></select>
+    <textarea class="finput" id="push-track-note" placeholder="Add a note... (optional)"
+              style="font-size:16px;min-height:60px;" autocorrect="off" spellcheck="false"></textarea>
+    <div style="display:flex;gap:6px;">
+      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">🚀 SEND TRACK</button>
+      <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>`;
 
@@ -6996,6 +7224,263 @@ if (window.visualViewport) {
 
 
 // scrollIntoView removed — causes layout thrash on Android
+
+
+// ═══════════════════════════════════════════════════════
+// SOCIAL SYSTEM — Follower→User submission
+// ═══════════════════════════════════════════════════════
+
+let _feedbackTrackId  = null;
+let _feedbackStars    = 0;
+let _pushTargetUser   = null;
+
+// ── Load settings tab data ──
+function loadSocialData() {
+  loadFollowers();
+  loadFollowing();
+}
+
+// ─────────────────────────────────────────────
+// USER SIDE — manage incoming follower requests
+// ─────────────────────────────────────────────
+async function loadFollowers() {
+  try {
+    const { ok, data } = await api('GET', '/follow-requests', null);
+    if (!ok) return;
+    renderFollowers(data.followers || []);
+  } catch(e) { console.warn('loadFollowers:', e); }
+}
+
+function renderFollowers(followers) {
+  const pending  = followers.filter(f => f.status === 'pending');
+  const accepted = followers.filter(f => f.status === 'accepted');
+
+  const pendingEl  = document.getElementById('pending-followers-list');
+  const acceptedEl = document.getElementById('accepted-followers-list');
+  if (!pendingEl || !acceptedEl) return;
+
+  pendingEl.innerHTML = pending.length ? pending.map(f => `
+    <div class="follower-item">
+      <div>
+        <div class="follower-name">@${esc(f.username)}</div>
+        ${f.note ? `<div class="follower-note">"${esc(f.note)}"</div>` : ''}
+      </div>
+      <div class="follower-actions">
+        <button class="soc-btn accept"  onclick="respondFollower('${esc(f.username)}','accept')">✅ ACCEPT</button>
+        <button class="soc-btn decline" onclick="respondFollower('${esc(f.username)}','decline')">✕ DECLINE</button>
+      </div>
+    </div>`).join('')
+    : '<div class="soc-empty">NO PENDING REQUESTS</div>';
+
+  acceptedEl.innerHTML = accepted.length ? accepted.map(f => `
+    <div class="follower-item">
+      <div class="follower-name">@${esc(f.username)}</div>
+      <span class="follower-status accepted">ACCEPTED</span>
+      <div class="follower-actions">
+        <button class="soc-btn promo"  onclick="addFollowerToPromo('${esc(f.username)}')">+ PROMO LIST</button>
+        <button class="soc-btn remove" onclick="removeFollower('${esc(f.username)}')">✕ REMOVE</button>
+      </div>
+    </div>`).join('')
+    : '<div class="soc-empty">NO ACCEPTED FOLLOWERS YET</div>';
+}
+
+async function respondFollower(username, action) {
+  try {
+    const { ok, data } = await api('PUT', '/follow-request/' + username, { action });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify(action === 'accept' ? '✅' : '✕',
+           action === 'accept' ? '@' + username + ' can now submit tracks!' : '@' + username + ' declined');
+    loadFollowers();
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+async function removeFollower(username) {
+  if (!confirm('Remove @' + username + ' as a follower?')) return;
+  try {
+    const { ok, data } = await api('DELETE', '/follow-request/' + username, null);
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify('🗑️', '@' + username + ' removed');
+    loadFollowers();
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+async function addFollowerToPromo(username) {
+  try {
+    const { ok, data } = await api('POST', '/add-follower-to-promo', { followerUsername: username });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify('📋', '@' + username + ' added to promo list!');
+    // Reload contacts
+    const pl = await api('GET', '/playlist', null);
+    if (pl.ok && pl.data.contacts) {
+      contacts = pl.data.contacts;
+      renderContacts();
+    }
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+// ─────────────────────────────────────────────
+// FOLLOWER SIDE — manage who they submit to
+// ─────────────────────────────────────────────
+async function loadFollowing() {
+  try {
+    const { ok, data } = await api('GET', '/following', null);
+    if (!ok) return;
+    renderFollowing(data.following || []);
+  } catch(e) { console.warn('loadFollowing:', e); }
+}
+
+function renderFollowing(following) {
+  const el = document.getElementById('following-list');
+  if (!el) return;
+  if (!following.length) {
+    el.innerHTML = '<div class="soc-empty">NOT FOLLOWING ANYONE YET<br>ENTER A USERNAME ABOVE TO REQUEST ACCESS</div>';
+    return;
+  }
+  el.innerHTML = following.map(f => `
+    <div class="following-item">
+      <div>
+        <div class="following-name">${esc(f.name || f.username)}</div>
+        <div style="font-family:'VT323',monospace;font-size:12px;color:var(--border-lo);">@${esc(f.username)}</div>
+      </div>
+      <span class="follower-status ${f.status}">${f.status.toUpperCase()}</span>
+      ${f.status === 'accepted' ? `
+        <button class="soc-btn push" onclick="openPushTrack('${esc(f.username)}','${esc(f.name||f.username)}')">📤 PUSH TRACK</button>
+      ` : ''}
+    </div>`).join('');
+}
+
+async function requestAccess() {
+  const input = document.getElementById('follow-username-input');
+  const username = input.value.trim().toLowerCase();
+  if (!username) { notify('😾', 'Enter a username'); return; }
+  try {
+    const { ok, data } = await api('POST', '/request-access/' + username, {});
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify('📨', 'Request sent to @' + username + '!');
+    input.value = '';
+    setTimeout(loadFollowing, 500);
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+// ─────────────────────────────────────────────
+// PUSH TRACK MODAL
+// ─────────────────────────────────────────────
+function openPushTrack(username, displayName) {
+  _pushTargetUser = username;
+  document.getElementById('push-track-to').textContent = 'TO: ' + displayName + ' (@' + username + ')';
+  document.getElementById('push-track-note').value = '';
+  // Populate track selector from MY TRACKS playlist
+  const sel = document.getElementById('push-track-select');
+  sel.innerHTML = playlist.length
+    ? playlist.map((t, i) => `<option value="${i}">${esc(t.title)} — ${esc(t.artist)}</option>`).join('')
+    : '<option value="">No tracks in My Tracks</option>';
+  document.getElementById('push-track-overlay').classList.add('show');
+}
+
+async function doPushTrack() {
+  if (!_pushTargetUser) return;
+  const sel = document.getElementById('push-track-select');
+  const idx = parseInt(sel.value);
+  if (isNaN(idx) || !playlist[idx]) { notify('😾', 'Select a track'); return; }
+  const t = playlist[idx];
+  const note = document.getElementById('push-track-note').value.trim();
+  try {
+    const { ok, data } = await api('POST', '/submit-track/' + _pushTargetUser, {
+      url: t.url, title: t.title, artist: t.artist,
+      album: t.album, year: t.year, bpm: t.bpm,
+      genre: t.genre, note
+    });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    document.getElementById('push-track-overlay').classList.remove('show');
+    notify('🚀', '"' + t.title + '" sent to @' + _pushTargetUser + '!');
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+// ─────────────────────────────────────────────
+// FEEDBACK MODAL — User rates/comments on inbox track
+// ─────────────────────────────────────────────
+function openFeedbackModal(trackId, trackTitle) {
+  _feedbackTrackId = trackId;
+  _feedbackStars   = 0;
+  document.getElementById('feedback-track-info').textContent = '"' + trackTitle + '"';
+  document.getElementById('feedback-text').value = '';
+  document.querySelectorAll('#feedback-stars .star').forEach(s => s.style.color = '#334433');
+  document.getElementById('feedback-overlay').classList.add('show');
+}
+
+function setFeedbackStar(n) {
+  _feedbackStars = n;
+  document.querySelectorAll('#feedback-stars .star').forEach((s, i) => {
+    s.style.color = i < n ? '#ffcc44' : '#334433';
+  });
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-overlay').classList.remove('show');
+  _feedbackTrackId = null;
+}
+
+async function submitFeedback() {
+  if (!_feedbackTrackId) return;
+  const feedback = document.getElementById('feedback-text').value.trim();
+  try {
+    const { ok, data } = await api('PUT', '/inbox-feedback/' + _feedbackTrackId, {
+      rating: _feedbackStars, feedback
+    });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    closeFeedbackModal();
+    notify('⭐', 'Feedback sent!');
+    // Refresh inbox display
+    const pl = await api('GET', '/playlist', null);
+    if (pl.ok && Array.isArray(pl.data.inbox)) {
+      inbox = pl.data.inbox;
+      renderInbox();
+    }
+  } catch(e) { notify('😾', 'Could not reach server'); }
+}
+
+// ── Add feedback button to inbox items ──
+// Override renderInbox to include ⭐ FEEDBACK button on follower-submitted tracks
+const _origRenderInbox = renderInbox;
+renderInbox = function() {
+  _origRenderInbox();
+  // Add feedback buttons to follower tracks
+  const list = document.getElementById('pl-list');
+  if (!list || playlistMode !== 'inbox') return;
+  inbox.forEach((t, i) => {
+    if (t.source !== 'follower' && !t.senderUsername) return;
+    const item = list.children[i];
+    if (!item) return;
+    const actions = item.querySelector('.inbox-actions');
+    if (!actions) return;
+    // Add feedback btn if not already there
+    if (!item.querySelector('.feedback-btn') && t.id) {
+      const btn = document.createElement('button');
+      btn.className = 'pl-bar-btn feedback-btn';
+      btn.style.cssText = 'font-size:5px;padding:2px 6px;color:#ffcc44;border-color:#664400;';
+      btn.textContent = '⭐ FEEDBACK';
+      btn.onclick = (e) => { e.stopPropagation(); openFeedbackModal(t.id, t.title); };
+      actions.appendChild(btn);
+    }
+    // Show existing feedback/rating if any
+    if ((t.rating || t.feedback) && !item.querySelector('.inbox-feedback-show')) {
+      const fb = document.createElement('div');
+      fb.className = 'inbox-feedback-show';
+      fb.style.cssText = 'font-family:VT323,monospace;font-size:13px;color:#556600;margin-top:3px;';
+      fb.textContent = (t.rating ? '★'.repeat(t.rating) + ' ' : '') + (t.feedback || '');
+      item.appendChild(fb);
+    }
+  });
+};
+
+// ── Load social data when settings tab opens ──
+const _origSwitchTab = switchTab;
+switchTab = function(name) {
+  _origSwitchTab(name);
+  if (name === 'settings' && currentUser) {
+    setTimeout(loadSocialData, 200);
+  }
+};
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
@@ -7317,5 +7802,37 @@ window.addEventListener('pagehide', () => {
   </div>
 </div>
 
+
+<!-- ── FEEDBACK MODAL ── -->
+<div class="feedback-overlay" id="feedback-overlay">
+  <div class="feedback-box">
+    <div class="feedback-title">⭐ SEND FEEDBACK</div>
+    <div id="feedback-track-info" style="font-family:'VT323',monospace;font-size:16px;color:var(--lcd-green);"></div>
+    <div style="display:flex;gap:4px;" id="feedback-stars">
+      ${[1,2,3,4,5].map(s=>`<span class="star" style="font-size:24px;cursor:pointer;color:#334433;" onclick="setFeedbackStar(${s})">★</span>`).join('')}
+    </div>
+    <textarea class="finput" id="feedback-text" placeholder="Leave a note for the artist... (optional)"
+              style="font-size:16px;min-height:80px;" autocorrect="off" spellcheck="false"></textarea>
+    <div style="display:flex;gap:6px;">
+      <button class="settings-save-btn" onclick="submitFeedback()" style="flex:1;">💾 SEND FEEDBACK</button>
+      <button class="back-btn" onclick="closeFeedbackModal()" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PUSH TRACK MODAL ── -->
+<div class="feedback-overlay" id="push-track-overlay">
+  <div class="feedback-box">
+    <div class="feedback-title">📤 PUSH TRACK</div>
+    <div id="push-track-to" style="font-family:'VT323',monospace;font-size:16px;color:var(--cat-orange);margin-bottom:4px;"></div>
+    <select class="finput" id="push-track-select" style="font-size:16px;"></select>
+    <textarea class="finput" id="push-track-note" placeholder="Add a note... (optional)"
+              style="font-size:16px;min-height:60px;" autocorrect="off" spellcheck="false"></textarea>
+    <div style="display:flex;gap:6px;">
+      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">🚀 SEND TRACK</button>
+      <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
