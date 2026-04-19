@@ -3494,10 +3494,23 @@ Listen here: {link}
           </div>
         </div>
 
+        <!-- RECENT SIGNUPS -->
+        <div class="promo-section" id="admin-signups-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🆕 RECENT SIGNUPS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderRecentSignups()">↻ REFRESH</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="recent-signups-list">
+              <div class="soc-empty">NO SIGNUPS YET</div>
+            </div>
+          </div>
+        </div>
+
         <!-- REGISTERED USERS -->
         <div class="promo-section">
           <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>👥 REGISTERED USERS</span>
+            <span>👥 ALL USERS</span>
             <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderUserList()">↻ REFRESH</button>
           </div>
           <div class="promo-section-body" style="padding:0;">
@@ -3848,10 +3861,14 @@ async function createInviteCode() {
   try {
     const { ok, data } = await api('POST', '/invites', {});
     if (!ok) { notify('😾', data.error || 'Could not create code'); return; }
+    // Switch to admin tab first so the DOM element exists, then render
+    if (!document.getElementById('panel-admin').classList.contains('active')) {
+      switchTab('admin');
+    }
     await renderInviteCodes();
     navigator.clipboard.writeText(data.code)
-      .then(() => notify('🎟️', 'Invite code copied: ' + data.code))
-      .catch(() => notify('🎟️', 'Code: ' + data.code));
+      .then(() => notify('🎟️', 'Code ' + data.code + ' copied!'))
+      .catch(() => notify('🎟️', 'New code: ' + data.code));
   } catch(e) { notify('😾', 'Server unreachable'); }
 }
 
@@ -3863,18 +3880,21 @@ async function revokeInvite(code) {
 }
 
 async function renderInviteCodes() {
-  const el = document.getElementById('invite-code-list');
-  if (!el) return;
-  el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">LOADING...</div>';
+  const els = document.querySelectorAll('#invite-code-list');
+  if (!els.length) return;
+  els.forEach(el => el.innerHTML = '<div style="font-family:VT323,monospace;font-size:16px;color:var(--border-lo);padding:8px;">LOADING...</div>');
   try {
     const { ok, data } = await api('GET', '/invites', null);
-    if (!ok || !data.codes) { el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">ERROR LOADING CODES</div>'; return; }
-    const invites = data.codes;
-    if (!invites.length) {
-      el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>';
+    if (!ok || !data.codes) {
+      els.forEach(el => el.innerHTML = '<div style="font-family:VT323,monospace;font-size:16px;color:#ff4444;padding:8px;">ERROR: ' + (data?.error||'Could not load') + '</div>');
       return;
     }
-    el.innerHTML = invites.map(i => `
+    const invites = data.codes;
+    if (!invites.length) {
+      els.forEach(el => el.innerHTML = '<div style="font-family:VT323,monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>');
+      return;
+    }
+    const html = invites.map(i => `
       <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border-lo);">
         <span style="font-family:'Press Start 2P',monospace;font-size:14px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:6px;">${i.code}</span>
         ${i.used
@@ -3883,11 +3903,40 @@ async function renderInviteCodes() {
              <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:5px;color:#884422;background:none;border:1px solid #441100;padding:4px 6px;cursor:pointer;">✕</button>`
         }
       </div>`).join('');
+    els.forEach(el => el.innerHTML = html);
   } catch(e) {
-    el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">SERVER UNREACHABLE</div>';
+    els.forEach(el => el.innerHTML = '<div style="font-family:VT323,monospace;font-size:16px;color:#ff4444;padding:8px;">SERVER UNREACHABLE</div>');
   }
 }
 
+
+// ── Admin: render recent signups from notifications ──
+function renderRecentSignups() {
+  const el = document.getElementById('recent-signups-list');
+  if (!el) return;
+  const signups = _notifications.filter(n => n.type === 'new_user');
+  if (!signups.length) {
+    el.innerHTML = '<div class="soc-empty">NO SIGNUPS YET</div>';
+    return;
+  }
+  el.innerHTML = signups.map(n => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border-lo);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lcd-green);margin-bottom:3px;">
+          ${esc(n.displayName || n.newUser || 'Unknown')}
+        </div>
+        <div style="font-family:'VT323',monospace;font-size:14px;color:#445544;">
+          ${esc(n.newUser || '')}
+        </div>
+      </div>
+      ${n.usedCode ? `
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:#556655;margin-bottom:3px;">USED CODE</div>
+          <div style="font-family:'Press Start 2P',monospace;font-size:12px;color:#44ff88;letter-spacing:4px;">${esc(n.usedCode)}</div>
+        </div>` : ''}
+      <div style="font-family:'VT323',monospace;font-size:13px;color:#334433;flex-shrink:0;">${timeAgo(n.at)}</div>
+    </div>`).join('');
+}
 async function deleteUser(username) {
   if (!confirm('Remove user @' + username + '? This cannot be undone.')) return;
   try {
@@ -4439,15 +4488,23 @@ function renderNotifList() {
     el.innerHTML = '<div class="notif-empty">NO NOTIFICATIONS YET<br><br>YOU\'LL SEE ALERTS HERE WHEN<br>TRACKS ARE PLAYED, RATED,<br>DOWNLOADED, OR USERS SIGN UP</div>';
     return;
   }
-  el.innerHTML = _notifications.map(n => `
-    <div class="notif-item${n.read ? '' : ' unread'}">
+  el.innerHTML = _notifications.map(n => {
+    const isCodeUsed = n.type === 'new_user';
+    const border = isCodeUsed ? 'border-left:3px solid #44ff88;' : '';
+    const extra = isCodeUsed && n.usedCode
+      ? `<div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;letter-spacing:4px;margin-top:4px;">CODE: ${esc(n.usedCode)}</div>`
+      : '';
+    return `
+    <div class="notif-item${n.read ? '' : ' unread'}" style="${border}">
       <div class="notif-item-icon">${n.icon || '🔔'}</div>
       <div class="notif-item-body">
         <div class="notif-item-title">${esc(n.title)}</div>
         <div class="notif-item-sub">${esc(n.body || '')}</div>
+        ${extra}
       </div>
       <div class="notif-item-time">${timeAgo(n.at)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function timeAgo(ts) {
@@ -7827,6 +7884,7 @@ switchTab = function(name) {
   if (name === 'admin') {
     renderInviteCodes();
     renderUserList();
+    renderRecentSignups();
   }
 };
 
