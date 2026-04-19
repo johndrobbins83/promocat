@@ -3487,8 +3487,20 @@ Listen here: {link}
             <button class="promo-btn primary" onclick="createInviteCode()" style="padding:4px 10px;">+ GENERATE CODE</button>
           </div>
           <div class="promo-section-body">
-            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:10px;line-height:1.5;">
-              Generate a 4-digit code and share it with someone to let them register.
+            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:12px;line-height:1.5;">
+              Generate a code, enter the recipient's email, and hit SEND to open your mail app with the invite pre-written.
+            </div>
+            <!-- Quick send row -->
+            <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+              <input class="finput" type="email" id="invite-send-email"
+                     placeholder="recipient@email.com" autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false"
+                     style="flex:1;min-width:200px;font-size:16px;">
+              <button class="promo-btn primary" onclick="generateAndSendInvite()"
+                      data-tip="GENERATE CODE & OPEN MAIL APP"
+                      style="flex:0;white-space:nowrap;padding:10px 16px;">
+                🎟️ GENERATE & SEND
+              </button>
             </div>
             <div id="invite-code-list" style="max-height:none;"></div>
           </div>
@@ -3821,38 +3833,41 @@ async function doRegister() {
 (async function autoLogin() {
   const stored = localStorage.getItem(SESSION_KEY);
   if (!stored) return;
+  let parsed;
+  try { parsed = JSON.parse(stored); } catch(e) { localStorage.removeItem(SESSION_KEY); return; }
+  const { username, token } = parsed;
+  if (!username || !token) { localStorage.removeItem(SESSION_KEY); return; }
+
+  // Set token so api() can send auth header
+  currentUser = { username, role: 'user', token };
+
   try {
-    const { username, role, token } = JSON.parse(stored);
-    if (!username || !token) { localStorage.removeItem(SESSION_KEY); return; }
-    // Set currentUser FIRST so api() sends the auth header
-    currentUser = { username, role, token };
     const { ok, data } = await api('GET', '/verify', null);
-    if (ok) {
-      applyUnlock(username, data.role || role, token);
-    } else {
-      // Token expired or invalid
-      currentUser = null;
-      localStorage.removeItem(SESSION_KEY);
-    }
+    if (!ok) { currentUser = null; localStorage.removeItem(SESSION_KEY); return; }
+    // data.role comes from KV (authoritative) — always trust it
+    const freshRole = data.role || 'user';
+    // Persist fresh role
+    parsed.role = freshRole;
+    localStorage.setItem(SESSION_KEY, JSON.stringify(parsed));
+    applyUnlock(username, freshRole, token);
   } catch(e) {
-    // Server unreachable — restore session but retry role check after delay
-    try {
-      const { username, role, token } = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
-      if (username && token) {
-        currentUser = { username, role, token };
-        applyUnlock(username, role, token); // use cached role temporarily
-        // Retry verify after 2s in case server was just slow
-        setTimeout(async () => {
-          try {
-            const { ok, data } = await api('GET', '/verify', null);
-            if (ok && data.role !== role) {
-              currentUser.role = data.role;
-              applyUnlock(username, data.role, token);
-            }
-          } catch(e3) {}
-        }, 2000);
-      }
-    } catch(e2) {}
+    // Offline fallback — use cached role temporarily, recheck when back online
+    const cachedRole = parsed.role || 'user';
+    currentUser = { username, role: cachedRole, token };
+    applyUnlock(username, cachedRole, token);
+    // Keep retrying verify every 3s until it succeeds
+    const retryId = setInterval(async () => {
+      try {
+        const { ok, data } = await api('GET', '/verify', null);
+        if (!ok) return;
+        clearInterval(retryId);
+        const freshRole = data.role || 'user';
+        parsed.role = freshRole;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(parsed));
+        currentUser.role = freshRole;
+        applyUnlock(username, freshRole, token);
+      } catch(e2) { /* still offline */ }
+    }, 3000);
   }
 })();
 
@@ -3867,6 +3882,66 @@ document.getElementById('tab-upload').addEventListener('click', function() {
 // ═══════════════════════════════════════════════
 // INVITE CODES — managed via Worker API
 // ═══════════════════════════════════════════════
+
+// ── Admin: generate invite code and open mail app ──
+async function generateAndSendInvite() {
+  const emailEl = document.getElementById('invite-send-email');
+  const toEmail = emailEl ? emailEl.value.trim() : '';
+  try {
+    const { ok, data } = await api('POST', '/invites', {});
+    if (!ok) { notify('😾', data.error || 'Could not create code'); return; }
+    const code = data.code;
+    // Refresh list
+    if (!document.getElementById('panel-admin').classList.contains('active')) {
+      switchTab('admin');
+    }
+    await renderInviteCodes();
+    // Build the invite email
+    const appUrl = window.location.origin + window.location.pathname;
+    const subject = encodeURIComponent('Your PromoCat Invite Code 🐱');
+    const body = encodeURIComponent(
+      'Hey,\n\n' +
+      'You\'ve been invited to join PromoCat!\n\n' +
+      'Your invite code is:\n\n' +
+      '  ' + code + '\n\n' +
+      'To create your account:\n' +
+      '1. Go to: ' + appUrl + '\n' +
+      '2. Click LOGIN → REGISTER\n' +
+      '3. Enter your email, choose a password, and enter code: ' + code + '\n\n' +
+      'See you on PromoCat! 🐱\n'
+    );
+    if (toEmail) {
+      window.location.href = 'mailto:' + encodeURIComponent(toEmail) +
+        '?subject=' + subject + '&body=' + body;
+      notify('✉️', 'Code ' + code + ' — mail app opening!');
+      if (emailEl) emailEl.value = '';
+    } else {
+      // No email entered — just copy the code and show a mailto link
+      navigator.clipboard.writeText(code)
+        .then(() => notify('🎟️', 'Code ' + code + ' copied! Enter an email to send directly.'))
+        .catch(() => notify('🎟️', 'Code: ' + code));
+    }
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+// ── Also add send button to each existing unused code in the list ──
+function sendExistingInvite(code) {
+  const appUrl = window.location.origin + window.location.pathname;
+  const subject = encodeURIComponent('Your PromoCat Invite Code 🐱');
+  const body = encodeURIComponent(
+    'Hey,\n\n' +
+    'You\'ve been invited to join PromoCat!\n\n' +
+    'Your invite code is:\n\n' +
+    '  ' + code + '\n\n' +
+    'To create your account:\n' +
+    '1. Go to: ' + appUrl + '\n' +
+    '2. Click LOGIN → REGISTER\n' +
+    '3. Enter your email, choose a password, and enter code: ' + code + '\n\n' +
+    'See you on PromoCat! 🐱\n'
+  );
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+}
+
 async function createInviteCode() {
   try {
     const { ok, data } = await api('POST', '/invites', {});
@@ -3909,8 +3984,9 @@ async function renderInviteCodes() {
         <span style="font-family:'Press Start 2P',monospace;font-size:14px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:6px;">${i.code}</span>
         ${i.used
           ? `<span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">USED BY ${(i.usedBy||'?').toUpperCase()}</span>`
-          : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🎟️','Code ${i.code} copied!'))" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:4px 8px;cursor:pointer;">📋 COPY</button>
-             <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:5px;color:#884422;background:none;border:1px solid #441100;padding:4px 6px;cursor:pointer;">✕</button>`
+          : `<button onclick="sendExistingInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:6px;color:#88ddff;background:rgba(0,50,80,.4);border:1px solid #005588;padding:6px 10px;cursor:pointer;">✉️ SEND</button>
+             <button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🎟️','Code ${i.code} copied!'))" style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:6px 10px;cursor:pointer;">📋 COPY</button>
+             <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:6px;color:#884422;background:none;border:1px solid #441100;padding:6px 8px;cursor:pointer;">✕</button>`
         }
       </div>`).join('');
     els.forEach(el => el.innerHTML = html);
