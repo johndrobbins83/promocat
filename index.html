@@ -3883,64 +3883,79 @@ document.getElementById('tab-upload').addEventListener('click', function() {
 // INVITE CODES — managed via Worker API
 // ═══════════════════════════════════════════════
 
-// ── Admin: generate invite code and open mail app ──
+// ── Admin: generate invite and show send modal ──
 async function generateAndSendInvite() {
   const emailEl = document.getElementById('invite-send-email');
   const toEmail = emailEl ? emailEl.value.trim() : '';
   try {
     const { ok, data } = await api('POST', '/invites', {});
     if (!ok) { notify('😾', data.error || 'Could not create code'); return; }
-    const code = data.code;
-    // Refresh list
-    if (!document.getElementById('panel-admin').classList.contains('active')) {
-      switchTab('admin');
-    }
+    if (!document.getElementById('panel-admin').classList.contains('active')) switchTab('admin');
     await renderInviteCodes();
-    // Build the invite email
-    const appUrl = window.location.origin + window.location.pathname;
-    const subject = encodeURIComponent('Your PromoCat Invite Code 🐱');
-    const body = encodeURIComponent(
-      'Hey,\n\n' +
-      'You\'ve been invited to join PromoCat!\n\n' +
-      'Your invite code is:\n\n' +
-      '  ' + code + '\n\n' +
-      'To create your account:\n' +
-      '1. Go to: ' + appUrl + '\n' +
-      '2. Click LOGIN → REGISTER\n' +
-      '3. Enter your email, choose a password, and enter code: ' + code + '\n\n' +
-      'See you on PromoCat! 🐱\n'
-    );
-    if (toEmail) {
-      window.location.href = 'mailto:' + encodeURIComponent(toEmail) +
-        '?subject=' + subject + '&body=' + body;
-      notify('✉️', 'Code ' + code + ' — mail app opening!');
-      if (emailEl) emailEl.value = '';
-    } else {
-      // No email entered — just copy the code and show a mailto link
-      navigator.clipboard.writeText(code)
-        .then(() => notify('🎟️', 'Code ' + code + ' copied! Enter an email to send directly.'))
-        .catch(() => notify('🎟️', 'Code: ' + code));
-    }
+    if (emailEl) emailEl.value = '';
+    openInviteSendModal(data.code, toEmail);
   } catch(e) { notify('😾', 'Server unreachable'); }
 }
 
-// ── Also add send button to each existing unused code in the list ──
 function sendExistingInvite(code) {
-  const appUrl = window.location.origin + window.location.pathname;
-  const subject = encodeURIComponent('Your PromoCat Invite Code 🐱');
-  const body = encodeURIComponent(
-    'Hey,\n\n' +
-    'You\'ve been invited to join PromoCat!\n\n' +
-    'Your invite code is:\n\n' +
-    '  ' + code + '\n\n' +
-    'To create your account:\n' +
-    '1. Go to: ' + appUrl + '\n' +
-    '2. Click LOGIN → REGISTER\n' +
-    '3. Enter your email, choose a password, and enter code: ' + code + '\n\n' +
-    'See you on PromoCat! 🐱\n'
-  );
-  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  openInviteSendModal(code, '');
 }
+
+function openInviteSendModal(code, prefillEmail) {
+  const appUrl = window.location.origin + window.location.pathname;
+  const subject = 'Your PromoCat Invite Code';
+  const bodyText = 'Hey,\n\nYou have been invited to join PromoCat!\n\nYour invite code is: '
+    + code + '\n\nTo create your account:\n1. Go to: ' + appUrl
+    + '\n2. Click LOGIN then REGISTER\n3. Enter your email and choose a password\n4. Enter invite code: '
+    + code + '\n\nSee you on PromoCat!';
+
+  window._inviteEmailText = bodyText;
+
+  const sEnc = encodeURIComponent(subject);
+  const bEnc = encodeURIComponent(bodyText);
+  const tEnc = prefillEmail ? encodeURIComponent(prefillEmail) : '';
+
+  const gmailUrl   = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + tEnc + '&su=' + sEnc + '&body=' + bEnc;
+  const outlookUrl = 'https://outlook.live.com/mail/0/deeplink/compose?to=' + tEnc + '&subject=' + sEnc + '&body=' + bEnc;
+  const yahooUrl   = 'https://compose.mail.yahoo.com/?to=' + tEnc + '&subject=' + sEnc + '&body=' + bEnc;
+  const mailtoUrl  = 'mailto:' + tEnc + '?subject=' + sEnc + '&body=' + bEnc;
+
+  let modal = document.getElementById('invite-send-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'invite-send-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    document.body.appendChild(modal);
+  }
+
+  const toLine = prefillEmail ? ('<div style="font-family:VT323,monospace;font-size:16px;color:#e8821a;margin-top:6px;">TO: ' + esc(prefillEmail) + '</div>') : '';
+  const BS = 'display:block;width:100%;padding:13px 16px;margin-bottom:8px;font-family:monospace;font-size:13px;border:1px solid;cursor:pointer;text-align:left;text-decoration:none;box-sizing:border-box;';
+
+  modal.innerHTML = [
+    '<div style="background:var(--win-bg);border:2px solid var(--border-hi);max-width:440px;width:100%;">',
+      '<div style="background:var(--title-grad);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">',
+        '<span style="font-family:monospace;font-size:11px;font-weight:bold;color:#010805;letter-spacing:2px;">SEND INVITE CODE</span>',
+        '<button onclick="document.getElementById(\'invite-send-modal\').style.display=\'none\'" style="font-family:monospace;font-size:12px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:5px 10px;cursor:pointer;">X CLOSE</button>',
+      '</div>',
+      '<div style="padding:16px 18px 10px;border-bottom:1px solid var(--border-lo);">',
+        '<div style="font-family:monospace;font-size:10px;color:var(--border-lo);margin-bottom:6px;letter-spacing:1px;">INVITE CODE</div>',
+        '<div style="font-family:monospace;font-size:32px;color:var(--lcd-green);letter-spacing:10px;font-weight:bold;">' + code + '</div>',
+        toLine,
+      '</div>',
+      '<div style="padding:16px 18px;">',
+        '<div style="font-family:monospace;font-size:10px;color:var(--border-lo);margin-bottom:12px;letter-spacing:1px;">OPEN WITH:</div>',
+        '<a href="' + gmailUrl   + '" target="_blank" style="' + BS + 'color:#ea4335;border-color:#660000;background:rgba(80,0,0,.3);">&#128231; GMAIL</a>',
+        '<a href="' + outlookUrl + '" target="_blank" style="' + BS + 'color:#4da3ff;border-color:#003366;background:rgba(0,30,70,.3);">&#128231; OUTLOOK</a>',
+        '<a href="' + yahooUrl   + '" target="_blank" style="' + BS + 'color:#a678ff;border-color:#330066;background:rgba(40,0,80,.3);">&#128231; YAHOO MAIL</a>',
+        '<a href="' + mailtoUrl  + '"                 style="' + BS + 'color:var(--lcd-green);border-color:var(--border-lo);background:rgba(0,30,15,.4);">&#128236; DEFAULT MAIL APP</a>',
+        '<button onclick="navigator.clipboard.writeText(window._inviteEmailText||\'\').then(function(){notify(\'📋\',\'Copied!\');document.getElementById(\'invite-send-modal\').style.display=\'none\';})" style="' + BS + 'color:#aaa;border-color:#444;background:rgba(30,30,30,.5);">&#128203; COPY EMAIL TEXT</button>',
+      '</div>',
+    '</div>'
+  ].join('');
+
+  modal.style.display = 'flex';
+}
+
 
 async function createInviteCode() {
   try {
@@ -7365,10 +7380,7 @@ function downloadEPK() {
         <div class="section-label">📞 CONTACTS</div>
         \${rows.map(({ label, key }) => {
           const r = ct[key];
-          return \`<div style="margin-bottom:12px;">
-            <div style="font-size:8px;color:#ff8c42;font-family:'Press Start 2P',monospace;margin-bottom:4px;">\${label}</div>
-            <div style="font-size:18px;color:#aaa;">\${r.name ? r.name + ' — ' : ''}\${r.email || ''}\${r.phone ? ' · ' + r.phone : ''}</div>
-          </div>\`;
+          return '<div style="margin-bottom:12px;"><div style="font-size:8px;color:#ff8c42;font-family:monospace;margin-bottom:4px;">' + label + '</div><div style="font-size:18px;color:#aaa;">' + (r.name ? r.name + ' — ' : '') + (r.email||'') + (r.phone ? ' · ' + r.phone : '') + '</div></div>';
         }).join('')}
       </div>\`;
     })()}
