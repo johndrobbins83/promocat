@@ -6244,8 +6244,10 @@ async function checkPromoHash() {
 
 // Run on load
 window.addEventListener('DOMContentLoaded', () => {
-  // Recheck admin role after page loads in case token has stale role
-  setTimeout(recheckAdminRole, 1500);
+  // Recheck admin role — run at 500ms, 2s, and 5s to handle slow deploys
+  setTimeout(recheckAdminRole, 500);
+  setTimeout(recheckAdminRole, 2000);
+  setTimeout(recheckAdminRole, 5000);
   const hash = window.location.hash;
   if (hash.startsWith('#playlist=') || hash.startsWith('#promo=') || hash.startsWith('#p=')) {
     checkPromoHash();
@@ -7906,15 +7908,22 @@ async function recheckAdminRole() {
   if (!currentUser) return;
   try {
     const { ok, data } = await api('GET', '/verify', null);
-    if (ok && data.role !== currentUser.role) {
-      currentUser.role = data.role;
-      const t = document.getElementById('tab-admin');
-      if (t) t.style.display = data.role === 'admin' ? 'flex' : 'none';
-      // Also update localStorage
+    if (!ok) return;
+    // Always update role and tab visibility from server — no condition
+    currentUser.role = data.role;
+    const t = document.getElementById('tab-admin');
+    if (t) t.style.display = data.role === 'admin' ? 'flex' : 'none';
+    // Show bell for admin
+    if (data.role === 'admin') {
+      const bell = document.getElementById('wbtn-bell');
+      if (bell) { bell.style.opacity = '1'; bell.style.pointerEvents = 'auto'; }
+    }
+    // Persist fresh role
+    try {
       const stored = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
       stored.role = data.role;
       localStorage.setItem(SESSION_KEY, JSON.stringify(stored));
-    }
+    } catch(e2) {}
   } catch(e) {}
 }
 
