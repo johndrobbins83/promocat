@@ -2468,6 +2468,63 @@ body.rave-mode .lcd-art img {
   .contact-act-btn.promo,
   .contact-act-btn.del { font-size: 6px !important; padding: 5px 9px !important; }
 }
+
+/* ── DROP PICKER POPOUT ── */
+.drop-picker {
+  position: fixed;
+  background: var(--win-bg);
+  border: 2px solid var(--border-hi);
+  z-index: 9999;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 0 20px rgba(68,221,136,.2);
+}
+.drop-picker-hdr {
+  background: var(--pl-bar-bg);
+  padding: 8px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border-lo);
+}
+.drop-picker-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px; color: var(--cat-orange); letter-spacing: .5px;
+}
+.drop-picker-close {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #ff4444; background: none; border: none; cursor: pointer; padding: 2px 5px;
+}
+.drop-picker-track {
+  font-family: 'VT323', monospace; font-size: 15px;
+  color: var(--lcd-green); padding: 6px 12px;
+  border-bottom: 1px solid var(--border-lo);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.drop-picker-list {
+  max-height: 260px; overflow-y: auto;
+}
+.drop-picker-user {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-bottom: 1px solid var(--border-lo);
+  cursor: pointer; transition: background .1s;
+}
+.drop-picker-user:hover { background: rgba(68,221,136,.08); }
+.drop-picker-user:last-child { border-bottom: none; }
+.drop-picker-uname {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--lcd-green); flex: 1;
+}
+.drop-picker-send {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--cat-orange); background: none;
+  border: 1px solid var(--border-lo); padding: 3px 7px; cursor: pointer;
+}
+.drop-picker-send:hover { border-color: var(--cat-orange); color: #fff; }
+.drop-picker-empty {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); padding: 20px 12px; text-align: center; line-height: 2.2;
+}
+.pl-act-btn.pl-drop-btn { color: #88ddff; }
+.pl-act-btn.pl-drop-btn:hover { color: #ffffff; background: rgba(68,170,255,.15); }
 </style>
 </head>
 <body>
@@ -3270,42 +3327,42 @@ body.rave-mode .lcd-art img {
         <!-- ── CONNECTIONS — single section, both directions ── -->
         <div class="settings-section" id="followers-section">
           <div class="settings-hdr" style="display:flex;justify-content:space-between;align-items:center;">
-            🤝 CONNECTIONS
+            🤝 CONNECTIONS <span id="connections-badge" style="display:none;background:#ff4444;color:#fff;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 5px;margin-left:6px;border-radius:2px;">NEW</span>
             <button class="settings-save-btn" style="padding:3px 8px;font-size:5px;" onclick="loadSocialData()">↻ REFRESH</button>
           </div>
           <div class="settings-content">
 
             <!-- ── WHO FOLLOWS ME (incoming) ── -->
             <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;letter-spacing:.5px;">
-              📥 PEOPLE SUBMITTING TO ME
+              📥 INCOMING REQUESTS
             </div>
             <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
-              Other users who want to send you music. Accept to allow them to push tracks to your inbox. Add them to your promo list to include them in email blasts.
+              Other users who want to swap tracks with you. Accept to let each other drop tracks directly into your inboxes.
             </div>
             <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:5px;">PENDING</div>
-            <div id="pending-followers-list"><div class="soc-empty">NO PENDING REQUESTS</div></div>
-            <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin:10px 0 5px;">ACCEPTED</div>
+            <div id="pending-followers-list"><div class="soc-empty">NO PENDING</div></div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin:10px 0 5px;">CONNECTED</div>
             <div id="accepted-followers-list"><div class="soc-empty">NONE YET</div></div>
 
             <div style="border-top:1px solid var(--border-lo);margin:14px 0;"></div>
 
             <!-- ── WHO I FOLLOW (outgoing) ── -->
             <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;letter-spacing:.5px;">
-              📤 I'M SUBMITTING TO
+              📤 CONNECTED USERS
             </div>
             <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
-              Request access to push tracks directly to another user's inbox. They must accept before you can send.
+              Search for a user and send a connection request. Once they accept, you'll both be able to drop tracks into each other's inbox.
             </div>
             <div style="display:flex;gap:6px;margin-bottom:6px;">
               <input class="finput" type="text" id="follow-username-input"
-                     placeholder="Search by name or email..." autocomplete="off" autocorrect="off"
+                     placeholder="Search users to connect..." autocomplete="off" autocorrect="off"
                      autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
                      oninput="searchUsers(this.value)">
-              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">📨 REQUEST</button>
+              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">🤝 CONNECT</button>
             </div>
             <!-- Search results -->
             <div id="user-search-results" style="margin-bottom:10px;"></div>
-            <div id="following-list"><div class="soc-empty">NOT CONNECTED TO ANYONE YET</div></div>
+            <div id="following-list"><div class="soc-empty">NO CONNECTIONS YET</div></div>
 
           </div>
         </div>
@@ -4042,7 +4099,7 @@ async function deleteUser(username) {
   if (!confirm('Remove user @' + username + '? This cannot be undone.')) return;
   try {
     const { ok } = await api('DELETE', '/admin/user/' + username, null);
-    if (ok) { notify('🗑️', '@' + username + ' removed'); renderUserList(); }
+    if (ok) { notify('🗑️', 'Disconnected from @' + username); renderUserList(); }
     else notify('😾', 'Could not remove user');
   } catch(e) { notify('😾', 'Server error'); }
 }
@@ -4958,6 +5015,7 @@ function renderPlaylist() {
         <!-- Action buttons -->
         <div class="pl-actions">
           ${!isSharedView ? `<button class="pl-act-btn pl-promo-add" onclick="addToPromo(event,${origIdx})" title="Add to promo">📤</button>` : ''}
+          ${!isSharedView && currentUser ? `<button class="pl-act-btn pl-drop-btn" onclick="openDropPicker(event,${origIdx})" data-tip="DROP TO A CONNECTION'S INBOX" title="Drop to inbox">📬</button>` : ''}
           <button class="pl-act-btn" onclick="toggleTrackInfo(event,${origIdx})" title="Track info">ℹ</button>
           ${!isSharedView ? `<button class="pl-act-btn" onclick="editTrack(event,${origIdx})" title="Edit">✏️</button>` : ''}
           ${!isSharedView ? `<button class="pl-act-btn pl-act-del" onclick="delTrack(event,${origIdx})" title="Delete">✕</button>` : ''}
@@ -7450,13 +7508,13 @@ function downloadEPK() {
 <!-- ── PUSH TRACK MODAL ── -->
 <div class="feedback-overlay" id="push-track-overlay">
   <div class="feedback-box">
-    <div class="feedback-title">📤 PUSH TRACK</div>
+    <div class="feedback-title">📬 DROP TRACK TO INBOX</div>
     <div id="push-track-to" style="font-family:'VT323',monospace;font-size:16px;color:var(--cat-orange);margin-bottom:4px;"></div>
     <select class="finput" id="push-track-select" style="font-size:16px;"></select>
     <textarea class="finput" id="push-track-note" placeholder="Add a note... (optional)"
               style="font-size:16px;min-height:60px;" autocorrect="off" spellcheck="false"></textarea>
     <div style="display:flex;gap:6px;">
-      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">🚀 SEND TRACK</button>
+      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">📬 DROP TO INBOX</button>
       <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
     </div>
   </div>
@@ -7604,47 +7662,55 @@ function renderFollowers(followers) {
   const acceptedEl = document.getElementById('accepted-followers-list');
   if (!pendingEl || !acceptedEl) return;
 
+  // Show badge on settings tab if pending requests
+  const badge = document.getElementById('connections-badge');
+  if (badge) badge.style.display = pending.length ? 'inline' : 'none';
+
   pendingEl.innerHTML = pending.length ? pending.map(f => `
-    <div class="follower-item">
-      <div>
+    <div class="follower-item" style="background:rgba(68,221,136,.05);border-left:3px solid var(--cat-orange);">
+      <div style="flex:1;">
         <div class="follower-name">@${esc(f.username)}</div>
         ${f.note ? `<div class="follower-note">"${esc(f.note)}"</div>` : ''}
+        <div style="font-family:'VT323',monospace;font-size:12px;color:var(--border-lo);margin-top:2px;">wants to connect with you</div>
       </div>
       <div class="follower-actions">
         <button class="soc-btn accept"  onclick="respondFollower('${esc(f.username)}','accept')">✅ ACCEPT</button>
         <button class="soc-btn decline" onclick="respondFollower('${esc(f.username)}','decline')">✕ DECLINE</button>
       </div>
     </div>`).join('')
-    : '<div class="soc-empty">NO PENDING REQUESTS</div>';
+    : '<div class="soc-empty">NO PENDING</div>';
 
   acceptedEl.innerHTML = accepted.length ? accepted.map(f => `
     <div class="follower-item">
-      <div class="follower-name">@${esc(f.username)}</div>
-      <span class="follower-status accepted">ACCEPTED</span>
+      <div style="flex:1;">
+        <div class="follower-name">@${esc(f.username)}</div>
+        <div style="font-family:'VT323',monospace;font-size:12px;color:#44ff88;margin-top:2px;">🔗 CONNECTED — can drop tracks to each other</div>
+      </div>
       <div class="follower-actions">
-        <button class="soc-btn promo"  onclick="addFollowerToPromo('${esc(f.username)}')">+ PROMO LIST</button>
-        <button class="soc-btn remove" onclick="removeFollower('${esc(f.username)}')">✕ REMOVE</button>
+        <button class="soc-btn push"   onclick="openPushTrack('${esc(f.username)}','${esc(f.username)}')">📤 DROP TRACK</button>
+        <button class="soc-btn promo"  onclick="addFollowerToPromo('${esc(f.username)}')">+ PROMO</button>
+        <button class="soc-btn remove" onclick="removeFollower('${esc(f.username)}')">✕</button>
       </div>
     </div>`).join('')
-    : '<div class="soc-empty">NO ACCEPTED FOLLOWERS YET</div>';
+    : '<div class="soc-empty">NO CONNECTIONS YET</div>';
 }
 
 async function respondFollower(username, action) {
   try {
     const { ok, data } = await api('PUT', '/follow-request/' + username, { action });
     if (!ok) { notify('😾', data.error || 'Failed'); return; }
-    notify(action === 'accept' ? '✅' : '✕',
-           action === 'accept' ? '@' + username + ' can now submit tracks!' : '@' + username + ' declined');
+    notify(action === 'accept' ? '🔗' : '✕',
+           action === 'accept' ? 'Connected with @' + username + '! You can now drop tracks to each other.' : '@' + username + ' declined');
     loadFollowers();
   } catch(e) { notify('😾', 'Could not reach server'); }
 }
 
 async function removeFollower(username) {
-  if (!confirm('Remove @' + username + ' as a follower?')) return;
+  if (!confirm('Disconnect from @' + username + '?')) return;
   try {
     const { ok, data } = await api('DELETE', '/follow-request/' + username, null);
     if (!ok) { notify('😾', data.error || 'Failed'); return; }
-    notify('🗑️', '@' + username + ' removed');
+    notify('🗑️', 'Disconnected from @' + username);
     loadFollowers();
   } catch(e) { notify('😾', 'Could not reach server'); }
 }
@@ -7678,18 +7744,21 @@ function renderFollowing(following) {
   const el = document.getElementById('following-list');
   if (!el) return;
   if (!following.length) {
-    el.innerHTML = '<div class="soc-empty">NOT FOLLOWING ANYONE YET<br>ENTER A USERNAME ABOVE TO REQUEST ACCESS</div>';
+    el.innerHTML = '<div class="soc-empty">NO CONNECTIONS YET<br>SEARCH ABOVE TO ADD USERS</div>';
     return;
   }
   el.innerHTML = following.map(f => `
     <div class="following-item">
-      <div>
+      <div style="flex:1;min-width:0;">
         <div class="following-name">${esc(f.name || f.username)}</div>
-        <div style="font-family:'VT323',monospace;font-size:12px;color:var(--border-lo);">@${esc(f.username)}</div>
+        <div style="font-family:'VT323',monospace;font-size:13px;color:var(--border-lo);">@${esc(f.username)}</div>
       </div>
-      <span class="follower-status ${f.status}">${f.status.toUpperCase()}</span>
+      <span class="follower-status ${f.status}" style="flex-shrink:0;">
+        ${f.status === 'accepted' ? '🟢 CONNECTED' : f.status === 'pending' ? '⏳ PENDING' : f.status.toUpperCase()}
+      </span>
       ${f.status === 'accepted' ? `
-        <button class="soc-btn push" onclick="openPushTrack('${esc(f.username)}','${esc(f.name||f.username)}')">📤 PUSH TRACK</button>
+        <button class="soc-btn push" data-tip="DROP A TRACK INTO THEIR INBOX"
+          onclick="openPushTrack('${esc(f.username)}','${esc(f.name||f.username)}')">📬 DROP TRACK</button>
       ` : ''}
     </div>`).join('');
 }
@@ -7701,7 +7770,7 @@ async function requestAccess() {
   try {
     const { ok, data } = await api('POST', '/request-access/' + username, {});
     if (!ok) { notify('😾', data.error || 'Failed'); return; }
-    notify('📨', 'Request sent to @' + username + '!');
+    notify('🤝', 'Connection request sent to @' + username + '!');
     input.value = '';
     setTimeout(loadFollowing, 500);
   } catch(e) { notify('😾', 'Could not reach server'); }
@@ -7712,7 +7781,7 @@ async function requestAccess() {
 // ─────────────────────────────────────────────
 function openPushTrack(username, displayName) {
   _pushTargetUser = username;
-  document.getElementById('push-track-to').textContent = 'TO: ' + displayName + ' (@' + username + ')';
+  document.getElementById('push-track-to').textContent = 'DROP TO: ' + displayName + ' (@' + username + ')';
   document.getElementById('push-track-note').value = '';
   // Populate track selector from MY TRACKS playlist
   const sel = document.getElementById('push-track-select');
@@ -7737,7 +7806,7 @@ async function doPushTrack() {
     });
     if (!ok) { notify('😾', data.error || 'Failed'); return; }
     document.getElementById('push-track-overlay').classList.remove('show');
-    notify('🚀', '"' + t.title + '" sent to @' + _pushTargetUser + '!');
+    notify('📬', '"' + t.title + '" dropped into @' + _pushTargetUser + '\'s inbox!');
   } catch(e) { notify('😾', 'Could not reach server'); }
 }
 
@@ -8014,6 +8083,141 @@ async function recheckAdminRole() {
     } catch(e2) {}
   } catch(e) {}
 }
+
+
+// ═══════════════════════════════════════════════════════
+// DROP PICKER — send a track to a connected user's inbox
+// ═══════════════════════════════════════════════════════
+
+let _dropPickerOpen = false;
+let _dropConnections = []; // cached list of accepted connections
+
+async function openDropPicker(event, trackIdx) {
+  event.stopPropagation();
+  closeDropPicker();
+
+  const t = playlist[trackIdx];
+  if (!t) return;
+
+  // Position picker near the button
+  const btn = event.currentTarget;
+  const rect = btn.getBoundingClientRect();
+
+  // Build or reuse picker
+  let picker = document.getElementById('drop-picker');
+  if (!picker) {
+    picker = document.createElement('div');
+    picker.id = 'drop-picker';
+    picker.className = 'drop-picker';
+    document.body.appendChild(picker);
+  }
+
+  // Load connections if not cached
+  if (!_dropConnections.length) {
+    await refreshDropConnections();
+  }
+
+  renderDropPicker(picker, t, trackIdx);
+
+  // Position — try to appear above/below button, keep on screen
+  const pw = 280;
+  const ph = 340;
+  let left = rect.left;
+  let top  = rect.bottom + 6;
+  if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
+  if (top + ph > window.innerHeight - 10) top = rect.top - ph - 6;
+  if (top < 10) top = 10;
+  picker.style.left = left + 'px';
+  picker.style.top  = top + 'px';
+  picker.style.display = 'block';
+  _dropPickerOpen = true;
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', closeDropPickerOutside, { once: true });
+  }, 0);
+}
+
+async function refreshDropConnections() {
+  try {
+    // Get connections from both following list and accepted followers
+    const [fwgRes, fwrRes] = await Promise.all([
+      api('GET', '/following', null),
+      api('GET', '/follow-requests', null)
+    ]);
+    const accepted = [];
+    // From following (outgoing accepted)
+    if (fwgRes.ok && fwgRes.data.following) {
+      fwgRes.data.following.filter(f => f.status === 'accepted').forEach(f => {
+        if (!accepted.find(a => a.username === f.username))
+          accepted.push({ username: f.username, name: f.name || f.username });
+      });
+    }
+    // From followers (incoming accepted)
+    if (fwrRes.ok && fwrRes.data.followers) {
+      fwrRes.data.followers.filter(f => f.status === 'accepted').forEach(f => {
+        if (!accepted.find(a => a.username === f.username))
+          accepted.push({ username: f.username, name: f.username });
+      });
+    }
+    _dropConnections = accepted;
+  } catch(e) { _dropConnections = []; }
+}
+
+function renderDropPicker(picker, t, trackIdx) {
+  const listHtml = _dropConnections.length
+    ? _dropConnections.map(c => `
+        <div class="drop-picker-user">
+          <div class="drop-picker-uname">@${esc(c.username)}</div>
+          <button class="drop-picker-send"
+            onclick="dropTrackTo('${esc(c.username)}',${trackIdx});event.stopPropagation();">
+            📬 DROP
+          </button>
+        </div>`).join('')
+    : '<div class="drop-picker-empty">NO CONNECTIONS YET<br><br>ADD CONNECTIONS IN<br>SETTINGS → CONNECTIONS</div>';
+
+  picker.innerHTML =
+    '<div class="drop-picker-hdr">' +
+      '<span class="drop-picker-title">📬 DROP TO INBOX</span>' +
+      '<button class="drop-picker-close" onclick="closeDropPicker()">✕</button>' +
+    '</div>' +
+    '<div class="drop-picker-track">' + esc(t.title) + ' — ' + esc(t.artist) + '</div>' +
+    '<div class="drop-picker-list">' + listHtml + '</div>';
+}
+
+async function dropTrackTo(username, trackIdx) {
+  const t = playlist[trackIdx];
+  if (!t) return;
+  closeDropPicker();
+  try {
+    const { ok, data } = await api('POST', '/submit-track/' + username, {
+      url: t.url, title: t.title, artist: t.artist,
+      album: t.album || '', year: t.year || '',
+      bpm: t.bpm || 0, genre: t.genre || '',
+      note: ''
+    });
+    if (!ok) { notify('😾', data.error || 'Could not drop track'); return; }
+    notify('📬', '"' + t.title + '" dropped into @' + username + '\'s inbox!');
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+function closeDropPicker() {
+  const picker = document.getElementById('drop-picker');
+  if (picker) picker.style.display = 'none';
+  _dropPickerOpen = false;
+}
+
+function closeDropPickerOutside(e) {
+  const picker = document.getElementById('drop-picker');
+  if (picker && !picker.contains(e.target)) closeDropPicker();
+}
+
+// Invalidate connection cache when connections change
+const _origLoadSocialData = loadSocialData;
+loadSocialData = function() {
+  _dropConnections = []; // force refresh next time picker opens
+  _origLoadSocialData();
+};
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
@@ -8357,13 +8561,13 @@ window.addEventListener('pagehide', () => {
 <!-- ── PUSH TRACK MODAL ── -->
 <div class="feedback-overlay" id="push-track-overlay">
   <div class="feedback-box">
-    <div class="feedback-title">📤 PUSH TRACK</div>
+    <div class="feedback-title">📬 DROP TRACK TO INBOX</div>
     <div id="push-track-to" style="font-family:'VT323',monospace;font-size:16px;color:var(--cat-orange);margin-bottom:4px;"></div>
     <select class="finput" id="push-track-select" style="font-size:16px;"></select>
     <textarea class="finput" id="push-track-note" placeholder="Add a note... (optional)"
               style="font-size:16px;min-height:60px;" autocorrect="off" spellcheck="false"></textarea>
     <div style="display:flex;gap:6px;">
-      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">🚀 SEND TRACK</button>
+      <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">📬 DROP TO INBOX</button>
       <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
     </div>
   </div>
