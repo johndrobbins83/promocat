@@ -2381,6 +2381,26 @@ body.rave-mode .lcd-art img {
   font-family: 'Press Start 2P', monospace; font-size: 7px;
   color: var(--cat-orange); letter-spacing: .5px;
 }
+
+/* ── CONTACTS PANEL ── */
+.contact-item-actions {
+  display: flex; gap: 3px; flex-shrink: 0; flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.contact-act-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 4px;
+  padding: 2px 5px; border: 1px solid; cursor: pointer;
+  background: none; white-space: nowrap;
+}
+.contact-act-btn.push  { color: var(--cat-orange); border-color: var(--border-lo); }
+.contact-act-btn.promo { color: #88ddff; border-color: #005588; }
+.contact-act-btn.del   { color: #ff4444; border-color: #660000; }
+.contact-source-badge {
+  font-family: 'Press Start 2P', monospace; font-size: 4px;
+  padding: 1px 4px; border: 1px solid; margin-left: 4px;
+}
+.contact-source-badge.user   { color: #44ff88; border-color: #006622; }
+.contact-source-badge.manual { color: #888; border-color: #444; }
 </style>
 </head>
 <body>
@@ -2397,6 +2417,7 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-artist" onclick="switchTab('artist')">ARTIST</div>
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">PROMO</div>
+    <div class="tab" id="tab-contacts" onclick="switchTab('contacts')" style="display:none">CONTACTS</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
     <div id="tab-settings" style="display:none"></div>
   </div>
@@ -3207,12 +3228,15 @@ body.rave-mode .lcd-art img {
             <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
               Request access to push tracks directly to another user's inbox. They must accept before you can send.
             </div>
-            <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
               <input class="finput" type="text" id="follow-username-input"
-                     placeholder="Enter their username..." autocomplete="off" autocorrect="off"
-                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;">
-              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">📨 REQUEST ACCESS</button>
+                     placeholder="Search by name or email..." autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
+                     oninput="searchUsers(this.value)">
+              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">📨 REQUEST</button>
             </div>
+            <!-- Search results -->
+            <div id="user-search-results" style="margin-bottom:10px;"></div>
             <div id="following-list"><div class="soc-empty">NOT CONNECTED TO ANYONE YET</div></div>
 
           </div>
@@ -3253,26 +3277,20 @@ body.rave-mode .lcd-art img {
     <div class="tab-panel" id="panel-promo">
       <div class="promo-body">
 
-        <!-- ── SECTION 1: PROMO LIST ── -->
+        <!-- ── SECTION 1: SEND TO ── -->
         <div class="promo-section">
-          <div class="promo-section-hdr">
-            <span>📋 PROMO LIST</span>
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>📋 SEND TO</span>
             <div style="display:flex;gap:6px;align-items:center;">
-              <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 CONTACTS</span>
+              <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 SELECTED</span>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="selectAllContacts()">ALL</button>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="clearContactSelection()">NONE</button>
+              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="switchTab('contacts')">✚ MANAGE</button>
             </div>
           </div>
-          <div class="promo-section-body">
-            <div class="contact-add-row">
-              <input class="finput" type="text" id="c-name" placeholder="Name..." autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
-              <input class="finput" type="email" id="c-email" placeholder="email@example.com"
-                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-                     onkeydown="if(event.key==='Enter')addContact()">
-              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
-            </div>
-            <div class="contact-list" id="contact-list">
-              <div class="contact-empty" id="contact-empty">NO CONTACTS YET</div>
+          <div class="promo-section-body" style="padding:0;">
+            <div class="contact-list" id="contact-list" style="max-height:160px;">
+              <div class="contact-empty" id="contact-empty">NO CONTACTS — ADD IN CONTACTS TAB</div>
             </div>
           </div>
         </div>
@@ -3361,6 +3379,54 @@ Listen here: {link}
       </div>
     </div><!-- /panel-promo -->
 
+
+
+    <!-- ════════ CONTACTS PANEL ════════ -->
+    <div class="tab-panel" id="panel-contacts">
+      <div class="promo-body">
+
+        <!-- ── ADD CONTACT ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">
+            <span>➕ ADD CONTACT</span>
+          </div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:10px;line-height:1.4;">
+              Add someone manually by name + email, or search for PromoCat users to connect with.
+            </div>
+            <!-- Manual add -->
+            <div class="contact-add-row" style="margin-bottom:8px;">
+              <input class="finput" type="text" id="c-name" placeholder="Name..." autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+              <input class="finput" type="email" id="c-email" placeholder="email@example.com" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')addContact()">
+              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
+            </div>
+            <!-- Search PromoCat users -->
+            <div style="display:flex;gap:6px;">
+              <input class="finput" type="text" id="contact-search-input"
+                     placeholder="Search PromoCat users..." autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
+                     oninput="searchContactUsers(this.value)">
+            </div>
+            <div id="contact-search-results" style="margin-top:6px;"></div>
+          </div>
+        </div>
+
+        <!-- ── MY CONTACTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>📋 MY CONTACTS</span>
+            <span id="contacts-total-count" style="font-family:'VT323',monospace;font-size:14px;color:var(--lcd-green);">0</span>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div class="contact-list" id="contacts-full-list" style="max-height:none;">
+              <div class="contact-empty">NO CONTACTS YET</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+      </div>
+    </div><!-- /panel-contacts -->
 
   </div><!-- /win-window -->
 </div><!-- /shell -->
@@ -3517,6 +3583,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'flex';
+  document.getElementById('tab-contacts').style.display = 'flex';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
@@ -3564,6 +3631,7 @@ function logout() {
   if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'none';
+  document.getElementById('tab-contacts').style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('lock-screen').style.display = 'flex';
   document.getElementById('upload-form').style.display = 'none';
@@ -3621,20 +3689,30 @@ async function doLogin() {
 }
 
 async function doRegister() {
-  const username = document.getElementById('r-username').value.trim().toLowerCase();
+  const name     = document.getElementById('r-name').value.trim();
+  const email    = document.getElementById('r-email').value.trim().toLowerCase();
   const password = document.getElementById('r-password').value;
   const password2= document.getElementById('r-password2').value;
-  const invite   = document.getElementById('r-invite').value.trim().toUpperCase();
-  if (!username || !password) { setLoginMsg('😾 FILL IN ALL FIELDS', true); return; }
-  if (password !== password2) { setLoginMsg('😾 PASSWORDS DO NOT MATCH', true); return; }
-  if (!invite)                { setLoginMsg('😾 INVITE CODE REQUIRED', true); return; }
+  const invite   = document.getElementById('r-invite').value.trim();
+  if (!name)     { setLoginMsg('😾 ENTER YOUR NAME', true); return; }
+  if (!email || !email.includes('@')) { setLoginMsg('😾 ENTER A VALID EMAIL', true); return; }
+  if (!password) { setLoginMsg('😾 ENTER A PASSWORD', true); return; }
+  if (password.length < 6)  { setLoginMsg('😾 PASSWORD TOO SHORT (MIN 6)', true); return; }
+  if (password !== password2){ setLoginMsg('😾 PASSWORDS DO NOT MATCH', true); return; }
+  if (!invite || invite.length !== 4 || isNaN(invite)) { setLoginMsg('😾 ENTER YOUR 4-DIGIT INVITE CODE', true); return; }
   setLoginMsg('⏳ CREATING ACCOUNT...', false);
   try {
-    const { ok, data } = await api('POST', '/register', { username, password, inviteCode: invite });
+    const { ok, data } = await api('POST', '/register', {
+      username: email,        // email is the username
+      password,
+      inviteCode: invite,
+      displayName: name,
+      email
+    });
     if (!ok) { setLoginMsg('😾 ' + (data.error || 'REGISTRATION FAILED').toUpperCase(), true); return; }
     setLoginMsg('✅ ACCOUNT CREATED! SIGN IN NOW.', false);
     switchLoginTab('signin');
-    document.getElementById('l-username').value = username;
+    document.getElementById('l-username').value = email;
   } catch(e) {
     setLoginMsg('😾 COULD NOT REACH SERVER', true);
   }
@@ -3711,12 +3789,12 @@ async function renderInviteCodes() {
       return;
     }
     el.innerHTML = invites.map(i => `
-      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-lo);">
-        <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:1px;">${i.code}</span>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border-lo);">
+        <span style="font-family:'Press Start 2P',monospace;font-size:14px;color:${i.used?'#444':'var(--lcd-green)'};flex:1;letter-spacing:6px;">${i.code}</span>
         ${i.used
           ? `<span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">USED BY ${(i.usedBy||'?').toUpperCase()}</span>`
-          : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🔗','Copied!'))" style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:2px 5px;cursor:pointer;">COPY</button>
-             <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:2px 5px;cursor:pointer;">REVOKE</button>`
+          : `<button onclick="navigator.clipboard.writeText('${i.code}').then(()=>notify('🎟️','Code ${i.code} copied!'))" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--lcd-green);background:rgba(0,60,20,.4);border:1px solid #1a4d22;padding:4px 8px;cursor:pointer;">📋 COPY</button>
+             <button onclick="revokeInvite('${i.code}')" style="font-family:'Press Start 2P',monospace;font-size:5px;color:#884422;background:none;border:1px solid #441100;padding:4px 6px;cursor:pointer;">✕</button>`
         }
       </div>`).join('');
   } catch(e) {
@@ -5619,6 +5697,8 @@ function clearContactSelection() {
 }
 
 function renderContacts() {
+  // Also update full contacts tab if visible
+  if (document.getElementById('panel-contacts')?.classList.contains('active')) renderContactsTab();
   const el = document.getElementById('contact-list');
   const selCount = selectedContacts.size;
   const total = contacts.length;
@@ -7070,10 +7150,11 @@ function downloadEPK() {
 
       <!-- Register form -->
       <div class="login-form hidden" id="lf-register">
-        <input class="finput" type="text" id="r-username" placeholder="Choose username..." autocomplete="username">
+        <input class="finput" type="text" id="r-name" placeholder="Your name / artist name..." autocomplete="name" autocorrect="off" spellcheck="false">
+        <input class="finput" type="email" id="r-email" placeholder="Your email address..." autocomplete="email" autocorrect="off" autocapitalize="none">
         <input class="finput" type="password" id="r-password" placeholder="Choose password..." autocomplete="new-password">
         <input class="finput" type="password" id="r-password2" placeholder="Confirm password...">
-        <input class="finput" type="text" id="r-invite" placeholder="Invite code...">
+        <input class="finput" type="text" id="r-invite" placeholder="4-digit invite code..." maxlength="4" inputmode="numeric" style="letter-spacing:4px;font-size:24px;">
         <button class="lock-btn" onclick="doRegister()">🐾 CREATE ACCOUNT</button>
       </div>
 
@@ -7482,6 +7563,164 @@ switchTab = function(name) {
   }
 };
 
+
+// ── USER SEARCH ──
+let _searchTimer = null;
+function searchUsers(q) {
+  clearTimeout(_searchTimer);
+  const el = document.getElementById('user-search-results');
+  if (!el) return;
+  if (!q || q.length < 2) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-family:VT323,monospace;font-size:14px;color:var(--border-lo);padding:4px 0;">SEARCHING...</div>';
+  _searchTimer = setTimeout(async () => {
+    try {
+      const { ok, data } = await api('GET', '/search-users?q=' + encodeURIComponent(q), null);
+      if (!ok || !data.results) { el.innerHTML = ''; return; }
+      if (!data.results.length) {
+        el.innerHTML = '<div style="font-family:VT323,monospace;font-size:14px;color:var(--border-lo);padding:4px 0;">NO USERS FOUND</div>';
+        return;
+      }
+      el.innerHTML = data.results.map(u => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border-lo);margin-bottom:3px;background:var(--vis-bg);">
+          <div style="flex:1;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);">${esc(u.name || u.displayName)}</div>
+            ${u.tagline ? `<div style="font-family:'VT323',monospace;font-size:13px;color:var(--border-lo);">${esc(u.tagline)}</div>` : ''}
+          </div>
+          <button class="soc-btn push" onclick="selectSearchUser('${esc(u.username)}','${esc(u.name||u.displayName)}')">
+            SELECT
+          </button>
+        </div>`).join('');
+    } catch(e) { el.innerHTML = ''; }
+  }, 400);
+}
+
+function selectSearchUser(username, name) {
+  document.getElementById('follow-username-input').value = username;
+  document.getElementById('user-search-results').innerHTML =
+    `<div style="font-family:'VT323',monospace;font-size:15px;color:var(--lcd-green);padding:4px 0;">✓ Selected: ${esc(name)}</div>`;
+}
+
+// Override requestAccess to clear search after
+const _origRequestAccess = requestAccess;
+requestAccess = async function() {
+  await _origRequestAccess();
+  document.getElementById('user-search-results').innerHTML = '';
+};
+
+
+// ═══════════════════════════════════════════════════════
+// CONTACTS TAB
+// ═══════════════════════════════════════════════════════
+
+// ── Render the full contacts list in the Contacts tab ──
+function renderContactsTab() {
+  const el = document.getElementById('contacts-full-list');
+  const countEl = document.getElementById('contacts-total-count');
+  if (!el) return;
+  if (countEl) countEl.textContent = contacts.length;
+
+  if (!contacts.length) {
+    el.innerHTML = '<div class="contact-empty">NO CONTACTS YET<br>ADD MANUALLY OR SEARCH ABOVE</div>';
+    return;
+  }
+
+  el.innerHTML = contacts.map((c, i) => {
+    const isUser = !!c.username; // PromoCat user vs manual
+    return `
+    <div class="contact-item${selectedContacts.has(i) ? ' selected' : ''}" onclick="toggleContactSelect(${i})">
+      <div class="contact-check"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="contact-name">${esc(c.name || c.username || 'Unknown')}</span>
+          <span class="contact-source-badge ${isUser ? 'user' : 'manual'}">${isUser ? 'USER' : 'MANUAL'}</span>
+        </div>
+        <div class="contact-email">${esc(c.email || '')}</div>
+      </div>
+      <div class="contact-item-actions" onclick="event.stopPropagation()">
+        ${isUser ? `<button class="contact-act-btn push" onclick="openPushTrack('${esc(c.username)}','${esc(c.name||c.username)}')">📤 PUSH</button>` : ''}
+        <button class="contact-act-btn promo" onclick="toggleContactSelectIdx(${i})">${selectedContacts.has(i) ? '✓ IN BLAST' : '+ BLAST'}</button>
+        <button class="contact-act-btn del" onclick="removeContactFromTab(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleContactSelectIdx(i) {
+  if (selectedContacts.has(i)) selectedContacts.delete(i);
+  else selectedContacts.add(i);
+  renderContacts();        // updates promo panel mini list
+  renderContactsTab();     // updates contacts tab full list
+}
+
+function removeContactFromTab(i) {
+  contacts.splice(i, 1);
+  selectedContacts = new Set([...selectedContacts].filter(x => x !== i).map(x => x > i ? x - 1 : x));
+  renderContacts();
+  renderContactsTab();
+  debouncedContactSync();
+  notify('🗑️', 'Contact removed');
+}
+
+// ── Search PromoCat users to add as contacts ──
+let _contactSearchTimer = null;
+function searchContactUsers(q) {
+  clearTimeout(_contactSearchTimer);
+  const el = document.getElementById('contact-search-results');
+  if (!el) return;
+  if (!q || q.length < 2) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-family:VT323,monospace;font-size:14px;color:var(--border-lo);padding:4px 0;">SEARCHING...</div>';
+  _contactSearchTimer = setTimeout(async () => {
+    try {
+      const { ok, data } = await api('GET', '/search-users?q=' + encodeURIComponent(q), null);
+      if (!ok || !data.results?.length) {
+        el.innerHTML = '<div style="font-family:VT323,monospace;font-size:14px;color:var(--border-lo);padding:4px 0;">' +
+          (data?.results?.length === 0 ? 'NO USERS FOUND' : 'ERROR') + '</div>';
+        return;
+      }
+      el.innerHTML = data.results.map(u => {
+        const alreadyAdded = contacts.some(c => c.username === u.username || c.email === u.username);
+        return `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border-lo);margin-bottom:3px;background:var(--vis-bg);">
+          <div style="flex:1;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);">${esc(u.name || u.displayName)}</div>
+            ${u.tagline ? `<div style="font-family:'VT323',monospace;font-size:12px;color:var(--border-lo);">${esc(u.tagline)}</div>` : ''}
+          </div>
+          ${alreadyAdded
+            ? `<span style="font-family:'Press Start 2P',monospace;font-size:5px;color:#556655;">IN CONTACTS</span>`
+            : `<button class="contact-act-btn promo" style="font-size:5px;padding:3px 7px;" onclick="addUserAsContact('${esc(u.username)}','${esc(u.name||u.displayName)}')">+ ADD</button>`
+          }
+        </div>`;
+      }).join('');
+    } catch(e) { el.innerHTML = ''; }
+  }, 400);
+}
+
+async function addUserAsContact(username, name) {
+  // Check not duplicate
+  if (contacts.some(c => c.username === username)) {
+    notify('😾', name + ' is already in your contacts'); return;
+  }
+  contacts.push({ username, name, email: username, source: 'user', addedAt: Date.now() });
+  selectedContacts.add(contacts.length - 1);
+  renderContacts();
+  renderContactsTab();
+  debouncedContactSync();
+  // Clear search
+  document.getElementById('contact-search-input').value = '';
+  document.getElementById('contact-search-results').innerHTML = '';
+  notify('✅', name + ' added to contacts!');
+}
+
+// ── Wire contacts tab to load when switched to ──
+// Override switchTab to also render contacts tab
+const __origSwitchTab = switchTab;
+switchTab = function(name) {
+  __origSwitchTab(name);
+  if (name === 'contacts') {
+    renderContactsTab();
+  }
+};
+
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
 // Stop playback when tab/window is closed or navigated away
@@ -7788,10 +8027,11 @@ window.addEventListener('pagehide', () => {
 
       <!-- Register form -->
       <div class="login-form hidden" id="lf-register">
-        <input class="finput" type="text" id="r-username" placeholder="Choose username..." autocomplete="username">
+        <input class="finput" type="text" id="r-name" placeholder="Your name / artist name..." autocomplete="name" autocorrect="off" spellcheck="false">
+        <input class="finput" type="email" id="r-email" placeholder="Your email address..." autocomplete="email" autocorrect="off" autocapitalize="none">
         <input class="finput" type="password" id="r-password" placeholder="Choose password..." autocomplete="new-password">
         <input class="finput" type="password" id="r-password2" placeholder="Confirm password...">
-        <input class="finput" type="text" id="r-invite" placeholder="Invite code...">
+        <input class="finput" type="text" id="r-invite" placeholder="4-digit invite code..." maxlength="4" inputmode="numeric" style="letter-spacing:4px;font-size:24px;">
         <button class="lock-btn" onclick="doRegister()">🐾 CREATE ACCOUNT</button>
       </div>
 
