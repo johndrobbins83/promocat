@@ -3689,9 +3689,10 @@ function applyUnlock(username, role, token) {
   loadUserData();
   startBgSync();
   // Show notification bell for admin, start polling
+  // Admin tab — show/hide based on role from server
+  const _adminTabEl = document.getElementById('tab-admin');
+  if (_adminTabEl) _adminTabEl.style.display = (role === 'admin') ? 'flex' : 'none';
   if (role === 'admin') {
-    const adminTab = document.getElementById('tab-admin');
-    if (adminTab) adminTab.style.display = 'flex';
     const bellBtn = document.getElementById('wbtn-bell');
     if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
     fetchNotifications();
