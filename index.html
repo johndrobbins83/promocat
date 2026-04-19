@@ -3835,12 +3835,22 @@ async function doRegister() {
       localStorage.removeItem(SESSION_KEY);
     }
   } catch(e) {
-    // Server unreachable — restore from localStorage session silently
+    // Server unreachable — restore session but retry role check after delay
     try {
       const { username, role, token } = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
       if (username && token) {
         currentUser = { username, role, token };
-        applyUnlock(username, role, token);
+        applyUnlock(username, role, token); // use cached role temporarily
+        // Retry verify after 2s in case server was just slow
+        setTimeout(async () => {
+          try {
+            const { ok, data } = await api('GET', '/verify', null);
+            if (ok && data.role !== role) {
+              currentUser.role = data.role;
+              applyUnlock(username, data.role, token);
+            }
+          } catch(e3) {}
+        }, 2000);
       }
     } catch(e2) {}
   }
@@ -6234,6 +6244,8 @@ async function checkPromoHash() {
 
 // Run on load
 window.addEventListener('DOMContentLoaded', () => {
+  // Recheck admin role after page loads in case token has stale role
+  setTimeout(recheckAdminRole, 1500);
   const hash = window.location.hash;
   if (hash.startsWith('#playlist=') || hash.startsWith('#promo=') || hash.startsWith('#p=')) {
     checkPromoHash();
@@ -7887,6 +7899,24 @@ switchTab = function(name) {
     renderRecentSignups();
   }
 };
+
+
+// ── Re-check admin status any time ──
+async function recheckAdminRole() {
+  if (!currentUser) return;
+  try {
+    const { ok, data } = await api('GET', '/verify', null);
+    if (ok && data.role !== currentUser.role) {
+      currentUser.role = data.role;
+      const t = document.getElementById('tab-admin');
+      if (t) t.style.display = data.role === 'admin' ? 'flex' : 'none';
+      // Also update localStorage
+      const stored = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+      stored.role = data.role;
+      localStorage.setItem(SESSION_KEY, JSON.stringify(stored));
+    }
+  } catch(e) {}
+}
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
