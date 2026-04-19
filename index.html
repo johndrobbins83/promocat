@@ -3868,8 +3868,8 @@ async function renderInviteCodes() {
   el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">LOADING...</div>';
   try {
     const { ok, data } = await api('GET', '/invites', null);
-    if (!ok || !data.invites) { el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">ERROR LOADING CODES</div>'; return; }
-    const invites = data.invites;
+    if (!ok || !data.codes) { el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:#ff4444;padding:8px;">ERROR LOADING CODES</div>'; return; }
+    const invites = data.codes;
     if (!invites.length) {
       el.innerHTML = '<div style="font-family:\'VT323\',monospace;font-size:16px;color:var(--border-lo);padding:8px;">NO CODES YET — GENERATE ONE ABOVE</div>';
       return;
@@ -3891,7 +3891,7 @@ async function renderInviteCodes() {
 async function deleteUser(username) {
   if (!confirm('Remove user @' + username + '? This cannot be undone.')) return;
   try {
-    const { ok } = await api('DELETE', '/admin/user/' + username + '?secret=' + encodeURIComponent(window._adminSecret || ''), null);
+    const { ok } = await api('DELETE', '/admin/user/' + username, null);
     if (ok) { notify('🗑️', '@' + username + ' removed'); renderUserList(); }
     else notify('😾', 'Could not remove user');
   } catch(e) { notify('😾', 'Server error'); }
@@ -3901,7 +3901,7 @@ async function renderUserList() {
   const el = document.getElementById('user-list');
   if (!el) return;
   try {
-    const { ok, data } = await api('GET', '/admin/users?secret=' + encodeURIComponent(window._adminSecret || ''), null);
+    const { ok, data } = await api('GET', '/admin/users', null);
     if (!ok) { el.innerHTML = ''; return; }
     el.innerHTML = (data.users || []).length === 0
       ? '<div style="font-family:monospace;font-size:12px;color:var(--border-lo);padding:16px;text-align:center;">NO USERS YET</div>'
