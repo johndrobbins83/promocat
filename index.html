@@ -1206,35 +1206,44 @@ select.finput { cursor: pointer; }
 .contact-list::-webkit-scrollbar-thumb { background: var(--border-lo); }
 
 .contact-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-bottom: 1px solid #1a1a1a;
-  font-family: 'VT323', monospace; font-size: 18px;
-  color: #cccccc; cursor: pointer; transition: background .1s;
-  user-select: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-bottom: 1px solid var(--border-lo);
+  cursor: pointer; user-select: none;
+  min-height: 48px;
 }
 .contact-item:hover { background: rgba(255,140,66,.07); }
 .contact-item:last-child { border-bottom: none; }
-.contact-item.selected { background: rgba(255,140,66,.14); border-left: 3px solid var(--cat-orange); padding-left: 7px; }
+.contact-item.selected { background: rgba(255,140,66,.1); border-left: 3px solid var(--cat-orange); padding-left: 9px; }
 
 /* Contact checkbox */
 .contact-check {
-  width: 13px; height: 13px; flex-shrink: 0;
-  border: 1px solid #444; border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
-  background: #0a0a0a; position: relative;
+  width: 16px; height: 16px; flex-shrink: 0;
+  border: 1px solid var(--border-lo);
+  border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
+  background: var(--vis-bg); position: relative;
 }
 .contact-item.selected .contact-check::after {
-  content: ''; position: absolute; top: 2px; left: 2px;
-  width: 7px; height: 7px;
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 8px; height: 8px;
   background: var(--cat-orange); box-shadow: 0 0 4px rgba(255,140,66,.8);
 }
-.contact-name { color: var(--cat-orange); font-weight: bold; margin-right: 4px; }
-.contact-email { color: #aaaaaa; }
-.contact-del {
-  background: none; border: none; color: #444; cursor: pointer;
-  font-size: 14px; transition: color .1s; margin-left: auto; flex-shrink: 0;
+.contact-name {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--cat-orange); display: block; margin-bottom: 3px;
 }
-.contact-del:hover { color: #ff4444; }
-.contact-empty { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--border-lo); text-align: center; padding: 14px; }
+.contact-email {
+  font-family: 'VT323', monospace; font-size: 15px;
+  color: var(--lcd-green); display: block;
+}
+.contact-del {
+  background: none; border: 1px solid #441100; color: #884422; cursor: pointer;
+  font-size: 11px; padding: 3px 6px; flex-shrink: 0;
+}
+.contact-del:hover { color: #ff4444; border-color: #ff4444; }
+.contact-empty {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); text-align: center; padding: 20px 14px; line-height: 2.2;
+}
 
 /* Select all row */
 .contact-select-bar {
@@ -2401,6 +2410,64 @@ body.rave-mode .lcd-art img {
 }
 .contact-source-badge.user   { color: #44ff88; border-color: #006622; }
 .contact-source-badge.manual { color: #888; border-color: #444; }
+
+/* ── ACCESSIBLE BUTTON TOOLTIPS ── */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.85);
+  transform-origin: bottom center;
+  background: var(--win-bg);
+  border: 1px solid var(--border-hi);
+  color: var(--cat-orange);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 5px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(68,221,136,.3);
+  letter-spacing: .5px;
+}
+[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+/* Don't show tooltip on mobile — they have no hover */
+@media (max-width: 599px) {
+  [data-tip]::after { display: none; }
+}
+
+/* ── DESKTOP BUTTON SIZE UPGRADES ── */
+@media (min-width: 900px) {
+  .back-btn       { font-size: 9px  !important; padding: 12px 20px !important; }
+  .sub-btn        { font-size: 11px !important; padding: 16px !important; }
+  .lock-btn       { font-size: 10px !important; padding: 14px !important; }
+  .promo-btn      { font-size: 8px  !important; padding: 10px 14px !important; min-width: 140px !important; }
+  .promo-btn.primary { font-size: 9px !important; }
+  .settings-save-btn { font-size: 9px !important; padding: 12px !important; }
+  .soc-btn        { font-size: 7px  !important; padding: 6px 10px !important; }
+  .contact-act-btn { font-size: 6px !important; padding: 4px 8px !important; }
+  .pl-bar-btn     { font-size: 7px  !important; padding: 5px 10px !important; }
+  .pl-bar-btn-copy { font-size: 9px !important; padding: 7px 16px !important; }
+  .filter-toggle  { font-size: 8px  !important; padding: 7px 12px !important; min-height: 34px !important; }
+  .cat-btn        { font-size: 8px  !important; padding: 6px 12px !important; }
+  .sort-btn       { font-size: 8px  !important; padding: 6px 12px !important; }
+  .pl-mode-btn    { font-size: 9px  !important; padding: 9px 18px !important; }
+  .roster-add-btn { font-size: 8px  !important; padding: 7px 14px !important; }
+  .saved-promo-link-btn { font-size: 7px !important; padding: 4px 8px !important; }
+  .pl-promo-add   { font-size: 6px  !important; padding: 4px 7px !important; }
+  .contact-act-btn.push,
+  .contact-act-btn.promo,
+  .contact-act-btn.del { font-size: 6px !important; padding: 5px 9px !important; }
+}
 </style>
 </head>
 <body>
@@ -2418,6 +2485,7 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">PROMO</div>
     <div class="tab" id="tab-contacts" onclick="switchTab('contacts')" style="display:none">CONTACTS</div>
+    <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display:none">⚙ ADMIN</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
     <div id="tab-settings" style="display:none"></div>
   </div>
@@ -2429,13 +2497,13 @@ body.rave-mode .lcd-art img {
     <div class="titlebar">
       <span class="titlebar-text" id="titlebar-text">The Promo Cat V1 — Purrfect Tunes</span>
       <div class="wbtns">
-        <div class="wbtn" id="wbtn-bell" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;font-size:12px;">
+        <div class="wbtn" id="wbtn-bell" data-tip="NOTIFICATIONS" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;opacity:0.25;pointer-events:none;font-size:12px;">
           &#9993;
           <div class="notif-bell-badge" id="notif-bell-badge"></div>
         </div>
-        <div class="wbtn" id="wbtn-profile" onclick="wbtnProfile()" title="Artist Profile">👤</div>
-        <div class="wbtn" id="wbtn-settings" onclick="wbtnSettings()" title="Settings">⚙</div>
-        <div class="wbtn" id="wbtn-close" onclick="wbtnClose()" title="Log Out / Login">×</div>
+        <div class="wbtn" id="wbtn-profile" data-tip="ARTIST PROFILE" onclick="wbtnProfile()" title="Artist Profile">👤</div>
+        <div class="wbtn" id="wbtn-settings" data-tip="SETTINGS" onclick="wbtnSettings()" title="Settings">⚙</div>
+        <div class="wbtn" id="wbtn-close" data-tip="LOGIN / LOGOUT" onclick="wbtnClose()" title="Log Out / Login">×</div>
       </div>
     </div>
 
@@ -2691,22 +2759,22 @@ body.rave-mode .lcd-art img {
 
         <!-- Transport -->
         <div class="transport">
-          <button class="tbtn t-prev" onclick="prevTrack()" title="Prev">
+          <button class="tbtn t-prev" data-tip="PREVIOUS TRACK" onclick="prevTrack()" title="Prev">
             <svg width="16" height="12" viewBox="0 0 16 12"><polygon points="8,1 0,6 8,11"/><rect x="8" y="1" width="2.5" height="10"/><polygon points="16,1 8,6 16,11"/></svg>
           </button>
-          <button class="tbtn t-play" onclick="playTrack()" title="Play">
+          <button class="tbtn t-play" data-tip="PLAY" onclick="playTrack()" title="Play">
             <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="2,1 12,7 2,13"/></svg>
           </button>
-          <button class="tbtn t-pause" onclick="pauseTrack()" title="Pause">
+          <button class="tbtn t-pause" data-tip="PLAY / PAUSE" onclick="pauseTrack()" title="Pause">
             <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="4" height="10"/><rect x="7" y="1" width="4" height="10"/></svg>
           </button>
-          <button class="tbtn t-stop" onclick="stopTrack()" title="Stop">
+          <button class="tbtn t-stop" data-tip="STOP" onclick="stopTrack()" title="Stop">
             <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10"/></svg>
           </button>
-          <button class="tbtn t-next" onclick="nextTrack()" title="Next">
+          <button class="tbtn t-next" data-tip="NEXT TRACK" onclick="nextTrack()" title="Next">
             <svg width="16" height="12" viewBox="0 0 16 12"><polygon points="0,1 8,6 0,11"/><rect x="5.5" y="1" width="2.5" height="10"/><polygon points="8,1 16,6 8,11"/></svg>
           </button>
-          <button class="tbtn t-eject" onclick="switchTab('upload')" title="Add Track">
+          <button class="tbtn t-eject" data-tip="ADD TRACK" onclick="switchTab('upload')" title="Add Track">
             <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,7 1,7"/><rect x="1" y="8.5" width="10" height="2.5"/></svg>
           </button>
         </div>
@@ -2715,8 +2783,8 @@ body.rave-mode .lcd-art img {
         <div class="modes">
           <button class="mbtn" id="m-shuffle" onclick="toggle('shuffle')">SHUFFLE</button>
           <button class="mbtn" id="m-repeat" onclick="toggle('repeat')">REPEAT</button>
-          <button class="mbtn mood-btn" onclick="randomTheme()" title="Random Color Scheme">🎨 MOOD</button>
-          <button class="mbtn rave-btn" id="btn-rave" onclick="toggleRaveMode()" title="Rave Mode">🪩 RAVE</button>
+          <button class="mbtn mood-btn" onclick="randomTheme()" data-tip="CHANGE COLOUR MOOD" title="Random Color Scheme">🎨 MOOD</button>
+          <button class="mbtn rave-btn" id="btn-rave" onclick="toggleRaveMode()" data-tip="RAVE MODE" title="Rave Mode">🪩 RAVE</button>
         </div>
 
 
@@ -2726,14 +2794,14 @@ body.rave-mode .lcd-art img {
       <div class="pl-section">
         <div class="pl-bar">
           <div class="pl-mode-btns">
-            <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')">🐾 MY TRACKS</button>
-            <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')">📬 INBOX <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
+            <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
+            <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="TRACKS SENT TO YOU">📬 INBOX <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
           <span class="pl-count" id="pl-count">0 TRACKS</span>
           <div style="display:flex;gap:4px;align-items:center;margin-left:auto;">
-            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" title="Copy shareable URL for full playlist">🔗 COPY URL</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" title="Copy your submission link" style="display:none;">📬 SUBMIT LINK</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" title="Refresh from cloud">↻</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL" title="Copy shareable URL">🔗 COPY URL</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY YOUR SUBMISSION LINK" title="Copy your submission link" style="display:none;">📬 SUBMIT LINK</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD" title="Refresh">↻</button>
             <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;color:#ff8844;">🧹</button>
           </div>
         </div>
@@ -2741,7 +2809,7 @@ body.rave-mode .lcd-art img {
         <div class="filter-bar">
           <!-- Category -->
           <div class="filter-group" id="fg-cat">
-            <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')">
+            <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')" data-tip="FILTER BY CATEGORY">
               <span class="active-dot"></span>CATEGORY <span class="arrow">▼</span>
             </button>
             <div class="filter-dropdown" id="fd-cat">
@@ -2753,7 +2821,7 @@ body.rave-mode .lcd-art img {
           </div>
           <!-- Availability -->
           <div class="filter-group" id="fg-avail">
-            <button class="filter-toggle" id="ft-avail" onclick="toggleFilter('avail')">
+            <button class="filter-toggle" id="ft-avail" onclick="toggleFilter('avail')" data-tip="FILTER BY STATUS">
               <span class="active-dot"></span>STATUS <span class="arrow">▼</span>
             </button>
             <div class="filter-dropdown" id="fd-avail">
@@ -2767,7 +2835,7 @@ body.rave-mode .lcd-art img {
           </div>
           <!-- Genre -->
           <div class="filter-group" id="fg-genre">
-            <button class="filter-toggle" id="ft-genre" onclick="toggleFilter('genre')">
+            <button class="filter-toggle" id="ft-genre" onclick="toggleFilter('genre')" data-tip="FILTER BY GENRE">
               <span class="active-dot"></span>GENRE <span class="arrow">▼</span>
             </button>
             <div class="filter-dropdown" id="fd-genre">
@@ -2794,7 +2862,7 @@ body.rave-mode .lcd-art img {
           </div>
           <!-- Sort -->
           <div class="filter-group" id="fg-sort">
-            <button class="filter-toggle has-filter" id="ft-sort" onclick="toggleFilter('sort')">
+            <button class="filter-toggle has-filter" id="ft-sort" onclick="toggleFilter('sort')" data-tip="SORT PLAYLIST">
               <span class="active-dot" style="display:inline-block;"></span>SORT <span class="arrow">&#9660;</span>
             </button>
             <div class="filter-dropdown" id="fd-sort">
@@ -3101,7 +3169,7 @@ body.rave-mode .lcd-art img {
               <textarea class="finput" id="s-bio" rows="5" placeholder="Write your bio here..." style="resize:vertical;line-height:1.5;min-height:80px;"></textarea>
             </div>
 
-            <button class="settings-save-btn" onclick="saveArtistProfile()">💾 SAVE PROFILE</button>
+            <button class="settings-save-btn" onclick="saveArtistProfile()" data-tip="SAVE YOUR PROFILE">💾 SAVE PROFILE</button>
           </div>
         </div>
 
@@ -3158,7 +3226,7 @@ body.rave-mode .lcd-art img {
               <input class="finput" type="text" id="s-pub-phone" placeholder="+1 555 000 0000">
             </div>
 
-            <button class="settings-save-btn" onclick="saveArtistProfile()">💾 SAVE CONTACTS</button>
+            <button class="settings-save-btn" onclick="saveArtistProfile()" data-tip="SAVE YOUR PROFILE">💾 SAVE CONTACTS</button>
           </div>
         </div>
         <div style="display:none"><!-- reopener -->
@@ -3193,7 +3261,7 @@ body.rave-mode .lcd-art img {
               <label class="flbl">▶️ YOUTUBE</label>
               <input class="finput" type="url" id="s-link6-url" placeholder="https://youtube.com/...">
             </div>
-            <button class="settings-save-btn" onclick="saveArtistProfile()">💾 SAVE LINKS</button>
+            <button class="settings-save-btn" onclick="saveArtistProfile()" data-tip="SAVE YOUR PROFILE">💾 SAVE LINKS</button>
           </div>
         </div>
 
@@ -3246,28 +3314,7 @@ body.rave-mode .lcd-art img {
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
         <button class="back-btn" id="debug-btn" onclick="debugSync()" style="color:#ff8844;border-color:#662200;margin-top:6px;">🔧 DEBUG SYNC</button>
 
-        <!-- ══ ADMIN ONLY: INVITE CODES & USERS ══ -->
-        <div class="admin-only-section" style="display:none;">
-
-          <div class="settings-section" style="margin-top:12px;">
-            <div class="settings-hdr">🎟️ INVITE CODES</div>
-            <div class="settings-content">
-              <div style="font-family:'VT323',monospace;font-size:16px;color:#556655;margin-bottom:10px;line-height:1.5;">
-                Generate a code and send it to someone. They use it to create their own login.
-              </div>
-              <button class="settings-save-btn" onclick="createInviteCode()" style="margin-bottom:10px;">🎟️ GENERATE &amp; COPY CODE</button>
-              <div id="invite-code-list" style="max-height:200px;overflow-y:auto;"></div>
-            </div>
-          </div>
-
-          <div class="settings-section" style="margin-top:12px;">
-            <div class="settings-hdr">👥 REGISTERED USERS</div>
-            <div class="settings-content">
-              <div id="user-list" style="max-height:160px;overflow-y:auto;"></div>
-            </div>
-          </div>
-
-        </div>
+<!-- admin moved to dedicated ADMIN tab -->
 
       </div>
     </div><!-- /panel-settings -->
@@ -3364,8 +3411,8 @@ Listen here: {link}
             </div>
 
             <div class="promo-actions" style="margin-top:10px;">
-              <button class="promo-btn" onclick="saveAndGenerateLink()" id="btn-save-generate">💾 SAVE & GET LINK</button>
-              <button class="promo-btn primary" onclick="firePromo()">🚀 SEND TO PROMO LIST</button>
+              <button class="promo-btn" onclick="saveAndGenerateLink()" id="btn-save-generate" data-tip="SAVE PLAYLIST & GET SHARE LINK">💾 SAVE & GET LINK</button>
+              <button class="promo-btn primary" onclick="firePromo()" data-tip="SEND EMAIL TO SELECTED CONTACTS">🚀 SEND TO PROMO LIST</button>
             </div>
 
             <div class="promo-link-box" id="promo-link-box">
@@ -3427,6 +3474,40 @@ Listen here: {link}
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
       </div>
     </div><!-- /panel-contacts -->
+
+
+    <!-- ════════ ADMIN PANEL ════════ -->
+    <div class="tab-panel" id="panel-admin">
+      <div class="promo-body">
+
+        <!-- INVITE CODES -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🎟️ INVITE CODES</span>
+            <button class="promo-btn primary" onclick="createInviteCode()" style="padding:4px 10px;">+ GENERATE CODE</button>
+          </div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:10px;line-height:1.5;">
+              Generate a 4-digit code and share it with someone to let them register.
+            </div>
+            <div id="invite-code-list" style="max-height:none;"></div>
+          </div>
+        </div>
+
+        <!-- REGISTERED USERS -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>👥 REGISTERED USERS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderUserList()">↻ REFRESH</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="user-list" style="max-height:none;"></div>
+          </div>
+        </div>
+
+        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+      </div>
+    </div><!-- /panel-admin -->
 
   </div><!-- /win-window -->
 </div><!-- /shell -->
@@ -3609,6 +3690,8 @@ function applyUnlock(username, role, token) {
   startBgSync();
   // Show notification bell for admin, start polling
   if (role === 'admin') {
+    const adminTab = document.getElementById('tab-admin');
+    if (adminTab) adminTab.style.display = 'flex';
     const bellBtn = document.getElementById('wbtn-bell');
     if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
     fetchNotifications();
@@ -3632,6 +3715,8 @@ function logout() {
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'none';
   document.getElementById('tab-contacts').style.display = 'none';
+  const adminTabEl = document.getElementById('tab-admin');
+  if (adminTabEl) adminTabEl.style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('lock-screen').style.display = 'flex';
   document.getElementById('upload-form').style.display = 'none';
@@ -3802,16 +3887,35 @@ async function renderInviteCodes() {
   }
 }
 
+async function deleteUser(username) {
+  if (!confirm('Remove user @' + username + '? This cannot be undone.')) return;
+  try {
+    const { ok } = await api('DELETE', '/admin/user/' + username + '?secret=' + encodeURIComponent(window._adminSecret || ''), null);
+    if (ok) { notify('🗑️', '@' + username + ' removed'); renderUserList(); }
+    else notify('😾', 'Could not remove user');
+  } catch(e) { notify('😾', 'Server error'); }
+}
+
 async function renderUserList() {
   const el = document.getElementById('user-list');
   if (!el) return;
   try {
     const { ok, data } = await api('GET', '/admin/users?secret=' + encodeURIComponent(window._adminSecret || ''), null);
     if (!ok) { el.innerHTML = ''; return; }
-    el.innerHTML = (data.users || []).map(u => `
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-lo);">
-        <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:${u.role==='admin'?'var(--cat-orange)':'var(--lcd-green)'};flex:1;">${u.username.toUpperCase()}</span>
-        <span style="font-family:'VT323',monospace;font-size:14px;color:#556655;">${u.role||'user'} · ${u.trackCount||0} tracks</span>
+    el.innerHTML = (data.users || []).length === 0
+      ? '<div style="font-family:monospace;font-size:12px;color:var(--border-lo);padding:16px;text-align:center;">NO USERS YET</div>'
+      : (data.users || []).map(u => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border-lo);min-height:48px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:${u.role==='admin'?'var(--cat-orange)':'var(--lcd-green)'};margin-bottom:3px;">
+            ${(u.username||'').toUpperCase()}
+            ${u.role==='admin' ? '<span style="font-size:5px;color:#ffaa44;margin-left:6px;">ADMIN</span>' : ''}
+          </div>
+          <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;">
+            ${u.trackCount||0} tracks · joined ${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '?'}
+          </div>
+        </div>
+        ${u.role !== 'admin' ? `<button onclick="deleteUser('${u.username}')" style="font-family:'Press Start 2P',monospace;font-size:4px;color:#884422;background:none;border:1px solid #441100;padding:4px 7px;cursor:pointer;">✕ REMOVE</button>` : ''}
       </div>`).join('');
   } catch(e) { el.innerHTML = ''; }
 }
@@ -7718,6 +7822,10 @@ switchTab = function(name) {
   __origSwitchTab(name);
   if (name === 'contacts') {
     renderContactsTab();
+  }
+  if (name === 'admin') {
+    renderInviteCodes();
+    renderUserList();
   }
 };
 
