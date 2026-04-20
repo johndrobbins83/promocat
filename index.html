@@ -3071,6 +3071,39 @@ body.rave-mode .lcd-art img {
 @media (min-width: 900px) {
   .people-subtab { font-size: 8px; padding: 12px 16px; }
 }
+
+/* ── COMBINED PLAYLIST BAR ── */
+.combined-pl-bar {
+  flex-wrap: wrap;   /* mobile: wraps naturally */
+  gap: 0;
+  padding: 0 !important;
+}
+.combined-pl-bar .pl-mode-btns {
+  flex-shrink: 0;
+  padding: 6px 8px;
+}
+.combined-pl-bar .inline-filter-bar {
+  flex: 1;
+  min-width: 0;
+  border: none !important;
+  background: none !important;
+  padding: 4px 6px !important;
+  border-bottom: none !important;
+}
+.combined-pl-bar .pl-count-actions {
+  display: flex; gap: 4px; align-items: center;
+  padding: 4px 8px; flex-shrink: 0; margin-left: auto;
+}
+/* Desktop: force single row */
+@media (min-width: 900px) {
+  .combined-pl-bar {
+    flex-wrap: nowrap !important;
+    align-items: center;
+  }
+  .combined-pl-bar .pl-mode-btns {
+    padding: 6px 8px;
+  }
+}
 </style>
 </head>
 <body>
@@ -3086,7 +3119,7 @@ body.rave-mode .lcd-art img {
     <div class="tab active" id="tab-player" onclick="switchTab('player')">PLAYER</div>
     <div class="tab" id="tab-artist" onclick="switchTab('artist')">ARTIST</div>
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
-    <div class="tab" id="tab-people" onclick="switchTab('people')" style="display:none">👥 PEOPLE</div>
+    <div class="tab" id="tab-connections" onclick="switchTab('connections')" style="display:none">🤝 CONNECTIONS</div>
     <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display:none">⚙ ADMIN</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
     <div id="tab-settings" style="display:none"></div>
@@ -3394,13 +3427,12 @@ body.rave-mode .lcd-art img {
 
       <!-- Playlist -->
       <div class="pl-section">
-        <!-- ONE ROW: mode btns + filters + count + actions -->
-        <div class="pl-bar" style="flex-wrap:nowrap;overflow:visible;position:relative;">
+        <div class="pl-bar combined-pl-bar">
           <div class="pl-mode-btns" style="flex-shrink:0;">
             <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
-            <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="TRACKS SENT TO YOU">📬 INBOX <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
+            <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="PROMOS SENT TO YOU">📬 PROMOS <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
-          <div class="filter-bar" style="flex:1;border:none;background:none;padding:0 4px;position:static;">
+          <div class="filter-bar inline-filter-bar">
           <!-- Category -->
           <div class="filter-group" id="fg-cat">
             <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')" data-tip="FILTER BY CATEGORY">
@@ -3471,7 +3503,7 @@ body.rave-mode .lcd-art img {
           </div>
           </div><!-- /filter-bar inline -->
           <!-- Track count + actions -->
-          <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;margin-left:auto;">
+          <div class="pl-count-actions">
             <span class="pl-count" id="pl-count" style="white-space:nowrap;">0 TRACKS</span>
             <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
             <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
@@ -3998,7 +4030,7 @@ body.rave-mode .lcd-art img {
                      placeholder="Search users to connect..." autocomplete="off" autocorrect="off"
                      autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
                      oninput="searchUsers(this.value)">
-              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">🤝 CONNECT</button>
+              <button class="settings-save-btn" onclick="requestAccess()" style="flex:0;white-space:nowrap;">🔍 FIND USERS</button>
             </div>
             <!-- Search results -->
             <div id="user-search-results" style="margin-bottom:10px;"></div>
@@ -4019,12 +4051,12 @@ body.rave-mode .lcd-art img {
 
     <!-- ════════ PROMO PANEL ════════ -->
     <!-- ════════ PEOPLE PANEL ════════ -->
-    <div class="tab-panel" id="panel-people">
+    <div class="tab-panel" id="panel-connections">
       <div class="promo-body" style="padding:0;">
 
         <!-- Sub-tab bar -->
         <div class="people-subtabs">
-          <button class="people-subtab active" id="pst-connect"  onclick="switchPeopleTab('connect')">🤝 CONNECT</button>
+          <button class="people-subtab active" id="pst-connect"  onclick="switchPeopleTab('connect')">🔍 FIND USERS</button>
           <button class="people-subtab"        id="pst-contacts" onclick="switchPeopleTab('contacts')">👥 CONTACTS</button>
           <button class="people-subtab"        id="pst-promo"    onclick="switchPeopleTab('promo')">🚀 PROMO</button>
         </div>
@@ -4151,7 +4183,7 @@ body.rave-mode .lcd-art img {
               <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 SELECTED</span>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="selectAllContacts()">ALL</button>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="clearContactSelection()">NONE</button>
-              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="switchTab('people');switchPeopleTab('contacts')">✚ MANAGE</button>
+              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="switchTab('connections');switchPeopleTab('contacts')">✚ MANAGE</button>
             </div>
           </div>
           <div class="promo-section-body" style="padding:0;">
@@ -4249,6 +4281,64 @@ Listen here: {link}
     </div><!-- /panel-people -->
 
 
+
+
+    <!-- ════════ ADMIN PANEL ════════ -->
+    <div class="tab-panel" id="panel-admin">
+      <div class="promo-body">
+
+        <!-- INVITE CODES -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🎟️ INVITE CODES</span>
+            <button class="promo-btn primary" onclick="createInviteCode()" data-tip="GENERATE &amp; COPY 4-DIGIT CODE" style="padding:4px 10px;">+ GENERATE CODE</button>
+          </div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:12px;line-height:1.5;">
+              Generate a code, enter the recipient's email, and hit SEND to open your mail app with the invite pre-written.
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+              <input class="finput" type="email" id="invite-send-email"
+                     placeholder="recipient@email.com" autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false"
+                     style="flex:1;min-width:200px;font-size:16px;">
+              <button class="promo-btn primary" onclick="generateAndSendInvite()"
+                      data-tip="GENERATE CODE &amp; OPEN MAIL APP"
+                      style="flex:0;white-space:nowrap;padding:10px 16px;">
+                🎟️ GENERATE &amp; SEND
+              </button>
+            </div>
+            <div id="invite-code-list"></div>
+          </div>
+        </div>
+
+        <!-- RECENT SIGNUPS -->
+        <div class="promo-section" id="admin-signups-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🆕 RECENT SIGNUPS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderRecentSignups()">↻ REFRESH</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="recent-signups-list">
+              <div class="soc-empty">NO SIGNUPS YET</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALL USERS -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>👥 ALL USERS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderUserList()">↻ REFRESH</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="user-list"></div>
+          </div>
+        </div>
+
+        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+      </div>
+    </div><!-- /panel-admin -->
 
   </div><!-- /win-window -->
 </div><!-- /shell -->
@@ -7452,7 +7542,7 @@ async function syncPlaylistData() {
       const oldCount = inbox.filter(t => !t.listened).length;
       const hasNew   = data.inbox.length > inbox.length || newCount > oldCount;
       inbox = data.inbox;
-      if (hasNew) notify('📬', (newCount - oldCount > 0 ? (newCount - oldCount) : 1) + ' new track' + (newCount - oldCount !== 1 ? 's' : '') + ' in your inbox!');
+      if (hasNew) notify('📬', (newCount - oldCount > 0 ? (newCount - oldCount) : 1) + ' new track' + (newCount - oldCount !== 1 ? 's' : '') + ' in your promos!');
       updateInboxBadge();
       if (playlistMode === 'inbox') renderInbox();
     }
@@ -7636,7 +7726,7 @@ function renderInbox() {
     (unread ? ' · ' + unread + ' NEW' : '');
 
   if (!inbox.length) {
-    list.innerHTML = '<div class="inbox-empty">📭 INBOX IS EMPTY<br><br>SHARE YOUR SUBMIT LINK<br>SO PEOPLE CAN SEND YOU MUSIC</div>';
+    list.innerHTML = '<div class="inbox-empty">📭 PROMOS INBOX EMPTY<br><br>SHARE YOUR SUBMIT LINK<br>SO PEOPLE CAN SEND YOU MUSIC</div>';
     return;
   }
 
@@ -7729,7 +7819,7 @@ function deleteInboxTrack(i) {
   inbox.splice(i, 1);
   saveInbox();
   renderInbox();
-  notify('🗑️', 'Track removed from inbox');
+  notify('🗑️', 'Track removed from promos');
 }
 
 function saveInbox() {
@@ -8789,7 +8879,7 @@ async function doPushTrack() {
     });
     if (!ok) { notify('😾', data.error || 'Failed'); return; }
     document.getElementById('push-track-overlay').classList.remove('show');
-    notify('📬', '"' + t.title + '" dropped into @' + _pushTargetUser + '\'s inbox!');
+    notify('📬', '"' + t.title + '" dropped into @' + _pushTargetUser + '\'s promos!');
   } catch(e) { notify('😾', 'Could not reach server'); }
 }
 
@@ -9032,7 +9122,7 @@ async function addUserAsContact(username, name) {
 const __origSwitchTab = switchTab;
 switchTab = function(name) {
   __origSwitchTab(name);
-  if (name === 'people') {
+  if (name === 'connections') {
     switchPeopleTab(_activePeopleTab || 'connect');
   }
   if (name === 'admin') {
@@ -9243,7 +9333,7 @@ async function dropTrackTo(username, trackIdx, permission, note) {
     const permLabel = permission === 'stream' ? '🎧 stream only'
                     : permission === 'download' ? '⬇ download allowed'
                     : '🎁 free download';
-    notify('📬', '"' + t.title + '" dropped to @' + username + ' (' + permLabel + ')');
+    notify('📬', '"' + t.title + '" sent to @' + username + ' promos (' + permLabel + ')');
   } catch(e) { notify('😾', 'Server unreachable'); }
 }
 
