@@ -3071,39 +3071,6 @@ body.rave-mode .lcd-art img {
 @media (min-width: 900px) {
   .people-subtab { font-size: 8px; padding: 12px 16px; }
 }
-
-/* ── COMBINED PLAYLIST BAR ── */
-.combined-pl-bar {
-  flex-wrap: wrap;   /* mobile: wraps naturally */
-  gap: 0;
-  padding: 0 !important;
-}
-.combined-pl-bar .pl-mode-btns {
-  flex-shrink: 0;
-  padding: 6px 8px;
-}
-.combined-pl-bar .inline-filter-bar {
-  flex: 1;
-  min-width: 0;
-  border: none !important;
-  background: none !important;
-  padding: 4px 6px !important;
-  border-bottom: none !important;
-}
-.combined-pl-bar .pl-count-actions {
-  display: flex; gap: 4px; align-items: center;
-  padding: 4px 8px; flex-shrink: 0; margin-left: auto;
-}
-/* Desktop: force single row */
-@media (min-width: 900px) {
-  .combined-pl-bar {
-    flex-wrap: nowrap !important;
-    align-items: center;
-  }
-  .combined-pl-bar .pl-mode-btns {
-    padding: 6px 8px;
-  }
-}
 </style>
 </head>
 <body>
@@ -3427,17 +3394,22 @@ body.rave-mode .lcd-art img {
 
       <!-- Playlist -->
       <div class="pl-section">
-        <div class="pl-bar combined-pl-bar">
-          <div class="pl-mode-btns" style="flex-shrink:0;">
+        <!-- ROW 1: MY TRACKS / PROMOS mode buttons -->
+        <div class="pl-bar" style="padding:6px 8px;gap:8px;border-bottom:1px solid var(--border-lo);">
+          <div class="pl-mode-btns">
             <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
             <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="PROMOS SENT TO YOU">📬 PROMOS <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
-          <div class="filter-bar inline-filter-bar">
-          <!-- Category -->
+          <span class="pl-count" id="pl-count" style="margin-left:auto;">0 TRACKS</span>
+          <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗 COPY URL</button>
+          <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬 LINK</button>
+          <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
+          <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
+        </div>
+        <!-- ROW 2: Filter bar -->
+        <div class="filter-bar" id="pl-filter-bar">
           <div class="filter-group" id="fg-cat">
-            <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')" data-tip="FILTER BY CATEGORY">
-              <span class="active-dot"></span>CATEGORY <span class="arrow">▼</span>
-            </button>
+            <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')" data-tip="FILTER BY CATEGORY"><span class="active-dot"></span>CATEGORY <span class="arrow">▼</span></button>
             <div class="filter-dropdown" id="fd-cat">
               <button class="cat-btn on" data-cat="all"     onclick="setCat('all');closeFilters()">ALL</button>
               <button class="cat-btn"    data-cat="dj"      onclick="setCat('dj');closeFilters()">DJ STUFF</button>
@@ -3445,11 +3417,8 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn"    data-cat="nonelec" onclick="setCat('nonelec');closeFilters()">NON ELECTRONIC</button>
             </div>
           </div>
-          <!-- Availability -->
           <div class="filter-group" id="fg-avail">
-            <button class="filter-toggle" id="ft-avail" onclick="toggleFilter('avail')" data-tip="FILTER BY STATUS">
-              <span class="active-dot"></span>STATUS <span class="arrow">▼</span>
-            </button>
+            <button class="filter-toggle" id="ft-avail" onclick="toggleFilter('avail')" data-tip="FILTER BY STATUS"><span class="active-dot"></span>STATUS <span class="arrow">▼</span></button>
             <div class="filter-dropdown" id="fd-avail">
               <button class="cat-btn on" data-avail="all"       onclick="setAvail('all');closeFilters()">ALL STATUS</button>
               <button class="cat-btn"    data-avail="available" onclick="setAvail('available');closeFilters()" style="color:#44ff88;">AVAILABLE</button>
@@ -3459,38 +3428,33 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn"    data-avail="undecided" onclick="setAvail('undecided');closeFilters()" style="color:#aaaaaa;">UNDECIDED</button>
             </div>
           </div>
-          <!-- Genre -->
           <div class="filter-group" id="fg-genre">
-            <button class="filter-toggle" id="ft-genre" onclick="toggleFilter('genre')" data-tip="FILTER BY GENRE">
-              <span class="active-dot"></span>GENRE <span class="arrow">▼</span>
-            </button>
+            <button class="filter-toggle" id="ft-genre" onclick="toggleFilter('genre')" data-tip="FILTER BY GENRE"><span class="active-dot"></span>GENRE <span class="arrow">▼</span></button>
             <div class="filter-dropdown" id="fd-genre">
-              <button class="cat-btn on" data-genre="all" onclick="setGenre('all');closeFilters()">ALL GENRES</button>
-              <button class="cat-btn" data-genre="ambient" onclick="setGenre('ambient');closeFilters()">AMBIENT</button>
-              <button class="cat-btn" data-genre="breaks" onclick="setGenre('breaks');closeFilters()">BREAKS</button>
-              <button class="cat-btn" data-genre="chill-out" onclick="setGenre('chill-out');closeFilters()">CHILL OUT</button>
-              <button class="cat-btn" data-genre="disco-house" onclick="setGenre('disco-house');closeFilters()">DISCO HOUSE</button>
-              <button class="cat-btn" data-genre="drum-and-bass" onclick="setGenre('drum-and-bass');closeFilters()">DRUM AND BASS</button>
-              <button class="cat-btn" data-genre="dubstep" onclick="setGenre('dubstep');closeFilters()">DUBSTEP</button>
-              <button class="cat-btn" data-genre="edm" onclick="setGenre('edm');closeFilters()">EDM</button>
-              <button class="cat-btn" data-genre="electro" onclick="setGenre('electro');closeFilters()">ELECTRO</button>
-              <button class="cat-btn" data-genre="glitch-hop" onclick="setGenre('glitch-hop');closeFilters()">GLITCH HOP</button>
-              <button class="cat-btn" data-genre="hardcore" onclick="setGenre('hardcore');closeFilters()">HARDCORE</button>
-              <button class="cat-btn" data-genre="hardstyle" onclick="setGenre('hardstyle');closeFilters()">HARDSTYLE</button>
-              <button class="cat-btn" data-genre="house" onclick="setGenre('house');closeFilters()">HOUSE</button>
-              <button class="cat-btn" data-genre="idm" onclick="setGenre('idm');closeFilters()">IDM</button>
-              <button class="cat-btn" data-genre="jungle" onclick="setGenre('jungle');closeFilters()">JUNGLE</button>
-              <button class="cat-btn" data-genre="metal-rock" onclick="setGenre('metal-rock');closeFilters()">METAL/ROCK</button>
-              <button class="cat-btn" data-genre="techno" onclick="setGenre('techno');closeFilters()">TECHNO</button>
-              <button class="cat-btn" data-genre="trance" onclick="setGenre('trance');closeFilters()">TRANCE</button>
-              <button class="cat-btn" data-genre="trip-hop" onclick="setGenre('trip-hop');closeFilters()">TRIP HOP</button>
+              <button class="cat-btn on"  data-genre="all"         onclick="setGenre('all');closeFilters()">ALL GENRES</button>
+              <button class="cat-btn"     data-genre="ambient"     onclick="setGenre('ambient');closeFilters()">AMBIENT</button>
+              <button class="cat-btn"     data-genre="breaks"      onclick="setGenre('breaks');closeFilters()">BREAKS</button>
+              <button class="cat-btn"     data-genre="chill-out"   onclick="setGenre('chill-out');closeFilters()">CHILL OUT</button>
+              <button class="cat-btn"     data-genre="classical"   onclick="setGenre('classical');closeFilters()">CLASSICAL</button>
+              <button class="cat-btn"     data-genre="disco-house" onclick="setGenre('disco-house');closeFilters()">DISCO HOUSE</button>
+              <button class="cat-btn"     data-genre="drum-and-bass" onclick="setGenre('drum-and-bass');closeFilters()">DRUM AND BASS</button>
+              <button class="cat-btn"     data-genre="dubstep"     onclick="setGenre('dubstep');closeFilters()">DUBSTEP</button>
+              <button class="cat-btn"     data-genre="edm"         onclick="setGenre('edm');closeFilters()">EDM</button>
+              <button class="cat-btn"     data-genre="electro"     onclick="setGenre('electro');closeFilters()">ELECTRO</button>
+              <button class="cat-btn"     data-genre="glitch-hop"  onclick="setGenre('glitch-hop');closeFilters()">GLITCH HOP</button>
+              <button class="cat-btn"     data-genre="hardcore"    onclick="setGenre('hardcore');closeFilters()">HARDCORE</button>
+              <button class="cat-btn"     data-genre="hardstyle"   onclick="setGenre('hardstyle');closeFilters()">HARDSTYLE</button>
+              <button class="cat-btn"     data-genre="house"       onclick="setGenre('house');closeFilters()">HOUSE</button>
+              <button class="cat-btn"     data-genre="idm"         onclick="setGenre('idm');closeFilters()">IDM</button>
+              <button class="cat-btn"     data-genre="jungle"      onclick="setGenre('jungle');closeFilters()">JUNGLE</button>
+              <button class="cat-btn"     data-genre="metal-rock"  onclick="setGenre('metal-rock');closeFilters()">METAL/ROCK</button>
+              <button class="cat-btn"     data-genre="techno"      onclick="setGenre('techno');closeFilters()">TECHNO</button>
+              <button class="cat-btn"     data-genre="trance"      onclick="setGenre('trance');closeFilters()">TRANCE</button>
+              <button class="cat-btn"     data-genre="trip-hop"    onclick="setGenre('trip-hop');closeFilters()">TRIP HOP</button>
             </div>
           </div>
-          <!-- Sort -->
           <div class="filter-group" id="fg-sort">
-            <button class="filter-toggle has-filter" id="ft-sort" onclick="toggleFilter('sort')" data-tip="SORT PLAYLIST">
-              <span class="active-dot" style="display:inline-block;"></span>SORT <span class="arrow">&#9660;</span>
-            </button>
+            <button class="filter-toggle has-filter" id="ft-sort" onclick="toggleFilter('sort')" data-tip="SORT PLAYLIST"><span class="active-dot" style="display:inline-block;"></span>SORT <span class="arrow">&#9660;</span></button>
             <div class="filter-dropdown" id="fd-sort">
               <button class="cat-btn on" data-sort="title-az" onclick="setSort('title-az');closeFilters()">A &#8594; Z</button>
               <button class="cat-btn"    data-sort="title-za" onclick="setSort('title-za');closeFilters()">Z &#8594; A</button>
@@ -3501,17 +3465,7 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn"    data-sort="rating"   onclick="setSort('rating');closeFilters()">&#9733; RATING</button>
             </div>
           </div>
-          </div><!-- /filter-bar inline -->
-          <!-- Track count + actions -->
-          <div class="pl-count-actions">
-            <span class="pl-count" id="pl-count" style="white-space:nowrap;">0 TRACKS</span>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
-            <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
-            <button class="pl-expand-btn" onclick="openPlPopout()" data-tip="EXPAND PLAYLIST">⛶ EXPAND</button>
-          </div>
-        </div><!-- /combined pl-bar -->
+        </div>
 
         <div class="pl-list" id="pl-list">
           <div class="pl-empty">
@@ -7705,7 +7659,7 @@ function setPlaylistMode(mode) {
   document.getElementById('mode-btn-my').classList.toggle('active', mode === 'my');
   document.getElementById('mode-btn-inbox').classList.toggle('active', mode === 'inbox');
   // Show/hide relevant filter bar and buttons
-  const filterBar = document.querySelector('.filter-bar');
+  const filterBar = document.getElementById('pl-filter-bar');
   if (filterBar) filterBar.style.display = mode === 'my' ? '' : 'none';
   document.getElementById('copy-url-btn').style.display   = mode === 'my'    ? '' : 'none';
   document.getElementById('inbox-url-btn').style.display  = mode === 'inbox' ? '' : 'none';
