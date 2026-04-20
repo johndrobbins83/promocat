@@ -2898,13 +2898,12 @@ body.rave-mode .lcd-art img {
     overflow: hidden;
   }
   .player-body {
-    width: 400px;
-    flex-shrink: 0;
+    width: 50%;
+    flex: 0 0 50%;
     border-right: 2px solid var(--border-lo);
     padding: 16px 18px 14px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    /* Scale down player elements to fit the column */
   }
   /* Scale player components to fit 400px column */
   .player-body .cat-deco  { padding: 2px 0 6px; }
@@ -2935,7 +2934,7 @@ body.rave-mode .lcd-art img {
   }
 }
 @media (min-width: 1280px) {
-  .player-body { width: 440px; }
+  .player-body { width: 50%; flex: 0 0 50%; }
   .player-body .lcd       { height: 120px !important; }
   .player-body .lcd-title { font-size: 26px !important; }
   .player-body .vis       { height: 90px !important; }
@@ -2991,10 +2990,10 @@ body.rave-mode .lcd-art img {
 .pl-expand-btn {
   font-family: 'Press Start 2P', monospace; font-size: 6px;
   color: var(--lcd-green); background: var(--btn-bg);
-  border-top: 1px solid var(--btn-hi); border-left: 1px solid var(--btn-hi);
-  border-bottom: 1px solid var(--btn-sh); border-right: 1px solid var(--btn-sh);
-  padding: 5px 8px; cursor: pointer; flex-shrink: 0;
-  white-space: nowrap;
+  border-top: 1px solid var(--mbtn-border-hi); border-left: 1px solid var(--mbtn-border-hi);
+  border-bottom: 1px solid var(--mbtn-border-lo); border-right: 1px solid var(--mbtn-border-lo);
+  padding: 8px 10px; cursor: pointer; flex-shrink: 0;
+  white-space: nowrap; margin-left: auto;
 }
 .pl-expand-btn:hover { filter: brightness(1.3); }
 
@@ -3541,7 +3540,6 @@ body.rave-mode .lcd-art img {
           <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
           <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
           <span class="pl-count" id="pl-count" style="margin-left:auto;display:none;">0 TRACKS</span>
-          <button class="pl-expand-btn" onclick="openPlPopout()" data-tip="EXPAND PLAYLIST">⛶ EXPAND</button>
         </div>
         <!-- ROW 2: Filter bar -->
         <div class="filter-bar" id="pl-filter-bar">
@@ -3602,6 +3600,7 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn"    data-sort="rating"   onclick="setSort('rating');closeFilters()">&#9733; RATING</button>
             </div>
           </div>
+          <button class="pl-expand-btn" onclick="openPlPopout()" data-tip="EXPAND PLAYLIST">⛶ EXPAND</button>
         </div>
 
         <div class="pl-list" id="pl-list">
