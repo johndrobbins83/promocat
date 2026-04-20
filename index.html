@@ -4232,7 +4232,7 @@ Listen here: {link}
 
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
       </div>
-    </div><!-- /panel-people -->
+    </div><!-- /panel-connections -->
 
 
 
@@ -4421,8 +4421,8 @@ function switchTab(name) {
     if (window.catTexture) window.catTexture.setRave(raveModeOn);
   }
   // Defer heavy promo render so tab paint completes first
-  if (name === 'promo') {
-    setTimeout(() => { renderPromoTab(); loadTemplate(); }, 150);
+  if (name === 'connections') {
+    switchPeopleTab(_activePeopleTab || 'connect');
   }
   updateTitlebar();
 }
@@ -4483,7 +4483,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
-  document.getElementById('tab-people').style.display = 'flex';
+  document.getElementById('tab-connections').style.display = 'flex';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
@@ -4538,7 +4538,7 @@ function logout() {
   const lb = document.getElementById('login-btn');
   if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
-  document.getElementById('tab-people').style.display = 'none';
+  document.getElementById('tab-connections').style.display = 'none';
   const adminTabEl = document.getElementById('tab-admin');
   if (adminTabEl) adminTabEl.style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
@@ -7113,7 +7113,7 @@ async function checkPromoHash() {
   // Hide controls that shouldn't be available to shared-link viewers
   const uploadTab = document.getElementById('tab-upload');
   if (uploadTab) uploadTab.style.display = 'none';
-  const promoTab = document.getElementById('tab-promo');
+  const promoTab = document.getElementById('tab-connections');
   if (promoTab) promoTab.style.display = 'none';
   const plAddBtn = document.querySelector('.pl-add-btn');
   if (plAddBtn) plAddBtn.style.display = 'none';
