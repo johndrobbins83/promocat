@@ -2541,6 +2541,7 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-artist" onclick="switchTab('artist')">ARTIST</div>
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
     <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">PROMO</div>
+    <div class="tab" id="tab-connect" onclick="switchTab('connect')" style="display:none">🤝 CONNECT</div>
     <div class="tab" id="tab-contacts" onclick="switchTab('contacts')" style="display:none">CONTACTS</div>
     <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display:none">⚙ ADMIN</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
@@ -3591,6 +3592,72 @@ Listen here: {link}
       </div>
     </div><!-- /panel-admin -->
 
+
+    <!-- ════════ CONNECT PANEL ════════ -->
+    <div class="tab-panel" id="panel-connect">
+      <div class="promo-body">
+
+        <!-- ── FIND USERS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">🔍 FIND USERS</div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:16px;color:#556655;margin-bottom:12px;line-height:1.5;">
+              Search for other PromoCat users by name or email. Send a connection request — once they accept you can both drop tracks directly into each other's inbox.
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input class="finput" type="text" id="connect-search-input"
+                     placeholder="Search by name or email..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+                     style="font-size:16px;flex:1;"
+                     oninput="searchConnectUsers(this.value)">
+              <button class="settings-save-btn" onclick="sendConnectRequest()" style="flex:0;white-space:nowrap;padding:10px 16px;">
+                🤝 SEND REQUEST
+              </button>
+            </div>
+            <div id="connect-search-results" style="margin-bottom:4px;"></div>
+          </div>
+        </div>
+
+        <!-- ── INCOMING REQUESTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>📥 INCOMING REQUESTS <span id="connect-pending-badge" style="display:none;background:#ff4444;color:#fff;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 6px;margin-left:6px;">NEW</span></span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowers()">↻</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-pending-list">
+              <div class="soc-empty">NO PENDING REQUESTS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MY CONNECTIONS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🟢 MY CONNECTIONS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowing()">↻</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-accepted-list">
+              <div class="soc-empty">NO CONNECTIONS YET</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SENT REQUESTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">📤 SENT REQUESTS</div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-sent-list">
+              <div class="soc-empty">NO PENDING SENT REQUESTS</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
+      </div>
+    </div><!-- /panel-connect -->
+
   </div><!-- /win-window -->
 </div><!-- /shell -->
 
@@ -3599,8 +3666,8 @@ Listen here: {link}
   <div class="notif-panel-hdr">
     <span>🔔 NOTIFICATIONS</span>
     <div class="notif-panel-actions">
-      <button class="notif-panel-btn" onclick="markNotifsRead()">MARK ALL READ</button>
-      <button class="notif-panel-btn" onclick="clearNotifs()">CLEAR ALL</button>
+      <button class="notif-panel-btn" onclick="markAllUserNotifsRead()">MARK ALL READ</button>
+      <button class="notif-panel-btn" onclick="clearAllUserNotifs()">CLEAR ALL</button>
       <button class="notif-panel-btn" onclick="toggleNotifPanel()">✕</button>
     </div>
   </div>
@@ -3746,6 +3813,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'flex';
+  document.getElementById('tab-connect').style.display = 'flex';
   document.getElementById('tab-contacts').style.display = 'flex';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
@@ -3774,9 +3842,12 @@ function applyUnlock(username, role, token) {
   // Admin tab — show/hide based on role from server
   const _adminTabEl = document.getElementById('tab-admin');
   if (_adminTabEl) _adminTabEl.style.display = (role === 'admin') ? 'flex' : 'none';
+  // Bell visible for everyone — shows connection requests + track drops
+  const bellBtn = document.getElementById('wbtn-bell');
+  if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
+  fetchUserNotifications();
+  startUserNotifPolling();
   if (role === 'admin') {
-    const bellBtn = document.getElementById('wbtn-bell');
-    if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
     fetchNotifications();
     startNotifPolling();
   }
@@ -3797,6 +3868,7 @@ function logout() {
   if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
   document.getElementById('tab-promo').style.display = 'none';
+  document.getElementById('tab-connect').style.display = 'none';
   document.getElementById('tab-contacts').style.display = 'none';
   const adminTabEl = document.getElementById('tab-admin');
   if (adminTabEl) adminTabEl.style.display = 'none';
@@ -4641,6 +4713,9 @@ document.addEventListener('click', e => {
 });
 
 function renderNotifList() {
+  return renderUserNotifList(); // unified renderer handles both admin + user notifs
+  // Legacy below kept for reference
+  if (false) {
   const el = document.getElementById('notif-list');
   if (!_notifications.length) {
     el.innerHTML = '<div class="notif-empty">NO NOTIFICATIONS YET<br><br>YOU\'LL SEE ALERTS HERE WHEN<br>TRACKS ARE PLAYED, RATED,<br>DOWNLOADED, OR USERS SIGN UP</div>';
@@ -4663,6 +4738,7 @@ function renderNotifList() {
       <div class="notif-item-time">${timeAgo(n.at)}</div>
     </div>`;
   }).join('');
+  } // end legacy
 }
 
 function timeAgo(ts) {
@@ -6693,15 +6769,15 @@ let _bgSyncTimer = null;
 function startBgSync() {
   stopBgSync();
   _bgSyncTimer = setInterval(async () => {
-    if (!currentUser?.token || !document.hasFocus() || _animPaused) return; // skip when not on player tab
+    if (!currentUser?.token || !document.hasFocus()) return;
     try {
       const { ok, data } = await api('GET', '/playlist', null);
       if (!ok) return;
-      // Only update if cloud has MORE tracks than local (another device added tracks)
+      // Playlist — update if cloud has more tracks
       if (Array.isArray(data.playlist) && data.playlist.length > playlist.length) {
         playlist = data.playlist;
         cacheSet(CACHE_PLAYLIST(), playlist);
-        renderPlaylist();
+        if (!_animPaused) renderPlaylist();
         notify('☁️', 'Playlist updated from cloud!');
       }
       if (Array.isArray(data.promoPlaylists) && data.promoPlaylists.length !== promoPlaylists.length) {
@@ -6714,16 +6790,20 @@ function startBgSync() {
         selectedContacts = new Set(contacts.map((_,i) => i));
         renderContacts();
       }
+      // Inbox — always check, not just when on player tab
       if (Array.isArray(data.inbox)) {
         const newCount = data.inbox.filter(t => !t.listened).length;
         const oldCount = inbox.filter(t => !t.listened).length;
+        const hasNew = data.inbox.length > inbox.length || newCount > oldCount;
         inbox = data.inbox;
-        if (newCount > oldCount) { notify('📬', (newCount - oldCount) + ' new track' + (newCount-oldCount>1?'s':'') + ' in your inbox!'); }
+        if (hasNew) {
+          notify('📬', (newCount - oldCount > 0 ? (newCount - oldCount) : 1) + ' new track' + (newCount - oldCount !== 1 ? 's' : '') + ' in your inbox!');
+        }
         updateInboxBadge();
         if (playlistMode === 'inbox') renderInbox();
       }
     } catch(e) { /* offline — ignore */ }
-  }, 60000); // every 60 seconds
+  }, 15000); // every 15 seconds — inbox needs to feel responsive
 }
 function stopBgSync() {
   clearInterval(_bgSyncTimer);
@@ -8052,6 +8132,9 @@ switchTab = function(name) {
   if (name === 'contacts') {
     renderContactsTab();
   }
+  if (name === 'connect') {
+    loadConnectTab();
+  }
   if (name === 'admin') {
     renderInviteCodes();
     renderUserList();
@@ -8218,6 +8301,325 @@ loadSocialData = function() {
   _dropConnections = []; // force refresh next time picker opens
   _origLoadSocialData();
 };
+
+
+// ═══════════════════════════════════════════════════════
+// CONNECT TAB
+// ═══════════════════════════════════════════════════════
+
+let _connectSearchTimer = null;
+let _connectSelectedUser = null;
+
+async function loadConnectTab() {
+  await Promise.all([ loadFollowers(), loadFollowing() ]);
+}
+
+// ── Search ──
+function searchConnectUsers(q) {
+  clearTimeout(_connectSearchTimer);
+  const el = document.getElementById('connect-search-results');
+  if (!el) return;
+  if (!q || q.length < 2) { el.innerHTML = ''; _connectSelectedUser = null; return; }
+  el.innerHTML = '<div style="font-family:VT323,monospace;font-size:15px;color:var(--border-lo);padding:6px 0;">SEARCHING...</div>';
+  _connectSearchTimer = setTimeout(async () => {
+    try {
+      const { ok, data } = await api('GET', '/search-users?q=' + encodeURIComponent(q), null);
+      if (!ok || !data.results?.length) {
+        el.innerHTML = '<div style="font-family:VT323,monospace;font-size:15px;color:var(--border-lo);padding:6px 0;">NO USERS FOUND</div>';
+        return;
+      }
+      el.innerHTML = data.results.map(u => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border-lo);margin-bottom:4px;background:var(--vis-bg);cursor:pointer;"
+             onclick="selectConnectUser('${esc(u.username)}','${esc(u.name||u.displayName||u.username)}',this)">
+          <div style="flex:1;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lcd-green);">${esc(u.name||u.displayName||u.username)}</div>
+            <div style="font-family:'VT323',monospace;font-size:13px;color:var(--border-lo);">@${esc(u.username)}</div>
+            ${u.tagline ? `<div style="font-family:'VT323',monospace;font-size:13px;color:#445544;">${esc(u.tagline)}</div>` : ''}
+          </div>
+          <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);">TAP TO SELECT</span>
+        </div>`).join('');
+    } catch(e) { el.innerHTML = ''; }
+  }, 400);
+}
+
+function selectConnectUser(username, name, el) {
+  _connectSelectedUser = { username, name };
+  document.getElementById('connect-search-input').value = name + ' (@' + username + ')';
+  document.getElementById('connect-search-results').innerHTML =
+    '<div style="font-family:VT323,monospace;font-size:15px;color:var(--lcd-green);padding:4px 0;">✓ ' + esc(name) + ' selected — hit SEND REQUEST</div>';
+}
+
+async function sendConnectRequest() {
+  if (!_connectSelectedUser) {
+    const input = document.getElementById('connect-search-input');
+    if (input && input.value.trim().length > 1) {
+      notify('😾', 'Select a user from the search results first'); return;
+    }
+    notify('😾', 'Search for a user first'); return;
+  }
+  const { username, name } = _connectSelectedUser;
+  try {
+    const { ok, data } = await api('POST', '/request-access/' + username, {});
+    if (!ok) { notify('😾', data.error || 'Could not send request'); return; }
+    notify('🤝', 'Connection request sent to ' + name + '!');
+    _connectSelectedUser = null;
+    document.getElementById('connect-search-input').value = '';
+    document.getElementById('connect-search-results').innerHTML = '';
+    setTimeout(loadFollowing, 500);
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+// ── Override loadFollowers to also render connect tab ──
+const _origLoadFollowers = loadFollowers;
+loadFollowers = async function() {
+  try {
+    const { ok, data } = await api('GET', '/follow-requests', null);
+    if (!ok) return;
+    renderFollowers(data.followers || []);
+    renderConnectIncoming(data.followers || []);
+  } catch(e) { console.warn('loadFollowers:', e); }
+};
+
+function renderConnectIncoming(followers) {
+  const pending  = followers.filter(f => f.status === 'pending');
+  const el = document.getElementById('connect-pending-list');
+  const badge = document.getElementById('connect-pending-badge');
+  if (badge) badge.style.display = pending.length ? 'inline' : 'none';
+  if (!el) return;
+
+  if (!pending.length) {
+    el.innerHTML = '<div class="soc-empty">NO PENDING REQUESTS</div>';
+    return;
+  }
+  el.innerHTML = pending.map(f => `
+    <div class="follower-item" style="background:rgba(68,221,136,.04);border-left:3px solid var(--cat-orange);">
+      <div style="flex:1;">
+        <div class="follower-name">@${esc(f.username)}</div>
+        ${f.note ? `<div class="follower-note">"${esc(f.note)}"</div>` : ''}
+        <div style="font-family:'VT323',monospace;font-size:13px;color:#445544;">wants to connect with you</div>
+      </div>
+      <div class="follower-actions">
+        <button class="soc-btn accept" onclick="acceptConnect('${esc(f.username)}')">✅ ACCEPT</button>
+        <button class="soc-btn decline" onclick="declineConnect('${esc(f.username)}')">✕ DECLINE</button>
+      </div>
+    </div>`).join('');
+}
+
+async function acceptConnect(username) {
+  const { ok, data } = await api('PUT', '/follow-request/' + username, { action: 'accept' });
+  if (!ok) { notify('😾', data.error || 'Failed'); return; }
+  notify('✅', 'Connected with @' + username + '! You can now drop tracks to each other.');
+  _dropConnections = []; // invalidate picker cache
+  loadConnectTab();
+}
+
+async function declineConnect(username) {
+  const { ok, data } = await api('PUT', '/follow-request/' + username, { action: 'decline' });
+  if (!ok) { notify('😾', data.error || 'Failed'); return; }
+  notify('✕', '@' + username + ' declined');
+  loadConnectTab();
+}
+
+// ── Override loadFollowing to also render connect tab ──
+const _origLoadFollowing = loadFollowing;
+loadFollowing = async function() {
+  try {
+    const { ok, data } = await api('GET', '/following', null);
+    if (!ok) return;
+    renderFollowing(data.following || []);
+    renderConnectAccepted(data.following || []);
+    renderConnectSent(data.following || []);
+  } catch(e) { console.warn('loadFollowing:', e); }
+};
+
+function renderConnectAccepted(following) {
+  const el = document.getElementById('connect-accepted-list');
+  if (!el) return;
+  const accepted = following.filter(f => f.status === 'accepted');
+  if (!accepted.length) {
+    el.innerHTML = '<div class="soc-empty">NO CONNECTIONS YET<br>SEARCH ABOVE AND SEND A REQUEST</div>';
+    return;
+  }
+  el.innerHTML = accepted.map(f => `
+    <div class="follower-item">
+      <div style="flex:1;">
+        <div class="follower-name">${esc(f.name || f.username)}</div>
+        <div style="font-family:'VT323',monospace;font-size:13px;color:#445544;">@${esc(f.username)}</div>
+      </div>
+      <span class="follower-status accepted">🟢 CONNECTED</span>
+      <div class="follower-actions">
+        <button class="soc-btn push" onclick="openPushTrack('${esc(f.username)}','${esc(f.name||f.username)}')">📬 DROP TRACK</button>
+        <button class="soc-btn remove" onclick="removeFollower('${esc(f.username)}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderConnectSent(following) {
+  const el = document.getElementById('connect-sent-list');
+  if (!el) return;
+  const pending = following.filter(f => f.status === 'pending');
+  if (!pending.length) {
+    el.innerHTML = '<div class="soc-empty">NO PENDING SENT REQUESTS</div>';
+    return;
+  }
+  el.innerHTML = pending.map(f => `
+    <div class="follower-item">
+      <div style="flex:1;">
+        <div class="follower-name">${esc(f.name || f.username)}</div>
+        <div style="font-family:'VT323',monospace;font-size:13px;color:#445544;">@${esc(f.username)}</div>
+      </div>
+      <span class="follower-status pending">⏳ AWAITING RESPONSE</span>
+    </div>`).join('');
+}
+
+// ── Bell badge for incoming requests ──
+const _origUpdateInboxBadge = updateInboxBadge;
+updateInboxBadge = function() {
+  _origUpdateInboxBadge();
+};
+
+
+// ═══════════════════════════════════════════════════════
+// USER NOTIFICATIONS — connection requests, track drops
+// ═══════════════════════════════════════════════════════
+
+let _userNotifications = [];
+let _userNotifPollTimer = null;
+
+async function fetchUserNotifications() {
+  if (!currentUser) return;
+  try {
+    const { ok, data } = await api('GET', '/my-notifications', null);
+    if (!ok) return;
+    _userNotifications = data.notifications || [];
+    const unread = data.unread || 0;
+    // Update bell badge — combine admin + user unread
+    updateBellBadge(unread);
+    renderUserNotifList();
+  } catch(e) {}
+}
+
+function startUserNotifPolling() {
+  if (_userNotifPollTimer) clearInterval(_userNotifPollTimer);
+  _userNotifPollTimer = setInterval(fetchUserNotifications, 15000);
+}
+
+function renderUserNotifList() {
+  // Merge with admin notifs if admin, otherwise just user notifs
+  const allNotifs = currentUser?.role === 'admin'
+    ? [..._userNotifications, ..._notifications]
+    : _userNotifications;
+
+  const el = document.getElementById('notif-list');
+  if (!el) return;
+
+  if (!allNotifs.length) {
+    el.innerHTML = '<div class="notif-empty">NO NOTIFICATIONS YET<br><br>CONNECTION REQUESTS AND<br>TRACK DROPS WILL APPEAR HERE</div>';
+    return;
+  }
+
+  // Sort newest first
+  const sorted = [...allNotifs].sort((a, b) => (b.at || 0) - (a.at || 0));
+
+  el.innerHTML = sorted.map(n => {
+    const isRequest  = n.type === 'access_request';
+    const isGranted  = n.type === 'access_granted';
+    const isTrack    = n.type === 'track_submitted';
+    const isCodeUsed = n.type === 'new_user';
+
+    let border = '';
+    if (isRequest)  border = 'border-left:3px solid var(--cat-orange);';
+    if (isGranted)  border = 'border-left:3px solid #44ff88;';
+    if (isTrack)    border = 'border-left:3px solid #88ddff;';
+    if (isCodeUsed) border = 'border-left:3px solid #44ff88;';
+
+    // Action buttons for connection requests
+    const actions = isRequest && n.fromUser ? `
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button class="soc-btn accept" style="font-size:6px;padding:5px 10px;"
+          onclick="acceptConnectFromNotif('${esc(n.fromUser)}','${esc(n.id||'')}')">
+          ✅ ACCEPT
+        </button>
+        <button class="soc-btn decline" style="font-size:6px;padding:5px 10px;"
+          onclick="declineConnectFromNotif('${esc(n.fromUser)}','${esc(n.id||'')}')">
+          ✕ DECLINE
+        </button>
+      </div>` : '';
+
+    // Track drop — show link to inbox
+    const inboxLink = isTrack ? `
+      <button style="font-family:'Press Start 2P',monospace;font-size:5px;color:#88ddff;background:none;border:1px solid #005588;padding:3px 7px;cursor:pointer;margin-top:6px;"
+        onclick="setPlaylistMode('inbox');switchTab('player');toggleNotifPanel();">
+        📬 VIEW INBOX
+      </button>` : '';
+
+    const codeExtra = isCodeUsed && n.usedCode
+      ? `<div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;letter-spacing:4px;margin-top:4px;">CODE: ${esc(n.usedCode)}</div>`
+      : '';
+
+    return `
+    <div class="notif-item${n.read ? '' : ' unread'}" style="${border}">
+      <div class="notif-item-icon">${n.icon || '🔔'}</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">${esc(n.title || '')}</div>
+        <div class="notif-item-sub">${esc(n.body || '')}</div>
+        ${codeExtra}
+        ${actions}
+        ${inboxLink}
+      </div>
+      <div class="notif-item-time">${timeAgo(n.at || Date.now())}</div>
+    </div>`;
+  }).join('');
+}
+
+async function acceptConnectFromNotif(fromUser, notifId) {
+  try {
+    const { ok, data } = await api('PUT', '/follow-request/' + fromUser, { action: 'accept' });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify('✅', 'Connected with @' + fromUser + '! You can now drop tracks to each other.');
+    _dropConnections = []; // invalidate cache
+    await markUserNotifRead(notifId);
+    fetchUserNotifications();
+    loadSocialData(); // refresh connections tab
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+async function declineConnectFromNotif(fromUser, notifId) {
+  try {
+    const { ok, data } = await api('PUT', '/follow-request/' + fromUser, { action: 'decline' });
+    if (!ok) { notify('😾', data.error || 'Failed'); return; }
+    notify('✕', '@' + fromUser + ' request declined');
+    await markUserNotifRead(notifId);
+    fetchUserNotifications();
+  } catch(e) { notify('😾', 'Server unreachable'); }
+}
+
+async function markUserNotifRead(notifId) {
+  // Mark locally
+  _userNotifications = _userNotifications.map(n =>
+    n.id === notifId ? { ...n, read: true } : n
+  );
+  // Mark all read on server
+  try { await api('PUT', '/my-notifications', {}); } catch(e) {}
+}
+
+async function markAllUserNotifsRead() {
+  try {
+    await api('PUT', '/my-notifications', {});
+    _userNotifications.forEach(n => n.read = true);
+    renderUserNotifList();
+    updateBellBadge(0);
+  } catch(e) {}
+}
+
+async function clearAllUserNotifs() {
+  try {
+    await api('DELETE', '/my-notifications', null);
+    _userNotifications = [];
+    renderUserNotifList();
+    updateBellBadge(0);
+  } catch(e) {}
+}
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
