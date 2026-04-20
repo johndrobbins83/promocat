@@ -2265,7 +2265,7 @@ body.rave-mode .lcd-art img {
   font-size: 7px;
   padding: 8px 14px;
   background: var(--mbtn-bg);
-  color: var(--border-lo);
+  color: #445544;
   border-top: 2px solid var(--mbtn-border-hi);
   border-left: 2px solid var(--mbtn-border-hi);
   border-bottom: 2px solid var(--mbtn-border-lo);
@@ -2273,7 +2273,9 @@ body.rave-mode .lcd-art img {
   cursor: pointer;
   letter-spacing: .5px;
   white-space: nowrap;
+  transition: color .15s;
 }
+.pl-mode-btn:hover { color: var(--lcd-green); }
 .pl-mode-btn:first-child { border-right: none; }
 .pl-mode-btn.active {
   background: var(--mbtn-on-bg);
@@ -3529,17 +3531,21 @@ body.rave-mode .lcd-art img {
 
       <!-- Playlist -->
       <div class="pl-section">
-        <!-- PLAYLIST BAR: all controls on one row -->
-        <div class="pl-bar" style="padding:5px 8px;gap:6px;border-bottom:1px solid var(--border-lo);flex-wrap:nowrap;">
+        <!-- PLAYLIST BAR -->
+        <div class="pl-bar" style="padding:5px 8px;gap:0;border-bottom:1px solid var(--border-lo);flex-wrap:nowrap;align-items:center;">
+          <!-- Mode buttons -->
           <div class="pl-mode-btns" style="flex-shrink:0;">
             <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
             <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="PROMOS SENT TO YOU">📬 PROMOS <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
-          <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
-          <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
-          <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
-          <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
-          <span class="pl-count" id="pl-count" style="margin-left:auto;display:none;">0 TRACKS</span>
+          <!-- Icons grouped tight, pushed right -->
+          <div style="display:flex;gap:0;align-items:center;margin-left:auto;flex-shrink:0;">
+            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
+            <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
+          </div>
+          <span class="pl-count" id="pl-count" style="display:none;margin-left:8px;">0 TRACKS</span>
         </div>
         <!-- ROW 2: Filter bar -->
         <div class="filter-bar" id="pl-filter-bar">
