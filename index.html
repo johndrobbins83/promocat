@@ -10105,12 +10105,15 @@ async function browseDropbox() {
   const listEl = document.getElementById('sb-dropbox-list');
   listEl.style.display = 'block';
 
-  // If it's a direct file link (dl=0), convert to stream URL
-  if (link.includes('dropbox.com') && !link.includes('/sh/')) {
-    const streamUrl = link.replace('www.dropbox.com','dl.dropboxusercontent.com').replace('?dl=0','').replace('?dl=1','');
-    listEl.innerHTML = '';
-    renderStorageFiles(listEl, [{ name: link.split('/').pop().split('?')[0], url: streamUrl }]);
-    return;
+  // Direct file link — convert to streamable URL
+  if (link.includes('dropbox.com')) {
+    const streamUrl = convertDropboxUrl(link);
+    if (streamUrl) {
+      const name = link.split('/').pop().split('?')[0] || 'track';
+      listEl.innerHTML = '';
+      renderStorageFiles(listEl, [{ name, url: streamUrl }]);
+      return;
+    }
   }
 
   // Shared folder link — use Dropbox API v2 with app key if available
@@ -10329,9 +10332,13 @@ function renderStorageFiles(el, files) {
 
 // ── Apply selected file to the ADD TRACK form ──
 function applyStorageFile(file) {
-  // Set stream URL
+  // Set stream URL — run through Dropbox converter if needed
+  let fileUrl = file.url || '';
+  if (fileUrl.includes('dropbox.com')) {
+    fileUrl = convertDropboxUrl(fileUrl) || fileUrl;
+  }
   const urlInput = document.getElementById('f-audio-url');
-  if (urlInput) { urlInput.value = file.url; checkAudioUrl(); }
+  if (urlInput) { urlInput.value = fileUrl; checkAudioUrl(); }
   // Auto-fill title from filename if empty
   const titleInput = document.getElementById('f-title');
   if (titleInput && !titleInput.value.trim()) {
@@ -10443,9 +10450,12 @@ async function browseDropbox(url) {
   });
 
   if (!resp.ok) {
-    // Fallback: try direct dl.dropboxusercontent.com conversion for single files
+    // Fallback: direct file link conversion
     if (url.includes('dropbox.com') && isAudioFile(url)) {
-      const direct = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '?dl=1').replace('?dl=1', '?dl=1');
+      const direct = url
+        .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+        .replace('?dl=0', '?dl=1')
+        + (url.includes('?') ? '' : '?dl=1');
       const name = url.split('/').pop().split('?')[0];
       return [{ name, url: direct, provider: 'dropbox' }];
     }
@@ -10792,6 +10802,40 @@ function updateNowPlayingInfo() {
     artEl.src = '';
     if (phEl) phEl.style.display = 'flex';
   }
+}
+
+
+// ── Dropbox URL converter — handles all share link formats ──
+function convertDropboxUrl(url) {
+  if (!url || !url.includes('dropbox.com')) return null;
+
+  // Already a direct content URL
+  if (url.includes('dl.dropboxusercontent.com')) {
+    return url.includes('dl=1') ? url : url + (url.includes('?') ? '&dl=1' : '?dl=1');
+  }
+
+  // New-style scl links: https://www.dropbox.com/scl/fi/xxx/file.mp3?rlkey=yyy&dl=0
+  // These need rlkey preserved and dl=1
+  if (url.includes('/scl/fi/')) {
+    return url
+      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+      .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
+      + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
+  }
+
+  // Old-style: https://www.dropbox.com/s/xxx/file.mp3?dl=0
+  if (url.includes('/s/') || url.includes('/sh/')) {
+    return url
+      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+      .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
+      + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
+  }
+
+  // Fallback — try generic conversion
+  return url
+    .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+    .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
+    + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
