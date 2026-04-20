@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- storage-overlay (legacy) removed --><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -96,12 +96,16 @@ body {
   overflow: hidden;
 }
 @media (min-width: 600px) {
-  body  { padding: 24px 16px; }
-  #shell { max-width: 560px; min-height: auto; }
+  body  { padding: 16px 12px; }
+  #shell { max-width: 600px; min-height: auto; }
 }
 @media (min-width: 900px) {
-  body  { padding: 50px 40px 60px; }
-  #shell { width: 1060px; max-width: 1060px; min-height: auto; }
+  body  { padding: 28px 24px 32px; }
+  #shell { width: 1280px; max-width: 95vw; min-height: auto; }
+}
+@media (min-width: 1400px) {
+  body  { padding: 36px 40px 40px; }
+  #shell { width: 1440px; max-width: 96vw; }
 }
 
 /* ── TAB BAR ── */
@@ -202,9 +206,9 @@ body {
 
 /* Desktop — all in one row, bigger text */
 @media (min-width: 900px) {
-  .tab-bar { flex-wrap: nowrap; gap: 3px; padding: 0 4px; }
-  .tab { font-size: 7px; padding: 9px 14px 7px; letter-spacing: .5px; }
-  .login-btn { font-size: 7px; padding: 5px 12px; }
+  .tab-bar { flex-wrap: nowrap; gap: 4px; padding: 0 6px; }
+  .tab { font-size: 9px; padding: 11px 18px 9px; letter-spacing: .6px; }
+  .login-btn { font-size: 8px; padding: 7px 14px; }
   .tab-user-name { font-size: 7px; }
   .tab-user-logout { font-size: 5px; padding: 3px 7px; }
 }
@@ -240,7 +244,7 @@ body {
   gap: 6px;
   flex-shrink: 0;
 }
-@media (min-width: 900px) { .titlebar { height: 46px; cursor: move; } }
+@media (min-width: 900px) { .titlebar { height: 54px; cursor: move; } }
 .titlebar::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:rgba(68,221,136,.4); }
 
 .titlebar-text {
@@ -255,7 +259,7 @@ body {
   flex: 1;
   min-width: 0;
 }
-@media (min-width: 900px) { .titlebar-text { font-size: 11px; letter-spacing: .5px; } }
+@media (min-width: 900px) { .titlebar-text { font-size: 13px; letter-spacing: .8px; } }
 
 .wbtns { display: flex; gap: 3px; flex-shrink: 0; }
 .wbtn {
@@ -268,7 +272,7 @@ body {
   transition: filter .1s; flex-shrink: 0; position: relative;
 }
 .wbtn:hover { filter: brightness(1.4); }
-@media (min-width: 900px) { .wbtn { width:34px; height:28px; font-size:15px; } }
+@media (min-width: 900px) { .wbtn { width:44px; height:36px; font-size:18px; } }
 
 #wbtn-profile:hover { background: linear-gradient(135deg,#44aa44,#224422) !important; color: #aaffaa !important; }
 #wbtn-settings:hover { background: linear-gradient(135deg,#22aa88,#114433) !important; color: #aaffcc !important; }
@@ -476,7 +480,12 @@ body.disco-mode .disco-ball-wrap { display: flex; }
   0%,100% { opacity:.7; }
   50%     { opacity:1; text-shadow:0 0 10px var(--cat-orange), 0 0 4px #fff; }
 }
-@media (min-width:900px) { .lcd-bpm-display { font-size:13px !important; } }
+@media (min-width:900px) {
+  .lcd-bpm-display { font-size:15px !important; }
+  .lcd-title { font-size:22px !important; }
+  .lcd-artist { font-size:18px !important; }
+  .lcd-album  { font-size:15px !important; }
+}
 
 .lcd-mode {
   font-family:'Press Start 2P',monospace; font-size:5px;
@@ -651,7 +660,7 @@ body.disco-mode .disco-ball-wrap { display: flex; }
   .pl-bar-title, .pl-count { font-size:10px !important; }
   .pl-bar    { padding: 8px 16px; }
   .pl-foot   { padding: 8px 16px; }
-  .pl-item   { padding: 8px 16px; gap:12px; min-height: auto; }
+  .pl-item   { padding: 10px 18px; gap:14px; min-height: 52px; }
   .pl-btn    { font-size:7px !important; padding:4px 8px !important; height:28px !important; min-width:48px !important; } }
 .pl-list::-webkit-scrollbar { width:7px; }
 .pl-list::-webkit-scrollbar-track { background:#0a1a0a; }
@@ -669,7 +678,7 @@ body.disco-mode .disco-ball-wrap { display: flex; }
 }
 .pl-item:hover { background: rgba(68,221,136,.06); }
 .pl-item.cur   { background: rgba(68,221,136,.12); border-left: 3px solid var(--lcd-green); }
-@media (min-width:900px) { .pl-item { padding: 10px 14px; } }
+@media (min-width:900px) { .pl-item { padding: 12px 18px; } }
 
 /* LEFT side — number + title/artist, takes remaining space */
 .pl-left {
@@ -1065,7 +1074,7 @@ body.disco-mode .disco-ball-wrap { display: flex; }
   overflow-x: hidden;
 }
 @media (min-width: 900px) {
-  .upload-body, .promo-body, .settings-body { padding: 20px 24px 28px; }
+  .upload-body, .promo-body, .settings-body { padding: 24px 32px 36px; }
 }
 
 /* ── FORM ROWS ── */
@@ -1912,7 +1921,7 @@ body.rave-mode .lcd-art img {
   letter-spacing: .5px;
   border-bottom: 1px solid var(--border-lo);
 }
-@media (min-width:900px) { .settings-hdr { font-size: 8px; padding: 7px 12px; } }
+@media (min-width:900px) { .settings-hdr { font-size: 9px; padding: 9px 14px; } }
 
 .settings-content {
   padding: 12px;
@@ -2251,31 +2260,32 @@ body.rave-mode .lcd-art img {
 }
 .pl-mode-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
-  padding: 6px 10px;
+  font-size: 7px;
+  padding: 8px 14px;
   background: var(--mbtn-bg);
   color: var(--border-lo);
-  border-top: 1px solid var(--mbtn-border-hi);
-  border-left: 1px solid var(--mbtn-border-hi);
-  border-bottom: 1px solid var(--mbtn-border-lo);
-  border-right: 1px solid var(--mbtn-border-lo);
+  border-top: 2px solid var(--mbtn-border-hi);
+  border-left: 2px solid var(--mbtn-border-hi);
+  border-bottom: 2px solid var(--mbtn-border-lo);
+  border-right: 2px solid var(--mbtn-border-lo);
   cursor: pointer;
-  letter-spacing: .4px;
+  letter-spacing: .5px;
   white-space: nowrap;
 }
 .pl-mode-btn:first-child { border-right: none; }
 .pl-mode-btn.active {
   background: var(--mbtn-on-bg);
   color: var(--cat-orange);
-  border-top: 1px solid var(--mbtn-border-lo);
-  border-left: 1px solid var(--mbtn-border-lo);
-  border-bottom: 1px solid var(--mbtn-border-hi);
-  border-right: 1px solid var(--mbtn-border-hi);
-  text-shadow: 0 0 8px var(--cat-orange);
-  box-shadow: 0 0 6px rgba(68,221,136,.2), inset 0 0 4px rgba(68,221,136,.1);
+  border-top: 2px solid var(--mbtn-border-lo);
+  border-left: 2px solid var(--mbtn-border-lo);
+  border-bottom: 2px solid var(--mbtn-border-hi);
+  border-right: 2px solid var(--mbtn-border-hi);
+  text-shadow: 0 0 10px var(--cat-orange);
+  box-shadow: 0 0 8px rgba(68,221,136,.25), inset 0 0 6px rgba(68,221,136,.12);
+  letter-spacing: .6px;
 }
 @media (min-width: 900px) {
-  .pl-mode-btn { font-size: 8px; padding: 7px 16px; }
+  .pl-mode-btn { font-size: 9px; padding: 10px 20px; }
 }
 
 /* ── INBOX ITEMS ── */
@@ -2719,6 +2729,348 @@ body.rave-mode .lcd-art img {
   color: var(--border-lo); display: block;
 }
 .drop-perm-actions { display: flex; gap: 8px; margin-top: 14px; }
+
+/* ── CLOUD STORAGE BROWSER ── */
+.storage-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.9);
+  z-index: 99996; display: none;
+  align-items: flex-start; justify-content: center; padding: 20px;
+  overflow-y: auto;
+}
+.storage-modal-overlay.open { display: flex; }
+.storage-modal {
+  background: var(--win-bg); border: 2px solid var(--border-hi);
+  width: 100%; max-width: 540px; margin: auto;
+  box-shadow: 0 0 30px rgba(0,0,0,.8);
+}
+.storage-modal-hdr {
+  background: var(--title-grad); padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #fff8e0; flex-shrink: 0;
+}
+.storage-tabs {
+  display: flex; border-bottom: 1px solid var(--border-lo);
+}
+.storage-tab {
+  flex: 1; padding: 8px 6px;
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); background: none; border: none;
+  cursor: pointer; border-bottom: 2px solid transparent;
+}
+.storage-tab.active { color: var(--cat-orange); border-bottom-color: var(--cat-orange); }
+.storage-body { padding: 14px; }
+.storage-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.storage-hint {
+  font-family: 'VT323', monospace; font-size: 14px;
+  color: #556655; margin-bottom: 10px; line-height: 1.5;
+}
+.storage-file-list {
+  max-height: 280px; overflow-y: auto;
+  border: 1px solid var(--border-lo);
+}
+.storage-file-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-bottom: 1px solid var(--border-lo);
+  cursor: pointer; font-family: 'VT323', monospace; font-size: 16px;
+  color: var(--lcd-green);
+}
+.storage-file-item:hover { background: rgba(68,221,136,.08); }
+.storage-file-item:last-child { border-bottom: none; }
+.storage-file-ext {
+  font-family: 'Press Start 2P', monospace; font-size: 4px;
+  color: var(--cat-orange); padding: 2px 4px;
+  border: 1px solid var(--border-lo); flex-shrink: 0;
+}
+.storage-file-use {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--lcd-green); background: none;
+  border: 1px solid var(--border-lo); padding: 3px 7px; cursor: pointer;
+  flex-shrink: 0; white-space: nowrap;
+}
+.storage-file-use:hover { border-color: var(--cat-orange); color: var(--cat-orange); }
+.storage-loading {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); padding: 20px; text-align: center; line-height: 2.5;
+}
+@media (min-width: 900px) {
+  .storage-tab { font-size: 7px; padding: 10px 10px; }
+}
+
+/* ── CLOUD STORAGE BROWSER ── */
+.storage-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.92);
+  z-index: 99996; display: none;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.storage-overlay.open { display: flex; }
+.storage-box {
+  background: var(--win-bg);
+  border: 2px solid var(--border-hi);
+  width: 100%; max-width: 580px;
+  max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 0 40px rgba(0,0,0,.9), 0 0 16px rgba(68,221,136,.15);
+}
+.storage-hdr {
+  background: var(--title-grad);
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.storage-hdr-title {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #fff8e0; letter-spacing: .5px;
+}
+.storage-body { padding: 14px; overflow-y: auto; flex: 1; }
+.storage-provider-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 14px;
+}
+@media (min-width: 500px) { .storage-provider-grid { grid-template-columns: 1fr 1fr 1fr; } }
+.storage-provider-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 8px;
+  border: 1px solid var(--border-lo); background: var(--vis-bg);
+  cursor: pointer; transition: border-color .15s, background .15s;
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); letter-spacing: .3px;
+}
+.storage-provider-btn:hover, .storage-provider-btn.active {
+  border-color: var(--cat-orange); color: var(--cat-orange);
+  background: rgba(255,140,66,.07);
+}
+.storage-provider-icon { font-size: 24px; }
+.storage-url-row {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+.storage-hint {
+  font-family: 'VT323', monospace; font-size: 14px;
+  color: #445544; margin-bottom: 10px; line-height: 1.5;
+}
+.storage-result-hdr {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); margin-bottom: 8px; letter-spacing: .5px;
+}
+.storage-file-list {
+  max-height: 280px; overflow-y: auto;
+  border: 1px solid var(--border-lo);
+}
+.storage-file {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-bottom: 1px solid var(--border-lo);
+  cursor: pointer; transition: background .1s;
+}
+.storage-file:last-child { border-bottom: none; }
+.storage-file:hover { background: rgba(68,221,136,.07); }
+.storage-file-icon { font-size: 16px; flex-shrink: 0; }
+.storage-file-name {
+  font-family: 'VT323', monospace; font-size: 16px;
+  color: var(--lcd-green); flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.storage-file-size {
+  font-family: 'VT323', monospace; font-size: 13px;
+  color: var(--border-lo); flex-shrink: 0;
+}
+.storage-use-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--cat-orange); background: none;
+  border: 1px solid var(--border-lo); padding: 3px 7px; cursor: pointer;
+  flex-shrink: 0; white-space: nowrap;
+}
+.storage-use-btn:hover { border-color: var(--cat-orange); }
+.storage-status {
+  font-family: 'VT323', monospace; font-size: 16px;
+  color: var(--border-lo); padding: 16px; text-align: center;
+}
+.storage-import-all {
+  margin-top: 10px;
+}
+
+/* ── DESKTOP PLAYER — single column ── */
+@media (min-width: 900px) {
+  #panel-player.active {
+    flex-direction: column !important;
+  }
+  .player-body {
+    width: 100%;
+    border-right: none;
+    padding: 18px 24px 16px;
+  }
+  .pl-section {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+
+/* ── PLAYLIST FULLSCREEN POPOUT ── */
+.pl-popout {
+  position: fixed;
+  inset: 0;
+  background: var(--win-bg);
+  z-index: 9990;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pl-popout.open { display: flex; }
+.pl-popout-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--title-grad);
+  flex-shrink: 0;
+  border-bottom: 2px solid var(--border-lo);
+}
+.pl-popout-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; color: #fff8e0;
+  flex: 1; letter-spacing: .5px;
+}
+.pl-popout-close {
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: #ff4444; background: #440000;
+  border: 1px solid #ff4444; padding: 6px 12px; cursor: pointer;
+}
+.pl-popout-bar {
+  flex-shrink: 0;
+  background: var(--pl-bar-bg);
+  padding: 6px 10px;
+  display: flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid var(--border-lo);
+  flex-wrap: nowrap; overflow: visible; position: relative;
+}
+.pl-popout-list {
+  flex: 1; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── EXPAND BUTTON on the playlist bar ── */
+.pl-expand-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--lcd-green); background: var(--btn-bg);
+  border-top: 1px solid var(--btn-hi); border-left: 1px solid var(--btn-hi);
+  border-bottom: 1px solid var(--btn-sh); border-right: 1px solid var(--btn-sh);
+  padding: 5px 8px; cursor: pointer; flex-shrink: 0;
+  white-space: nowrap;
+}
+.pl-expand-btn:hover { filter: brightness(1.3); }
+
+/* ── MOBILE PLAYER — tighter spacing ── */
+@media (max-width: 599px) {
+  .player-body { padding: 6px 8px 2px !important; }
+  .cat-deco { margin-bottom: 4px !important; }
+  .lcd { height: 80px !important; margin-bottom: 6px !important; padding: 6px 10px !important; }
+  .lcd-title { font-size: 18px !important; height: 20px !important; }
+  .lcd-meta  { font-size: 16px !important; margin-top: 2px !important; }
+  .lcd-time  { font-size: 16px !important; }
+  .lcd-st    { font-size: 8px !important; }
+  .vis       { height: 50px !important; margin-bottom: 4px !important; }
+  .seek      { height: 12px !important; margin-bottom: 4px !important; }
+  .sliders   { margin-bottom: 4px !important; gap: 6px !important; }
+  .transport { gap: 4px !important; margin-bottom: 6px !important; }
+  .t-prev, .t-next, .t-pause, .t-stop { width: 54px !important; height: 44px !important; }
+  .t-play  { width: 66px !important; height: 44px !important; }
+  .tbtn svg { width: 20px !important; height: 20px !important; }
+  .modes { gap: 4px !important; margin-bottom: 4px !important; }
+  .mbtn  { font-size: 5px !important; padding: 5px 8px !important; }
+  .promocat-text { font-size: 32px !important; }
+  .cat-svg { width: 70px !important; height: 54px !important; }
+}
+
+/* ── FULLSCREEN PLAYLIST (mobile) ── */
+.pl-section.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  background: var(--win-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pl-section.fullscreen .pl-list {
+  max-height: none !important;
+  flex: 1;
+}
+.pl-fullscreen-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 6px 10px;
+  background: var(--mbtn-bg);
+  border-top: 1px solid var(--mbtn-border-hi);
+  border-left: 1px solid var(--mbtn-border-hi);
+  border-bottom: 1px solid var(--mbtn-border-lo);
+  border-right: 1px solid var(--mbtn-border-lo);
+  color: var(--lcd-green);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pl-fullscreen-btn:hover { filter: brightness(1.3); }
+/* Hide expand btn on desktop — plenty of room */
+@media (min-width: 900px) {
+  .pl-fullscreen-btn { display: none; }
+}
+
+/* ── MOBILE PLAYER — reduce player-body height so more playlist shows ── */
+@media (max-width: 899px) {
+  /* Compress cat area on small screens */
+  .cat-deco { min-height: 80px !important; }
+  .cat-svg  { width: 70px !important; height: 54px !important; }
+  .promocat-text { font-size: 28px !important; letter-spacing: 1px !important; }
+  .promocat-the  { font-size: 10px !important; top: -10px !important; }
+  /* Compress LCD */
+  .lcd { height: 78px !important; padding: 6px 10px !important; margin-bottom: 6px !important; }
+  .lcd-title { font-size: 18px !important; height: 20px !important; }
+  .lcd-meta  { font-size: 15px !important; margin-top: 2px !important; }
+  .lcd-time  { font-size: 15px !important; margin-top: 2px !important; }
+  /* Compress transport */
+  .t-prev, .t-next, .t-pause, .t-stop { width: 52px !important; height: 44px !important; }
+  .t-play { width: 64px !important; height: 44px !important; }
+  .tbtn svg { width: 20px !important; height: 20px !important; }
+  .transport { gap: 4px !important; margin-bottom: 6px !important; }
+  /* Compress mode btns */
+  .mbtn { font-size: 5px !important; padding: 5px 8px !important; }
+  .modes { gap: 4px !important; margin-bottom: 6px !important; }
+  /* Compress vis */
+  .vis { height: 44px !important; margin-bottom: 6px !important; }
+  /* Compress seek + sliders */
+  .seek    { height: 10px !important; margin-bottom: 6px !important; }
+  .sliders { gap: 8px !important; margin-bottom: 6px !important; }
+  .player-body { padding: 6px 8px 4px !important; }
+  /* Give playlist more room */
+  .pl-list { min-height: 180px !important; }
+}
+
+/* ── PEOPLE TAB SUB-TABS ── */
+.people-subtabs {
+  display: flex; flex-shrink: 0;
+  border-bottom: 2px solid var(--border-lo);
+  background: var(--pl-bar-bg);
+  position: sticky; top: 0; z-index: 2;
+}
+.people-subtab {
+  flex: 1; padding: 10px 8px;
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); background: none; border: none;
+  cursor: pointer; letter-spacing: .4px;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  transition: color .15s;
+}
+.people-subtab:hover { color: var(--lcd-green); }
+.people-subtab.active {
+  color: var(--cat-orange);
+  border-bottom-color: var(--cat-orange);
+  text-shadow: 0 0 8px rgba(255,140,66,.5);
+}
+@media (min-width: 900px) {
+  .people-subtab { font-size: 8px; padding: 12px 16px; }
+}
 </style>
 </head>
 <body>
@@ -2734,9 +3086,7 @@ body.rave-mode .lcd-art img {
     <div class="tab active" id="tab-player" onclick="switchTab('player')">PLAYER</div>
     <div class="tab" id="tab-artist" onclick="switchTab('artist')">ARTIST</div>
     <div class="tab" id="tab-upload" onclick="switchTab('upload')">ADD TRACK</div>
-    <div class="tab" id="tab-promo" onclick="switchTab('promo')" style="display:none">PROMO</div>
-    <div class="tab" id="tab-connect" onclick="switchTab('connect')" style="display:none">🤝 CONNECT</div>
-    <div class="tab" id="tab-contacts" onclick="switchTab('contacts')" style="display:none">CONTACTS</div>
+    <div class="tab" id="tab-people" onclick="switchTab('people')" style="display:none">👥 PEOPLE</div>
     <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display:none">⚙ ADMIN</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
     <div id="tab-settings" style="display:none"></div>
@@ -3044,21 +3394,13 @@ body.rave-mode .lcd-art img {
 
       <!-- Playlist -->
       <div class="pl-section">
-        <div class="pl-bar">
-          <div class="pl-mode-btns">
+        <!-- ONE ROW: mode btns + filters + count + actions -->
+        <div class="pl-bar" style="flex-wrap:nowrap;overflow:visible;position:relative;">
+          <div class="pl-mode-btns" style="flex-shrink:0;">
             <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
             <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="TRACKS SENT TO YOU">📬 INBOX <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
-          <span class="pl-count" id="pl-count">0 TRACKS</span>
-          <div style="display:flex;gap:4px;align-items:center;margin-left:auto;">
-            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL" title="Copy shareable URL">🔗 COPY URL</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY YOUR SUBMISSION LINK" title="Copy your submission link" style="display:none;">📬 SUBMIT LINK</button>
-            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD" title="Refresh">↻</button>
-            <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" title="Remove tracks with no URL or title" style="display:none;color:#ff8844;">🧹</button>
-          </div>
-        </div>
-        <!-- FILTER BAR — compact dropdowns -->
-        <div class="filter-bar">
+          <div class="filter-bar" style="flex:1;border:none;background:none;padding:0 4px;position:static;">
           <!-- Category -->
           <div class="filter-group" id="fg-cat">
             <button class="filter-toggle" id="ft-cat" onclick="toggleFilter('cat')" data-tip="FILTER BY CATEGORY">
@@ -3127,7 +3469,17 @@ body.rave-mode .lcd-art img {
               <button class="cat-btn"    data-sort="rating"   onclick="setSort('rating');closeFilters()">&#9733; RATING</button>
             </div>
           </div>
-        </div>
+          </div><!-- /filter-bar inline -->
+          <!-- Track count + actions -->
+          <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;margin-left:auto;">
+            <span class="pl-count" id="pl-count" style="white-space:nowrap;">0 TRACKS</span>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
+            <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
+            <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
+            <button class="pl-expand-btn" onclick="openPlPopout()" data-tip="EXPAND PLAYLIST">⛶ EXPAND</button>
+          </div>
+        </div><!-- /combined pl-bar -->
 
         <div class="pl-list" id="pl-list">
           <div class="pl-empty">
@@ -3156,6 +3508,7 @@ body.rave-mode .lcd-art img {
       <div class="upload-body" id="upload-form" style="display:none">
 
         <div class="upload-title" id="upload-title">🎵 ADD TRACK TO CATAMP</div>
+        <button class="sub-btn" style="margin-bottom:14px;padding:10px;font-size:7px;" onclick="openStorageBrowser()">🗂️ BROWSE CLOUD FILES</button>
 
         <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
@@ -3485,6 +3838,41 @@ body.rave-mode .lcd-art img {
           </div>
         </div>
 
+        <!-- Cloud Storage Settings -->
+        <div class="settings-section">
+          <div class="settings-hdr">☁️ CLOUD STORAGE</div>
+          <div class="settings-content">
+            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:12px;line-height:1.5;">
+              Add API keys or base URLs for your storage providers. Used in the <strong style="color:var(--lcd-green);">Browse Cloud Files</strong> button when adding tracks.
+            </div>
+            <div class="frow">
+              <label class="flbl">📦 DROPBOX ACCESS TOKEN</label>
+              <input class="finput" type="password" id="s-dropbox-key"
+                     placeholder="Paste your Dropbox API access token..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none">
+              <div style="font-family:'VT323',monospace;font-size:13px;color:#445544;margin-top:3px;">
+                Get from dropbox.com/developers → Apps → Generate token
+              </div>
+            </div>
+            <div class="frow">
+              <label class="flbl">📁 GOOGLE DRIVE API KEY</label>
+              <input class="finput" type="password" id="s-gdrive-key"
+                     placeholder="Paste your Google API key..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none">
+              <div style="font-family:'VT323',monospace;font-size:13px;color:#445544;margin-top:3px;">
+                console.cloud.google.com → APIs → Drive API → Credentials
+              </div>
+            </div>
+            <div class="frow">
+              <label class="flbl">☁️ R2 / S3 BUCKET URL</label>
+              <input class="finput" type="url" id="s-r2-url"
+                     placeholder="https://pub-xxxx.r2.dev or https://bucket.s3.amazonaws.com"
+                     autocomplete="off" autocorrect="off">
+            </div>
+            <button class="settings-save-btn" onclick="saveCloudStorageSettings()">💾 SAVE STORAGE SETTINGS</button>
+          </div>
+        </div>
+
         <!-- Social Links section -->
         <div class="settings-section">
           <div class="settings-hdr">🔗 SOCIAL LINKS</div>
@@ -3519,6 +3907,63 @@ body.rave-mode .lcd-art img {
 
 
         <!-- ── FOLLOWERS (User sees who follows them) ── -->
+
+        <!-- ── CLOUD STORAGE ── -->
+        <div class="settings-section">
+          <div class="settings-hdr">☁️ CLOUD STORAGE</div>
+          <div class="settings-content">
+            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:14px;line-height:1.5;">
+              Connect your cloud storage so you can browse and import audio files directly when adding tracks.
+            </div>
+
+            <!-- R2 / Public bucket -->
+            <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;">
+              ☁️ R2 / PUBLIC BUCKET URL
+            </div>
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
+              Paste your Cloudflare R2 public bucket URL or any public S3-compatible bucket. Files must be publicly accessible.
+            </div>
+            <div class="frow">
+              <input class="finput" type="url" id="s-r2-url"
+                     placeholder="https://pub-xxxx.r2.dev/mymusic/"
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+
+            <div style="margin-top:14px;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;">
+              📦 DROPBOX APP KEY
+            </div>
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
+              Create a free app at dropbox.com/developers, set access to "Full Dropbox" or a specific folder, and paste your App Key here. You'll be prompted to authorise on first use.
+            </div>
+            <div class="frow">
+              <input class="finput" type="text" id="s-dropbox-key"
+                     placeholder="Your Dropbox App Key..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <div class="frow" id="dropbox-folder-row" style="display:none;">
+              <label class="flbl">FOLDER PATH</label>
+              <input class="finput" type="text" id="s-dropbox-folder"
+                     placeholder="/Music/Promos"
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+
+            <div style="margin-top:14px;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:6px;">
+              📁 GOOGLE DRIVE API KEY
+            </div>
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:8px;line-height:1.4;">
+              For browsing Google Drive folders. Create a free API key at console.cloud.google.com → APIs → Drive API. Not needed for single file links.
+            </div>
+            <div class="frow">
+              <input class="finput" type="text" id="s-gdrive-key"
+                     placeholder="Your Google API key..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+
+            <button class="settings-save-btn" onclick="saveCloudStorage()" data-tip="SAVE CLOUD STORAGE SETTINGS">
+              💾 SAVE STORAGE SETTINGS
+            </button>
+          </div>
+        </div>
         <!-- ── CONNECTIONS — single section, both directions ── -->
         <div class="settings-section" id="followers-section">
           <div class="settings-hdr" style="display:flex;justify-content:space-between;align-items:center;">
@@ -3573,8 +4018,130 @@ body.rave-mode .lcd-art img {
 
 
     <!-- ════════ PROMO PANEL ════════ -->
-    <div class="tab-panel" id="panel-promo">
-      <div class="promo-body">
+    <!-- ════════ PEOPLE PANEL ════════ -->
+    <div class="tab-panel" id="panel-people">
+      <div class="promo-body" style="padding:0;">
+
+        <!-- Sub-tab bar -->
+        <div class="people-subtabs">
+          <button class="people-subtab active" id="pst-connect"  onclick="switchPeopleTab('connect')">🤝 CONNECT</button>
+          <button class="people-subtab"        id="pst-contacts" onclick="switchPeopleTab('contacts')">👥 CONTACTS</button>
+          <button class="people-subtab"        id="pst-promo"    onclick="switchPeopleTab('promo')">🚀 PROMO</button>
+        </div>
+
+        <!-- CONNECT sub-panel -->
+        <div id="people-panel-connect" class="promo-body">
+
+
+        <!-- ── FIND USERS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">🔍 FIND USERS</div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:16px;color:#556655;margin-bottom:12px;line-height:1.5;">
+              Search for other PromoCat users by name or email. Send a connection request — once they accept you can both drop tracks directly into each other's inbox.
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input class="finput" type="text" id="connect-search-input"
+                     placeholder="Search by name or email..."
+                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+                     style="font-size:16px;flex:1;"
+                     oninput="searchConnectUsers(this.value)">
+              <button class="settings-save-btn" onclick="sendConnectRequest()" style="flex:0;white-space:nowrap;padding:10px 16px;">
+                🤝 SEND REQUEST
+              </button>
+            </div>
+            <div id="connect-search-results" style="margin-bottom:4px;"></div>
+          </div>
+        </div>
+
+        <!-- ── INCOMING REQUESTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>📥 INCOMING REQUESTS <span id="connect-pending-badge" style="display:none;background:#ff4444;color:#fff;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 6px;margin-left:6px;">NEW</span></span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowers()">↻</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-pending-list">
+              <div class="soc-empty">NO PENDING REQUESTS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MY CONNECTIONS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>🟢 MY CONNECTIONS</span>
+            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowing()">↻</button>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-accepted-list">
+              <div class="soc-empty">NO CONNECTIONS YET</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── SENT REQUESTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">📤 SENT REQUESTS</div>
+          <div class="promo-section-body" style="padding:0;">
+            <div id="connect-sent-list">
+              <div class="soc-empty">NO PENDING SENT REQUESTS</div>
+            </div>
+          </div>
+        </div>
+
+
+        </div>
+
+        <!-- CONTACTS sub-panel -->
+        <div id="people-panel-contacts" class="promo-body" style="display:none;">
+
+
+        <!-- ── ADD CONTACT ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr">
+            <span>➕ ADD CONTACT</span>
+          </div>
+          <div class="promo-section-body">
+            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:10px;line-height:1.4;">
+              Add someone manually by name + email, or search for PromoCat users to connect with.
+            </div>
+            <!-- Manual add -->
+            <div class="contact-add-row" style="margin-bottom:8px;">
+              <input class="finput" type="text" id="c-name" placeholder="Name..." autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+              <input class="finput" type="email" id="c-email" placeholder="email@example.com" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')addContact()">
+              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
+            </div>
+            <!-- Search PromoCat users -->
+            <div style="display:flex;gap:6px;">
+              <input class="finput" type="text" id="contact-search-input"
+                     placeholder="Search PromoCat users..." autocomplete="off" autocorrect="off"
+                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
+                     oninput="searchContactUsers(this.value)">
+            </div>
+            <div id="contact-search-results" style="margin-top:6px;"></div>
+          </div>
+        </div>
+
+        <!-- ── MY CONTACTS ── -->
+        <div class="promo-section">
+          <div class="promo-section-hdr" style="justify-content:space-between;">
+            <span>📋 MY CONTACTS</span>
+            <span id="contacts-total-count" style="font-family:'VT323',monospace;font-size:14px;color:var(--lcd-green);">0</span>
+          </div>
+          <div class="promo-section-body" style="padding:0;">
+            <div class="contact-list" id="contacts-full-list" style="max-height:none;">
+              <div class="contact-empty">NO CONTACTS YET</div>
+            </div>
+          </div>
+        </div>
+
+
+        </div>
+
+        <!-- PROMO sub-panel -->
+        <div id="people-panel-promo" class="promo-body" style="display:none;">
+
 
         <!-- ── SECTION 1: SEND TO ── -->
         <div class="promo-section">
@@ -3584,7 +4151,7 @@ body.rave-mode .lcd-art img {
               <span id="contact-count" style="color:var(--lcd-green);font-size:5px;">0 SELECTED</span>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="selectAllContacts()">ALL</button>
               <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="clearContactSelection()">NONE</button>
-              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="switchTab('contacts')">✚ MANAGE</button>
+              <button class="promo-btn" style="flex:0;padding:2px 6px;font-size:5px;" onclick="switchTab('people');switchPeopleTab('contacts')">✚ MANAGE</button>
             </div>
           </div>
           <div class="promo-section-body" style="padding:0;">
@@ -3674,183 +4241,14 @@ Listen here: {link}
           </div>
         </div>
 
-        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
-      </div>
-    </div><!-- /panel-promo -->
 
-
-
-    <!-- ════════ CONTACTS PANEL ════════ -->
-    <div class="tab-panel" id="panel-contacts">
-      <div class="promo-body">
-
-        <!-- ── ADD CONTACT ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr">
-            <span>➕ ADD CONTACT</span>
-          </div>
-          <div class="promo-section-body">
-            <div style="font-family:'VT323',monospace;font-size:14px;color:#556655;margin-bottom:10px;line-height:1.4;">
-              Add someone manually by name + email, or search for PromoCat users to connect with.
-            </div>
-            <!-- Manual add -->
-            <div class="contact-add-row" style="margin-bottom:8px;">
-              <input class="finput" type="text" id="c-name" placeholder="Name..." autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
-              <input class="finput" type="email" id="c-email" placeholder="email@example.com" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')addContact()">
-              <button class="promo-btn" style="flex:0;white-space:nowrap;padding:6px 10px;" onclick="addContact()">+ ADD</button>
-            </div>
-            <!-- Search PromoCat users -->
-            <div style="display:flex;gap:6px;">
-              <input class="finput" type="text" id="contact-search-input"
-                     placeholder="Search PromoCat users..." autocomplete="off" autocorrect="off"
-                     autocapitalize="none" spellcheck="false" style="font-size:16px;flex:1;"
-                     oninput="searchContactUsers(this.value)">
-            </div>
-            <div id="contact-search-results" style="margin-top:6px;"></div>
-          </div>
-        </div>
-
-        <!-- ── MY CONTACTS ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>📋 MY CONTACTS</span>
-            <span id="contacts-total-count" style="font-family:'VT323',monospace;font-size:14px;color:var(--lcd-green);">0</span>
-          </div>
-          <div class="promo-section-body" style="padding:0;">
-            <div class="contact-list" id="contacts-full-list" style="max-height:none;">
-              <div class="contact-empty">NO CONTACTS YET</div>
-            </div>
-          </div>
         </div>
 
         <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
       </div>
-    </div><!-- /panel-contacts -->
+    </div><!-- /panel-people -->
 
 
-    <!-- ════════ ADMIN PANEL ════════ -->
-    <div class="tab-panel" id="panel-admin">
-      <div class="promo-body">
-
-        <!-- INVITE CODES -->
-        <div class="promo-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>🎟️ INVITE CODES</span>
-            <button class="promo-btn primary" onclick="createInviteCode()" style="padding:4px 10px;">+ GENERATE CODE</button>
-          </div>
-          <div class="promo-section-body">
-            <div style="font-family:'VT323',monospace;font-size:15px;color:#556655;margin-bottom:12px;line-height:1.5;">
-              Generate a code, enter the recipient's email, and hit SEND to open your mail app with the invite pre-written.
-            </div>
-            <!-- Quick send row -->
-            <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-              <input class="finput" type="email" id="invite-send-email"
-                     placeholder="recipient@email.com" autocomplete="off" autocorrect="off"
-                     autocapitalize="none" spellcheck="false"
-                     style="flex:1;min-width:200px;font-size:16px;">
-              <button class="promo-btn primary" onclick="generateAndSendInvite()"
-                      data-tip="GENERATE CODE & OPEN MAIL APP"
-                      style="flex:0;white-space:nowrap;padding:10px 16px;">
-                🎟️ GENERATE & SEND
-              </button>
-            </div>
-            <div id="invite-code-list" style="max-height:none;"></div>
-          </div>
-        </div>
-
-        <!-- RECENT SIGNUPS -->
-        <div class="promo-section" id="admin-signups-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>🆕 RECENT SIGNUPS</span>
-            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderRecentSignups()">↻ REFRESH</button>
-          </div>
-          <div class="promo-section-body" style="padding:0;">
-            <div id="recent-signups-list">
-              <div class="soc-empty">NO SIGNUPS YET</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- REGISTERED USERS -->
-        <div class="promo-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>👥 ALL USERS</span>
-            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="renderUserList()">↻ REFRESH</button>
-          </div>
-          <div class="promo-section-body" style="padding:0;">
-            <div id="user-list" style="max-height:none;"></div>
-          </div>
-        </div>
-
-        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
-      </div>
-    </div><!-- /panel-admin -->
-
-
-    <!-- ════════ CONNECT PANEL ════════ -->
-    <div class="tab-panel" id="panel-connect">
-      <div class="promo-body">
-
-        <!-- ── FIND USERS ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr">🔍 FIND USERS</div>
-          <div class="promo-section-body">
-            <div style="font-family:'VT323',monospace;font-size:16px;color:#556655;margin-bottom:12px;line-height:1.5;">
-              Search for other PromoCat users by name or email. Send a connection request — once they accept you can both drop tracks directly into each other's inbox.
-            </div>
-            <div style="display:flex;gap:8px;margin-bottom:8px;">
-              <input class="finput" type="text" id="connect-search-input"
-                     placeholder="Search by name or email..."
-                     autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-                     style="font-size:16px;flex:1;"
-                     oninput="searchConnectUsers(this.value)">
-              <button class="settings-save-btn" onclick="sendConnectRequest()" style="flex:0;white-space:nowrap;padding:10px 16px;">
-                🤝 SEND REQUEST
-              </button>
-            </div>
-            <div id="connect-search-results" style="margin-bottom:4px;"></div>
-          </div>
-        </div>
-
-        <!-- ── INCOMING REQUESTS ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>📥 INCOMING REQUESTS <span id="connect-pending-badge" style="display:none;background:#ff4444;color:#fff;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 6px;margin-left:6px;">NEW</span></span>
-            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowers()">↻</button>
-          </div>
-          <div class="promo-section-body" style="padding:0;">
-            <div id="connect-pending-list">
-              <div class="soc-empty">NO PENDING REQUESTS</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── MY CONNECTIONS ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr" style="justify-content:space-between;">
-            <span>🟢 MY CONNECTIONS</span>
-            <button class="promo-btn" style="padding:3px 8px;font-size:5px;" onclick="loadFollowing()">↻</button>
-          </div>
-          <div class="promo-section-body" style="padding:0;">
-            <div id="connect-accepted-list">
-              <div class="soc-empty">NO CONNECTIONS YET</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── SENT REQUESTS ── -->
-        <div class="promo-section">
-          <div class="promo-section-hdr">📤 SENT REQUESTS</div>
-          <div class="promo-section-body" style="padding:0;">
-            <div id="connect-sent-list">
-              <div class="soc-empty">NO PENDING SENT REQUESTS</div>
-            </div>
-          </div>
-        </div>
-
-        <button class="back-btn" onclick="switchTab('player')">← BACK TO PLAYER</button>
-      </div>
-    </div><!-- /panel-connect -->
 
   </div><!-- /win-window -->
 </div><!-- /shell -->
@@ -4041,9 +4439,7 @@ function applyUnlock(username, role, token) {
   document.getElementById('lock-screen').style.display = 'none';
   document.getElementById('upload-form').style.display = 'block';
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
-  document.getElementById('tab-promo').style.display = 'flex';
-  document.getElementById('tab-connect').style.display = 'flex';
-  document.getElementById('tab-contacts').style.display = 'flex';
+  document.getElementById('tab-people').style.display = 'flex';
   document.getElementById('tab-settings').style.display = 'none';
   document.getElementById('user-bar').classList.add('show'); // legacy compat
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
@@ -4098,9 +4494,7 @@ function logout() {
   const lb = document.getElementById('login-btn');
   if (lb) { lb.textContent = '🔑 LOGIN'; lb.classList.remove('logged-in'); }
   document.getElementById('tab-upload').textContent = 'ADD TRACK';
-  document.getElementById('tab-promo').style.display = 'none';
-  document.getElementById('tab-connect').style.display = 'none';
-  document.getElementById('tab-contacts').style.display = 'none';
+  document.getElementById('tab-people').style.display = 'none';
   const adminTabEl = document.getElementById('tab-admin');
   if (adminTabEl) adminTabEl.style.display = 'none';
   document.getElementById('tab-settings').style.display = 'none';
@@ -7927,6 +8321,187 @@ function downloadEPK() {
     </div>
   </div>
 </div>
+
+<!-- ── CLOUD STORAGE BROWSER ── -->
+<div class="storage-modal-overlay" id="storage-modal-overlay">
+  <div class="storage-modal">
+    <div class="storage-modal-hdr">
+      <span>🗂️ IMPORT FROM CLOUD</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
+    </div>
+    <div class="storage-tabs" style="flex-wrap:wrap;">
+      <button class="storage-tab active" id="stab-r2"        onclick="switchStorageTab('r2')">☁️ R2</button>
+      <button class="storage-tab"        id="stab-dropbox"   onclick="switchStorageTab('dropbox')">📦 DROPBOX</button>
+      <button class="storage-tab"        id="stab-gdrive"    onclick="switchStorageTab('gdrive')">📁 G.DRIVE</button>
+      <button class="storage-tab"        id="stab-onedrive"  onclick="switchStorageTab('onedrive')">☁ ONEDRIVE</button>
+      <button class="storage-tab"        id="stab-soundcloud" onclick="switchStorageTab('soundcloud')">🎵 SOUNDCLOUD</button>
+      <button class="storage-tab"        id="stab-url"       onclick="switchStorageTab('url')">🔗 DIRECT URL</button>
+    </div>
+    <div class="storage-body">
+
+      <!-- ── R2 / PUBLIC BUCKET ── -->
+      <div id="stab-content-r2">
+        <div class="storage-hint">Paste your Cloudflare R2 public bucket URL. The bucket must have public access enabled.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-r2-url" placeholder="https://pub-xxxx.r2.dev/music/"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseR2()">🔍 SCAN</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Also works with any S3-compatible public bucket (Backblaze B2, AWS S3, etc.)</div>
+        <div id="sb-r2-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── DROPBOX ── -->
+      <div id="stab-content-dropbox" style="display:none;">
+        <div class="storage-hint">Paste a Dropbox share link. Single file or shared folder — both work.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-dropbox-link"
+                 placeholder="https://www.dropbox.com/s/... or /sh/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseDropbox()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Single file links are converted to stream URLs automatically. For folders, add your Dropbox App Token in Settings.</div>
+        <div id="sb-dropbox-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── GOOGLE DRIVE ── -->
+      <div id="stab-content-gdrive" style="display:none;">
+        <div class="storage-hint">Paste a Google Drive file or folder share link.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-gdrive-link"
+                 placeholder="https://drive.google.com/file/d/... or /drive/folders/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseGDrive()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">File must be shared as "Anyone with the link". Folders require a Google API key in Settings.</div>
+        <div id="sb-gdrive-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── ONEDRIVE ── -->
+      <div id="stab-content-onedrive" style="display:none;">
+        <div class="storage-hint">Paste a OneDrive share link to a file or folder.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-onedrive-link"
+                 placeholder="https://1drv.ms/... or onedrive.live.com/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseOneDrive()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Share link must be set to "Anyone with the link can view".</div>
+        <div id="sb-onedrive-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── SOUNDCLOUD ── -->
+      <div id="stab-content-soundcloud" style="display:none;">
+        <div class="storage-hint">Paste a SoundCloud track URL. The track must be public.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-sc-url"
+                 placeholder="https://soundcloud.com/artist/trackname"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseSoundCloud()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Imports title, artist and stream URL from the SoundCloud oEmbed API. No account needed for public tracks.</div>
+        <div id="sb-sc-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── DIRECT URL ── -->
+      <div id="stab-content-url" style="display:none;">
+        <div class="storage-hint">Paste any direct audio URL (MP3, WAV, FLAC, OGG, AAC). Works with any public host.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-direct-url"
+                 placeholder="https://example.com/mytrack.mp3"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="useDirectUrl()">✅ USE</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── CLOUD STORAGE BROWSER ── -->
+<div class="storage-overlay" id="storage-overlay">
+  <div class="storage-box">
+    <div class="storage-hdr">
+      <span class="storage-hdr-title">🗂️ BROWSE CLOUD STORAGE</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
+    </div>
+    <div class="storage-body">
+
+      <!-- Provider selector -->
+      <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:8px;letter-spacing:.5px;">SELECT STORAGE PROVIDER</div>
+      <div class="storage-provider-grid">
+        <button class="storage-provider-btn" id="sp-dropbox"   onclick="selectProvider('dropbox')">
+          <span class="storage-provider-icon">📦</span>DROPBOX
+        </button>
+        <button class="storage-provider-btn" id="sp-gdrive"    onclick="selectProvider('gdrive')">
+          <span class="storage-provider-icon">📁</span>GOOGLE DRIVE
+        </button>
+        <button class="storage-provider-btn" id="sp-r2"        onclick="selectProvider('r2')">
+          <span class="storage-provider-icon">☁️</span>CLOUDFLARE R2
+        </button>
+        <button class="storage-provider-btn" id="sp-s3"        onclick="selectProvider('s3')">
+          <span class="storage-provider-icon">🪣</span>AWS S3
+        </button>
+        <button class="storage-provider-btn" id="sp-onedrive"  onclick="selectProvider('onedrive')">
+          <span class="storage-provider-icon">🔷</span>ONEDRIVE
+        </button>
+        <button class="storage-provider-btn" id="sp-direct"    onclick="selectProvider('direct')">
+          <span class="storage-provider-icon">🔗</span>DIRECT URL
+        </button>
+      </div>
+
+      <!-- URL input + hint -->
+      <div id="storage-hint" class="storage-hint">Select a provider above to get started.</div>
+      <div class="storage-url-row">
+        <input class="finput" type="url" id="storage-url-input"
+               placeholder="Paste your shared folder or file URL..."
+               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+               style="font-size:15px;flex:1;"
+               onkeydown="if(event.key==='Enter')browseStorage()">
+        <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 14px;" onclick="browseStorage()">
+          🔍 BROWSE
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="storage-results"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
+<div class="pl-popout" id="pl-popout">
+  <div class="pl-popout-hdr">
+    <span class="pl-popout-title" id="pl-popout-title">🐾 MY TRACKS</span>
+    <span id="pl-popout-count" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a6633;margin-right:8px;"></span>
+    <button class="pl-popout-close" onclick="closePlPopout()">✕ CLOSE</button>
+  </div>
+  <!-- Mode + filters bar -->
+  <div class="pl-popout-bar">
+    <div class="pl-mode-btns" style="flex-shrink:0;">
+      <button class="pl-mode-btn" id="pop-btn-my" onclick="setPlaylistMode('my');syncPopoutMode();" style="font-size:6px;padding:6px 12px;">🐾 MY TRACKS</button>
+      <button class="pl-mode-btn" id="pop-btn-inbox" onclick="setPlaylistMode('inbox');syncPopoutMode();" style="font-size:6px;padding:6px 12px;">📬 INBOX <span id="pop-inbox-badge" style="display:none;color:#ff8844;">●</span></button>
+    </div>
+    <div class="filter-bar" id="popout-filter-bar" style="flex:1;border:none;background:none;padding:0 4px;position:static;">
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('cat')"><span class="active-dot"></span>CAT <span class="arrow">▼</span></button>
+        <div class="filter-dropdown" id="fd-cat-pop" style="display:none;"></div>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('avail')"><span class="active-dot"></span>STATUS <span class="arrow">▼</span></button>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('genre')"><span class="active-dot"></span>GENRE <span class="arrow">▼</span></button>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('sort')"><span class="active-dot"></span>SORT <span class="arrow">▼</span></button>
+      </div>
+    </div>
+  </div>
+  <!-- The actual list — shared with main pl-list via JS -->
+  <div class="pl-popout-list" id="pl-popout-list"></div>
+</div>
 </body>
 </html>`;
 
@@ -8457,11 +9032,8 @@ async function addUserAsContact(username, name) {
 const __origSwitchTab = switchTab;
 switchTab = function(name) {
   __origSwitchTab(name);
-  if (name === 'contacts') {
-    renderContactsTab();
-  }
-  if (name === 'connect') {
-    loadConnectTab();
+  if (name === 'people') {
+    switchPeopleTab(_activePeopleTab || 'connect');
   }
   if (name === 'admin') {
     renderInviteCodes();
@@ -9232,6 +9804,742 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && currentUser?.token) heartbeat();
 });
 
+
+// ═══════════════════════════════════════════════════════
+// CLOUD STORAGE BROWSER
+// ═══════════════════════════════════════════════════════
+
+let _storageTab = 'r2';
+const AUDIO_EXTS = ['.mp3','.wav','.flac','.ogg','.aac','.m4a','.aiff','.opus'];
+
+// ── Save / load settings ──
+function saveCloudStorage() {
+  const r2  = document.getElementById('s-r2-url')?.value.trim()  || '';
+  const dbk = document.getElementById('s-dropbox-key')?.value.trim() || '';
+  const dbf = document.getElementById('s-dropbox-folder')?.value.trim() || '';
+  const p = getCurrentProfile() || {};
+  p.cloudStorage = { r2Url: r2, dropboxKey: dbk, dropboxFolder: dbf };
+  saveArtistProfile();
+  // also persist to localStorage for quick access
+  try { localStorage.setItem('pc_cloud_storage', JSON.stringify({r2Url:r2,dropboxKey:dbk,dropboxFolder:dbf})); } catch(e) {}
+  notify('☁️', 'Cloud storage settings saved!');
+}
+
+function saveCloudStorageSettings() {
+  const settings = {
+    dropboxKey: document.getElementById('s-dropbox-key')?.value.trim() || '',
+    gdriveKey:  document.getElementById('s-gdrive-key')?.value.trim()  || '',
+    r2Url:      document.getElementById('s-r2-url')?.value.trim()      || '',
+  };
+  localStorage.setItem('pc_cloud_storage', JSON.stringify(settings));
+  if (document.getElementById('sb-r2-url')) document.getElementById('sb-r2-url').value = settings.r2Url;
+  notify('☁️', 'Cloud storage settings saved!');
+}
+
+function loadCloudStorageSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
+    if (saved.r2Url      && document.getElementById('s-r2-url'))         document.getElementById('s-r2-url').value = saved.r2Url;
+    if (saved.dropboxKey && document.getElementById('s-dropbox-key'))    document.getElementById('s-dropbox-key').value = saved.dropboxKey;
+    if (saved.dropboxFolder && document.getElementById('s-dropbox-folder')) document.getElementById('s-dropbox-folder').value = saved.dropboxFolder;
+    if (saved.gdriveKey  && document.getElementById('s-gdrive-key'))     document.getElementById('s-gdrive-key').value = saved.gdriveKey;
+    // Pre-fill browser inputs too
+    if (saved.r2Url && document.getElementById('sb-r2-url')) document.getElementById('sb-r2-url').value = saved.r2Url;
+  } catch(e) {}
+}
+
+// ── Modal open / close ──
+function openStorageBrowser() {
+  loadCloudStorageSettings();
+  // Pre-fill R2 url from settings
+  try {
+    const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
+    if (saved.r2Url) document.getElementById('sb-r2-url').value = saved.r2Url;
+  } catch(e) {}
+  switchStorageTab('r2');
+  document.getElementById('storage-modal-overlay').classList.add('open');
+}
+
+function closeStorageBrowser() {
+  document.getElementById('storage-modal-overlay').classList.remove('open');
+}
+
+function switchStorageTab(tab) {
+  _storageTab = tab;
+  ['r2','dropbox','gdrive','onedrive','soundcloud','url'].forEach(t => {
+    const btn = document.getElementById('stab-' + t);
+    const body = document.getElementById('stab-content-' + t);
+    if (btn)  btn.classList.toggle('active', t === tab);
+    if (body) body.style.display = t === tab ? '' : 'none';
+  });
+}
+
+// ── R2 / Public bucket browser ──
+async function browseR2() {
+  const url = document.getElementById('sb-r2-url').value.trim();
+  if (!url) { notify('😾', 'Enter your bucket URL first'); return; }
+  const listEl = document.getElementById('sb-r2-list');
+  listEl.style.display = 'block';
+  listEl.innerHTML = '<div class="storage-loading">FETCHING FILE LIST...</div>';
+
+  try {
+    // R2 public buckets support S3-style XML listing at the bucket root
+    const base = url.endsWith('/') ? url : url + '/';
+    // Try S3 XML list (works for R2 public buckets with ?list-type=2)
+    const res = await fetch(base + '?list-type=2', { headers: { Accept: 'application/xml' } });
+    if (res.ok) {
+      const xml  = await res.text();
+      const keys = [...xml.matchAll(/<Key>([^<]+)<\/Key>/g)].map(m => m[1]);
+      const audio = keys.filter(k => AUDIO_EXTS.some(e => k.toLowerCase().endsWith(e)));
+      if (!audio.length) {
+        listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND<br>CHECK URL OR BUCKET PERMISSIONS</div>';
+        return;
+      }
+      renderStorageFiles(listEl, audio.map(k => ({ name: k, url: base + k })));
+    } else {
+      // Fallback: treat the URL itself as a single file
+      listEl.innerHTML = '<div class="storage-loading">COULD NOT LIST BUCKET<br>MAKE SURE THE BUCKET IS PUBLIC<br>OR USE DIRECT URL TAB</div>';
+    }
+  } catch(e) {
+    listEl.innerHTML = '<div class="storage-loading">CORS ERROR OR BUCKET NOT PUBLIC<br>TRY DIRECT URL TAB INSTEAD</div>';
+  }
+}
+
+// ── Dropbox browser ──
+async function browseDropbox() {
+  const link = document.getElementById('sb-dropbox-link').value.trim();
+  if (!link) { notify('😾', 'Paste a Dropbox link first'); return; }
+  const listEl = document.getElementById('sb-dropbox-list');
+  listEl.style.display = 'block';
+
+  // If it's a direct file link (dl=0), convert to stream URL
+  if (link.includes('dropbox.com') && !link.includes('/sh/')) {
+    const streamUrl = link.replace('www.dropbox.com','dl.dropboxusercontent.com').replace('?dl=0','').replace('?dl=1','');
+    listEl.innerHTML = '';
+    renderStorageFiles(listEl, [{ name: link.split('/').pop().split('?')[0], url: streamUrl }]);
+    return;
+  }
+
+  // Shared folder link — use Dropbox API v2 with app key if available
+  try {
+    const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
+    const appKey = saved.dropboxKey;
+    if (!appKey) {
+      // No app key — show instructions
+      listEl.innerHTML = '<div class="storage-loading">ADD YOUR DROPBOX APP KEY IN SETTINGS<br>TO BROWSE FOLDERS<br><br>FOR SINGLE FILES:<br>PASTE A DIRECT DROPBOX SHARE LINK</div>';
+      return;
+    }
+
+    listEl.innerHTML = '<div class="storage-loading">LOADING DROPBOX FILES...</div>';
+
+    // Extract shared link path and use Dropbox list_shared_link_file_metadata
+    const res = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + appKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ path: saved.dropboxFolder || '', recursive: false })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      listEl.innerHTML = '<div class="storage-loading">DROPBOX ERROR: ' + (data.error_summary || 'Check App Key') + '</div>';
+      return;
+    }
+    const audio = (data.entries || []).filter(e =>
+      e['.tag'] === 'file' && AUDIO_EXTS.some(ext => e.name.toLowerCase().endsWith(ext))
+    );
+    if (!audio.length) {
+      listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND IN FOLDER</div>';
+      return;
+    }
+    // Get temporary links for each file
+    const files = await Promise.all(audio.slice(0,50).map(async f => {
+      try {
+        const lr = await fetch('https://api.dropboxapi.com/2/files/get_temporary_link', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + appKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: f.path_lower })
+        });
+        const ld = await lr.json();
+        return { name: f.name, url: ld.link || '' };
+      } catch(e) { return { name: f.name, url: '' }; }
+    }));
+    renderStorageFiles(listEl, files.filter(f => f.url));
+  } catch(e) {
+    listEl.innerHTML = '<div class="storage-loading">ERROR CONNECTING TO DROPBOX</div>';
+  }
+}
+
+// ── Direct URL ──
+function useDirectUrl() {
+  const url = document.getElementById('sb-direct-url').value.trim();
+  if (!url) { notify('😾', 'Paste a URL first'); return; }
+  applyStorageFile({ name: url.split('/').pop().split('?')[0], url });
+}
+
+
+// ── Google Drive browser ──
+async function browseGDrive() {
+  const link = document.getElementById('sb-gdrive-link').value.trim();
+  if (!link) { notify('😾', 'Paste a Google Drive link first'); return; }
+  const listEl = document.getElementById('sb-gdrive-list');
+  listEl.style.display = 'block';
+  listEl.innerHTML = '<div class="storage-loading">RESOLVING GOOGLE DRIVE LINK...</div>';
+
+  try {
+    // Extract file ID from various Google Drive URL formats
+    const fileMatch = link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    const folderMatch = link.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+
+    if (fileMatch) {
+      // Single file — build direct stream URL
+      const fileId = fileMatch[1];
+      const streamUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      const name = 'Google Drive File (' + fileId.slice(0,8) + '...)';
+      listEl.innerHTML = '';
+      renderStorageFiles(listEl, [{ name, url: streamUrl, hint: 'File must be shared as Anyone with link' }]);
+
+    } else if (folderMatch) {
+      // Folder — need API key to list contents
+      const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
+      const apiKey = saved.gdriveKey;
+      if (!apiKey) {
+        listEl.innerHTML = '<div class="storage-loading">ADD YOUR GOOGLE API KEY IN SETTINGS<br>TO BROWSE DRIVE FOLDERS<br><br>FOR SINGLE FILES:<br>USE A DIRECT FILE SHARE LINK</div>';
+        return;
+      }
+      const folderId = folderMatch[1];
+      const res = await fetch(
+        'https://www.googleapis.com/drive/v3/files?q=' +
+        encodeURIComponent('"' + folderId + '" in parents and mimeType contains "audio/"') +
+        '&fields=files(id,name,mimeType)&key=' + apiKey
+      );
+      const data = await res.json();
+      if (!res.ok || !data.files?.length) {
+        listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND<br>CHECK FOLDER SHARING SETTINGS</div>';
+        return;
+      }
+      const files = data.files.map(f => ({
+        name: f.name,
+        url: 'https://drive.google.com/uc?export=download&id=' + f.id
+      }));
+      renderStorageFiles(listEl, files);
+
+    } else {
+      listEl.innerHTML = '<div class="storage-loading">UNRECOGNISED GOOGLE DRIVE URL<br>PASTE A FILE OR FOLDER SHARE LINK</div>';
+    }
+  } catch(e) {
+    listEl.innerHTML = '<div class="storage-loading">ERROR — CHECK URL AND TRY AGAIN</div>';
+  }
+}
+
+// ── OneDrive browser ──
+async function browseOneDrive() {
+  const link = document.getElementById('sb-onedrive-link').value.trim();
+  if (!link) { notify('😾', 'Paste a OneDrive link first'); return; }
+  const listEl = document.getElementById('sb-onedrive-list');
+  listEl.style.display = 'block';
+  listEl.innerHTML = '<div class="storage-loading">RESOLVING ONEDRIVE LINK...</div>';
+
+  try {
+    // Convert OneDrive share link to direct download URL
+    // OneDrive short links (1drv.ms) redirect to a download URL
+    // We construct the download URL from the share link
+    let streamUrl = '';
+
+    if (link.includes('1drv.ms') || link.includes('onedrive.live.com')) {
+      // Encode the share URL for the OneDrive API
+      const b64 = btoa(link).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+      streamUrl = 'https://api.onedrive.com/v1.0/shares/u!' + b64 + '/root/content';
+      const name = link.split('/').pop().split('?')[0] || 'OneDrive File';
+      listEl.innerHTML = '';
+      renderStorageFiles(listEl, [{ name, url: streamUrl }]);
+    } else {
+      listEl.innerHTML = '<div class="storage-loading">PASTE A 1drv.ms OR onedrive.live.com LINK</div>';
+    }
+  } catch(e) {
+    listEl.innerHTML = '<div class="storage-loading">ERROR — CHECK URL AND TRY AGAIN</div>';
+  }
+}
+
+// ── SoundCloud browser ──
+async function browseSoundCloud() {
+  const url = document.getElementById('sb-sc-url').value.trim();
+  if (!url) { notify('😾', 'Paste a SoundCloud track URL first'); return; }
+  const listEl = document.getElementById('sb-sc-list');
+  listEl.style.display = 'block';
+  listEl.innerHTML = '<div class="storage-loading">FETCHING FROM SOUNDCLOUD...</div>';
+
+  try {
+    // Use SoundCloud oEmbed API — no key needed for public tracks
+    const oembedUrl = 'https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(url);
+    const res = await fetch(oembedUrl);
+    if (!res.ok) throw new Error('oEmbed failed');
+    const data = await res.json();
+
+    // Extract stream URL from oEmbed iframe src
+    const iframeSrcMatch = data.html?.match(/src="([^"]+)"/);
+    let streamUrl = url; // fallback to the page URL
+
+    // Parse author and title
+    const title  = (data.title || '').replace(/ by .*$/, '').trim();
+    const artist = data.author_name || '';
+
+    listEl.innerHTML = '';
+    renderStorageFiles(listEl, [{
+      name: title || url.split('/').pop(),
+      url: streamUrl,
+      artist,
+      title,
+      artUrl: data.thumbnail_url || ''
+    }]);
+
+    // Also pre-fill artist if we got it
+    if (artist) {
+      const artistInput = document.getElementById('f-artist');
+      if (artistInput && !artistInput.value.trim()) artistInput.value = artist;
+    }
+    if (title) {
+      const titleInput = document.getElementById('f-title');
+      if (titleInput && !titleInput.value.trim()) titleInput.value = title;
+    }
+
+  } catch(e) {
+    listEl.innerHTML = '<div class="storage-loading">COULD NOT FETCH TRACK<br>MAKE SURE THE TRACK IS PUBLIC<br>AND THE URL IS CORRECT</div>';
+  }
+}
+
+// ── Render file list ──
+function renderStorageFiles(el, files) {
+  if (!files.length) {
+    el.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND</div>';
+    return;
+  }
+  el.innerHTML = files.map((f, i) => {
+    const ext = f.name.split('.').pop().toUpperCase();
+    const name = f.name.replace(/\.(mp3|wav|flac|ogg|aac|m4a|aiff|opus)$/i, '');
+    return `
+    <div class="storage-file-item">
+      <span class="storage-file-ext">${ext}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(name)}</span>
+      <button class="storage-file-use" onclick="applyStorageFile(${JSON.stringify(f).replace(/"/g,'&quot;')})">
+        USE AS STREAM
+      </button>
+      ${(ext==='WAV'||ext==='MP3') ? `
+      <button class="storage-file-use" style="color:#88ddff;border-color:#005588;"
+        onclick="applyStorageFileDownload(${JSON.stringify(f).replace(/"/g,'&quot;')},'${ext.toLowerCase()}')">
+        + DL LINK
+      </button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Apply selected file to the ADD TRACK form ──
+function applyStorageFile(file) {
+  // Set stream URL
+  const urlInput = document.getElementById('f-audio-url');
+  if (urlInput) { urlInput.value = file.url; checkAudioUrl(); }
+  // Auto-fill title from filename if empty
+  const titleInput = document.getElementById('f-title');
+  if (titleInput && !titleInput.value.trim()) {
+    titleInput.value = file.name.replace(/\.(mp3|wav|flac|ogg|aac|m4a|aiff|opus)$/i,'').replace(/[-_]/g,' ');
+  }
+  closeStorageBrowser();
+  switchTab('upload');
+  openSection('fs-info');
+  notify('🎵', 'URL imported — fill in track details');
+}
+
+function applyStorageFileDownload(file, type) {
+  const field = type === 'wav' ? 'f-wav' : 'f-mp3';
+  const el = document.getElementById(field);
+  if (el) { el.value = file.url; openSection('fs-links'); }
+  notify('⬇', type.toUpperCase() + ' download link set!');
+}
+
+// ── Load settings when settings tab opens ──
+const _origSwitchTabStorage = switchTab;
+switchTab = function(name) {
+  _origSwitchTabStorage(name);
+  if (name === 'settings') setTimeout(loadCloudStorageSettings, 100);
+};
+
+
+// ═══════════════════════════════════════════════════════
+// CLOUD STORAGE BROWSER
+// Supports: Dropbox, Google Drive, Cloudflare R2, AWS S3,
+//           OneDrive, and direct audio URLs
+// ═══════════════════════════════════════════════════════
+
+// AUDIO_EXTS already declared above
+let _storageProvider = null;
+
+const PROVIDER_HINTS = {
+  dropbox:  'Paste a Dropbox shared folder link.\nExample: https://www.dropbox.com/sh/xxxx/yyyy\nFiles must be in a shared folder (not private).',
+  gdrive:   'Paste a Google Drive folder share link.\nExample: https://drive.google.com/drive/folders/xxxx\nFolder must be set to "Anyone with the link can view".',
+  r2:       'Paste your Cloudflare R2 public bucket base URL.\nExample: https://pub-xxxx.r2.dev\nBucket must have public access enabled.',
+  s3:       'Paste your AWS S3 public bucket URL.\nExample: https://my-bucket.s3.amazonaws.com\nor https://s3.amazonaws.com/my-bucket\nBucket must allow public listing.',
+  onedrive: 'Paste a OneDrive shared folder link.\nExample: https://1drv.ms/f/xxxx\nor https://onedrive.live.com/...',
+  direct:   'Paste a direct link to a single audio file.\nWorks with any public URL ending in .mp3, .wav, .flac etc.\nThe URL must be a direct stream link, not a webpage.',
+};
+// (duplicate openStorageBrowser removed — see primary above)
+
+function closeStorageBrowser() {
+  document.getElementById('storage-overlay').classList.remove('open');
+}
+
+function selectProvider(p) {
+  _storageProvider = p;
+  document.querySelectorAll('.storage-provider-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + p).classList.add('active');
+  document.getElementById('storage-hint').textContent = PROVIDER_HINTS[p] || '';
+  document.getElementById('storage-url-input').value = '';
+  document.getElementById('storage-results').innerHTML = '';
+  document.getElementById('storage-url-input').focus();
+}
+
+function isAudioFile(name) {
+  const lower = name.toLowerCase();
+  return AUDIO_EXTS.some(ext => lower.endsWith(ext));
+}
+
+function guessTitle(filename) {
+  // Strip extension, replace dashes/underscores with spaces, title-case
+  return filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+async function browseStorage() {
+  if (!_storageProvider) { notify('😾', 'Select a storage provider first'); return; }
+  const url = document.getElementById('storage-url-input').value.trim();
+  if (!url) { notify('😾', 'Paste a URL first'); return; }
+
+  const el = document.getElementById('storage-results');
+  el.innerHTML = '<div class="storage-status">🔍 SCANNING...</div>';
+
+  try {
+    let files = [];
+    switch (_storageProvider) {
+      case 'dropbox':  files = await browseDropbox(url);  break;
+      case 'gdrive':   files = await browseGDrive(url);   break;
+      case 'r2':       files = await browseR2orS3(url);   break;
+      case 's3':       files = await browseR2orS3(url);   break;
+      case 'onedrive': files = await browseOneDrive(url); break;
+      case 'direct':   files = browseDirectUrl(url);      break;
+    }
+    renderStorageResults(files);
+  } catch(e) {
+    el.innerHTML = '<div class="storage-status" style="color:#ff4444;">ERROR: ' + esc(e.message) + '</div>';
+  }
+}
+
+// ── DROPBOX ──
+// Transforms shared folder URLs to API calls
+async function browseDropbox(url) {
+  // Convert share URL to API URL
+  // https://www.dropbox.com/sh/xxx/yyy → API list
+  let apiUrl = url.replace('www.dropbox.com', 'api.dropboxapi.com');
+
+  // Use the Dropbox shared link contents API (no auth needed for shared folders)
+  const resp = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Dropbox-API-Path-Root': JSON.stringify({ '.tag': 'namespace_id', 'namespace_id': '' })
+    },
+    body: JSON.stringify({ path: '', shared_link: { url } })
+  });
+
+  if (!resp.ok) {
+    // Fallback: try direct dl.dropboxusercontent.com conversion for single files
+    if (url.includes('dropbox.com') && isAudioFile(url)) {
+      const direct = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '?dl=1').replace('?dl=1', '?dl=1');
+      const name = url.split('/').pop().split('?')[0];
+      return [{ name, url: direct, provider: 'dropbox' }];
+    }
+    throw new Error('Could not access Dropbox folder. Make sure the folder is shared publicly.');
+  }
+
+  const data = await resp.json();
+  return (data.entries || [])
+    .filter(e => e['.tag'] === 'file' && isAudioFile(e.name))
+    .map(e => ({
+      name: e.name,
+      url: 'https://dl.dropboxusercontent.com/sh/' + url.split('/sh/')[1]?.split('?')[0] + '/' + encodeURIComponent(e.name) + '?dl=1',
+      size: e.size,
+      provider: 'dropbox'
+    }));
+}
+
+// ── GOOGLE DRIVE ──
+// Uses the public Drive API v3 (no auth needed for public folders)
+async function browseGDrive(url) {
+  // Extract folder ID
+  const folderMatch = url.match(/folders\/([a-zA-Z0-9_-]+)/);
+  const fileMatch   = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+  const idMatch     = url.match(/id=([a-zA-Z0-9_-]+)/);
+
+  if (fileMatch || idMatch) {
+    // Single file
+    const id = fileMatch?.[1] || idMatch?.[1];
+    const directUrl = 'https://drive.google.com/uc?export=download&id=' + id;
+    return [{ name: 'Google Drive File', url: directUrl, provider: 'gdrive', id }];
+  }
+
+  if (!folderMatch) throw new Error('Could not find a Google Drive folder ID in the URL.');
+  const folderId = folderMatch[1];
+
+  // List files in folder via public API
+  const apiResp = await fetch(
+    'https://www.googleapis.com/drive/v3/files?q=' +
+    encodeURIComponent('"' + folderId + '" in parents') +
+    '&key=AIzaSyD-dummy&fields=files(id,name,size,mimeType)&pageSize=100'
+  );
+
+  // Google Drive API requires an API key — guide user to get direct links instead
+  // Fallback: parse the folder page
+  const pageResp = await fetch('https://drive.google.com/drive/folders/' + folderId, {
+    headers: { 'Accept': 'text/html' }
+  });
+  const html = await pageResp.text();
+  // Extract file IDs from the page source
+  const idMatches = [...html.matchAll(/"([a-zA-Z0-9_-]{25,})"/g)];
+  // This is limited — guide user to individual file links
+  throw new Error(
+    'Google Drive folder scanning requires individual file links due to API restrictions.\n' +
+    'Right-click each audio file in Drive → Get link → paste here one at a time,\nor use the DIRECT URL option with the file\'s direct download link.'
+  );
+}
+
+// ── CLOUDFLARE R2 / AWS S3 (public bucket with XML listing) ──
+async function browseR2orS3(url) {
+  // Clean up URL
+  const base = url.replace(/\/$/, '');
+
+  // S3/R2 public buckets return XML listing at the root
+  const resp = await fetch(base + '/?list-type=2&max-keys=200', {
+    headers: { 'Accept': 'application/xml' }
+  });
+  if (!resp.ok) throw new Error('Could not list bucket. Make sure the bucket is public and has listing enabled.');
+
+  const xml = await resp.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'application/xml');
+  const keys = [...doc.querySelectorAll('Key')].map(k => k.textContent);
+
+  const audioFiles = keys.filter(k => isAudioFile(k));
+  if (!audioFiles.length) throw new Error('No audio files found in this bucket. Supported: ' + AUDIO_EXTS.join(', '));
+
+  return audioFiles.map(key => ({
+    name: key.split('/').pop(),
+    url: base + '/' + key,
+    provider: _storageProvider
+  }));
+}
+
+// ── ONEDRIVE ──
+async function browseOneDrive(url) {
+  // OneDrive short links (1drv.ms) need to be resolved
+  // Convert share URL to direct download for individual files
+  if (isAudioFile(url)) {
+    // Direct file — convert to download link
+    const b64 = btoa(url).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const directUrl = 'https://api.onedrive.com/v1.0/shares/u!' + b64 + '/root/content';
+    const name = url.split('/').pop().split('?')[0];
+    return [{ name, url: directUrl, provider: 'onedrive' }];
+  }
+
+  // For folders, use the OneDrive sharing API
+  const b64 = btoa(url).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const resp = await fetch('https://api.onedrive.com/v1.0/shares/u!' + b64 + '/root/children?$select=name,size,file,@microsoft.graph.downloadUrl');
+  if (!resp.ok) throw new Error('Could not access OneDrive folder. Make sure the link is set to "Anyone with the link".');
+
+  const data = await resp.json();
+  const files = (data.value || []).filter(f => f.file && isAudioFile(f.name));
+  if (!files.length) throw new Error('No audio files found in this OneDrive folder.');
+
+  return files.map(f => ({
+    name: f.name,
+    url: f['@microsoft.graph.downloadUrl'] || '',
+    size: f.size,
+    provider: 'onedrive'
+  }));
+}
+
+// ── DIRECT URL ──
+function browseDirectUrl(url) {
+  if (!isAudioFile(url)) {
+    throw new Error('URL does not appear to be a direct audio file. Make sure it ends with .mp3, .wav, .flac etc.');
+  }
+  const name = url.split('/').pop().split('?')[0];
+  return [{ name, url, provider: 'direct' }];
+}
+
+// ── RENDER RESULTS ──
+function renderStorageResults(files) {
+  const el = document.getElementById('storage-results');
+  if (!files.length) {
+    el.innerHTML = '<div class="storage-status">NO AUDIO FILES FOUND</div>';
+    return;
+  }
+
+  const listHtml = files.map((f, i) => `
+    <div class="storage-file">
+      <span class="storage-file-icon">🎵</span>
+      <span class="storage-file-name" title="${esc(f.url)}">${esc(f.name)}</span>
+      ${f.size ? `<span class="storage-file-size">${(f.size/1024/1024).toFixed(1)}MB</span>` : ''}
+      <button class="storage-use-btn" onclick="useStorageFile(${i})">USE</button>
+    </div>`).join('');
+
+  el.innerHTML =
+    '<div class="storage-result-hdr">' + files.length + ' AUDIO FILE' + (files.length !== 1 ? 'S' : '') + ' FOUND</div>' +
+    '<div class="storage-file-list">' + listHtml + '</div>' +
+    (files.length > 1 ? `
+      <button class="sub-btn storage-import-all" onclick="importAllStorageFiles()" style="margin-top:10px;font-size:7px;padding:10px;">
+        ⬇ IMPORT ALL ${files.length} TRACKS
+      </button>` : '');
+
+  // Cache files for use
+  window._storageFiles = files;
+}
+
+function useStorageFile(idx) {
+  const f = window._storageFiles[idx];
+  if (!f) return;
+  closeStorageBrowser();
+  // Pre-fill the URL field and title in the add track form
+  document.getElementById('f-audio-url').value = f.url;
+  document.getElementById('f-title').value = guessTitle(f.name);
+  checkAudioUrl();
+  // Open the info section
+  openSection('fs-info');
+  notify('🎵', '"' + guessTitle(f.name) + '" loaded — fill in the details and save!');
+}
+
+async function importAllStorageFiles() {
+  const files = window._storageFiles || [];
+  if (!files.length) return;
+  closeStorageBrowser();
+
+  let imported = 0;
+  for (const f of files) {
+    const title = guessTitle(f.name);
+    // Add directly to playlist with defaults
+    playlist.push({
+      url: f.url,
+      title,
+      artist: currentUser?.username || 'Unknown',
+      album: '', year: '', bpm: 0, genre: '',
+      category: 'listen', status: 'unreleased', avail: 'undecided',
+      artUrl: '', email: '', mgmt: '', mgmtEmail: '',
+      booking: '', label: '', wavLink: '', mp3Link: '', buyLink: '',
+      rating: 0
+    });
+    imported++;
+  }
+
+  renderPlaylist();
+  savePlaylist();
+  notify('☁️', imported + ' track' + (imported !== 1 ? 's' : '') + ' imported! Edit details in your playlist.');
+}
+
+
+// ── Playlist fullscreen popout ──
+function openPlPopout() {
+  const popout = document.getElementById('pl-popout');
+  if (!popout) return;
+  popout.classList.add('open');
+  syncPopoutMode();
+  renderPopoutList();
+}
+
+function closePlPopout() {
+  document.getElementById('pl-popout').classList.remove('open');
+}
+
+function syncPopoutMode() {
+  const myActive = playlistMode === 'my';
+  document.getElementById('pop-btn-my')?.classList.toggle('active', myActive);
+  document.getElementById('pop-btn-inbox')?.classList.toggle('active', !myActive);
+  const title = document.getElementById('pl-popout-title');
+  if (title) title.textContent = myActive ? '🐾 MY TRACKS' : '📬 INBOX';
+  const filterBar = document.getElementById('popout-filter-bar');
+  if (filterBar) filterBar.style.display = myActive ? 'flex' : 'none';
+  renderPopoutList();
+}
+
+function renderPopoutList() {
+  const el = document.getElementById('pl-popout-list');
+  if (!el) return;
+  // Re-use the same rendered HTML from the main pl-list
+  const main = document.getElementById('pl-list');
+  if (main) {
+    el.innerHTML = main.innerHTML;
+    // Rebind click handlers — clone nodes lose them, so use event delegation
+  }
+  const count = document.getElementById('pl-popout-count');
+  if (count) count.textContent = (playlistMode === 'my' ? playlist.length : inbox.length) + ' TRACKS';
+}
+
+// Keep popout in sync when renderPlaylist/renderInbox fires
+const _origRenderPlaylist = renderPlaylist;
+renderPlaylist = function() {
+  _origRenderPlaylist();
+  if (document.getElementById('pl-popout')?.classList.contains('open')) renderPopoutList();
+};
+
+// Close popout on back button (Android)
+window.addEventListener('popstate', () => {
+  if (document.getElementById('pl-popout')?.classList.contains('open')) {
+    closePlPopout();
+  }
+});
+// Push state when popout opens so back button works
+const _origOpenPlPopout = openPlPopout;
+openPlPopout = function() {
+  history.pushState({ plPopout: true }, '');
+  _origOpenPlPopout();
+};
+
+
+// ── Fullscreen playlist (mobile) ──
+let _plFullscreen = false;
+
+function togglePlaylistFullscreen() {
+  const pl   = document.querySelector('.pl-section');
+  const btn  = document.getElementById('pl-fs-btn');
+  if (!pl) return;
+  _plFullscreen = !_plFullscreen;
+  pl.classList.toggle('fullscreen', _plFullscreen);
+  if (btn) btn.textContent = _plFullscreen ? '✕ CLOSE' : '⛶';
+  // On close, scroll back to top of list
+  if (!_plFullscreen) {
+    const list = document.getElementById('pl-list');
+    if (list) list.scrollTop = 0;
+  }
+}
+
+// Close fullscreen on back gesture / escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _plFullscreen) togglePlaylistFullscreen();
+});
+
+
+// ── PEOPLE TAB sub-navigation ──
+let _activePeopleTab = 'connect';
+
+function switchPeopleTab(name) {
+  _activePeopleTab = name;
+  ['connect','contacts','promo'].forEach(t => {
+    document.getElementById('pst-' + t)?.classList.toggle('active', t === name);
+    const panel = document.getElementById('people-panel-' + t);
+    if (panel) panel.style.display = t === name ? '' : 'none';
+  });
+  // Load data for the active sub-tab
+  if (name === 'connect')  loadConnectTab();
+  if (name === 'contacts') renderContactsTab();
+  if (name === 'promo')    renderPromoTab();
+}
+
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
 // Stop playback when tab/window is closed or navigated away
@@ -9641,6 +10949,187 @@ window.addEventListener('pagehide', () => {
       </div>
     </div>
   </div>
+</div>
+
+<!-- ── CLOUD STORAGE BROWSER ── -->
+<div class="storage-modal-overlay" id="storage-modal-overlay">
+  <div class="storage-modal">
+    <div class="storage-modal-hdr">
+      <span>🗂️ IMPORT FROM CLOUD</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
+    </div>
+    <div class="storage-tabs" style="flex-wrap:wrap;">
+      <button class="storage-tab active" id="stab-r2"        onclick="switchStorageTab('r2')">☁️ R2</button>
+      <button class="storage-tab"        id="stab-dropbox"   onclick="switchStorageTab('dropbox')">📦 DROPBOX</button>
+      <button class="storage-tab"        id="stab-gdrive"    onclick="switchStorageTab('gdrive')">📁 G.DRIVE</button>
+      <button class="storage-tab"        id="stab-onedrive"  onclick="switchStorageTab('onedrive')">☁ ONEDRIVE</button>
+      <button class="storage-tab"        id="stab-soundcloud" onclick="switchStorageTab('soundcloud')">🎵 SOUNDCLOUD</button>
+      <button class="storage-tab"        id="stab-url"       onclick="switchStorageTab('url')">🔗 DIRECT URL</button>
+    </div>
+    <div class="storage-body">
+
+      <!-- ── R2 / PUBLIC BUCKET ── -->
+      <div id="stab-content-r2">
+        <div class="storage-hint">Paste your Cloudflare R2 public bucket URL. The bucket must have public access enabled.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-r2-url" placeholder="https://pub-xxxx.r2.dev/music/"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseR2()">🔍 SCAN</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Also works with any S3-compatible public bucket (Backblaze B2, AWS S3, etc.)</div>
+        <div id="sb-r2-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── DROPBOX ── -->
+      <div id="stab-content-dropbox" style="display:none;">
+        <div class="storage-hint">Paste a Dropbox share link. Single file or shared folder — both work.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-dropbox-link"
+                 placeholder="https://www.dropbox.com/s/... or /sh/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseDropbox()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Single file links are converted to stream URLs automatically. For folders, add your Dropbox App Token in Settings.</div>
+        <div id="sb-dropbox-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── GOOGLE DRIVE ── -->
+      <div id="stab-content-gdrive" style="display:none;">
+        <div class="storage-hint">Paste a Google Drive file or folder share link.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-gdrive-link"
+                 placeholder="https://drive.google.com/file/d/... or /drive/folders/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseGDrive()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">File must be shared as "Anyone with the link". Folders require a Google API key in Settings.</div>
+        <div id="sb-gdrive-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── ONEDRIVE ── -->
+      <div id="stab-content-onedrive" style="display:none;">
+        <div class="storage-hint">Paste a OneDrive share link to a file or folder.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-onedrive-link"
+                 placeholder="https://1drv.ms/... or onedrive.live.com/..."
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseOneDrive()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Share link must be set to "Anyone with the link can view".</div>
+        <div id="sb-onedrive-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── SOUNDCLOUD ── -->
+      <div id="stab-content-soundcloud" style="display:none;">
+        <div class="storage-hint">Paste a SoundCloud track URL. The track must be public.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-sc-url"
+                 placeholder="https://soundcloud.com/artist/trackname"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseSoundCloud()">🔍 IMPORT</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:4px;">Imports title, artist and stream URL from the SoundCloud oEmbed API. No account needed for public tracks.</div>
+        <div id="sb-sc-list" class="storage-file-list" style="display:none;"></div>
+      </div>
+
+      <!-- ── DIRECT URL ── -->
+      <div id="stab-content-url" style="display:none;">
+        <div class="storage-hint">Paste any direct audio URL (MP3, WAV, FLAC, OGG, AAC). Works with any public host.</div>
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-direct-url"
+                 placeholder="https://example.com/mytrack.mp3"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="useDirectUrl()">✅ USE</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── CLOUD STORAGE BROWSER ── -->
+<div class="storage-overlay" id="storage-overlay">
+  <div class="storage-box">
+    <div class="storage-hdr">
+      <span class="storage-hdr-title">🗂️ BROWSE CLOUD STORAGE</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
+    </div>
+    <div class="storage-body">
+
+      <!-- Provider selector -->
+      <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:8px;letter-spacing:.5px;">SELECT STORAGE PROVIDER</div>
+      <div class="storage-provider-grid">
+        <button class="storage-provider-btn" id="sp-dropbox"   onclick="selectProvider('dropbox')">
+          <span class="storage-provider-icon">📦</span>DROPBOX
+        </button>
+        <button class="storage-provider-btn" id="sp-gdrive"    onclick="selectProvider('gdrive')">
+          <span class="storage-provider-icon">📁</span>GOOGLE DRIVE
+        </button>
+        <button class="storage-provider-btn" id="sp-r2"        onclick="selectProvider('r2')">
+          <span class="storage-provider-icon">☁️</span>CLOUDFLARE R2
+        </button>
+        <button class="storage-provider-btn" id="sp-s3"        onclick="selectProvider('s3')">
+          <span class="storage-provider-icon">🪣</span>AWS S3
+        </button>
+        <button class="storage-provider-btn" id="sp-onedrive"  onclick="selectProvider('onedrive')">
+          <span class="storage-provider-icon">🔷</span>ONEDRIVE
+        </button>
+        <button class="storage-provider-btn" id="sp-direct"    onclick="selectProvider('direct')">
+          <span class="storage-provider-icon">🔗</span>DIRECT URL
+        </button>
+      </div>
+
+      <!-- URL input + hint -->
+      <div id="storage-hint" class="storage-hint">Select a provider above to get started.</div>
+      <div class="storage-url-row">
+        <input class="finput" type="url" id="storage-url-input"
+               placeholder="Paste your shared folder or file URL..."
+               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+               style="font-size:15px;flex:1;"
+               onkeydown="if(event.key==='Enter')browseStorage()">
+        <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 14px;" onclick="browseStorage()">
+          🔍 BROWSE
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="storage-results"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
+<div class="pl-popout" id="pl-popout">
+  <div class="pl-popout-hdr">
+    <span class="pl-popout-title" id="pl-popout-title">🐾 MY TRACKS</span>
+    <span id="pl-popout-count" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#2a6633;margin-right:8px;"></span>
+    <button class="pl-popout-close" onclick="closePlPopout()">✕ CLOSE</button>
+  </div>
+  <!-- Mode + filters bar -->
+  <div class="pl-popout-bar">
+    <div class="pl-mode-btns" style="flex-shrink:0;">
+      <button class="pl-mode-btn" id="pop-btn-my" onclick="setPlaylistMode('my');syncPopoutMode();" style="font-size:6px;padding:6px 12px;">🐾 MY TRACKS</button>
+      <button class="pl-mode-btn" id="pop-btn-inbox" onclick="setPlaylistMode('inbox');syncPopoutMode();" style="font-size:6px;padding:6px 12px;">📬 INBOX <span id="pop-inbox-badge" style="display:none;color:#ff8844;">●</span></button>
+    </div>
+    <div class="filter-bar" id="popout-filter-bar" style="flex:1;border:none;background:none;padding:0 4px;position:static;">
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('cat')"><span class="active-dot"></span>CAT <span class="arrow">▼</span></button>
+        <div class="filter-dropdown" id="fd-cat-pop" style="display:none;"></div>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('avail')"><span class="active-dot"></span>STATUS <span class="arrow">▼</span></button>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('genre')"><span class="active-dot"></span>GENRE <span class="arrow">▼</span></button>
+      </div>
+      <div class="filter-group">
+        <button class="filter-toggle" onclick="toggleFilter('sort')"><span class="active-dot"></span>SORT <span class="arrow">▼</span></button>
+      </div>
+    </div>
+  </div>
+  <!-- The actual list — shared with main pl-list via JS -->
+  <div class="pl-popout-list" id="pl-popout-list"></div>
 </div>
 </body>
 </html>
