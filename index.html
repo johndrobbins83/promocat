@@ -2525,6 +2525,200 @@ body.rave-mode .lcd-art img {
 }
 .pl-act-btn.pl-drop-btn { color: #88ddff; }
 .pl-act-btn.pl-drop-btn:hover { color: #ffffff; background: rgba(68,170,255,.15); }
+
+/* ── NOTIF PANEL TABS ── */
+.notif-panel {
+  width: min(360px, 95vw) !important;
+  max-height: 520px !important;
+}
+.notif-tabs {
+  display: flex; flex-shrink: 0;
+  border-bottom: 1px solid var(--border-lo);
+}
+.notif-tab {
+  flex: 1; padding: 7px 4px;
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); background: none; border: none;
+  cursor: pointer; letter-spacing: .3px;
+  border-bottom: 2px solid transparent;
+}
+.notif-tab.active { color: var(--cat-orange); border-bottom-color: var(--cat-orange); }
+.notif-tab-badge {
+  display: inline-block; background: #ff4444; color: #fff;
+  font-size: 4px; padding: 1px 4px; margin-left: 4px; vertical-align: middle;
+}
+@media (min-width: 900px) {
+  .notif-tab { font-size: 7px; padding: 9px 8px; }
+}
+
+/* ── CHAT WINDOW ── */
+.chat-window {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  width: min(340px, 95vw);
+  height: 480px;
+  background: var(--win-bg);
+  border: 2px solid var(--border-hi);
+  box-shadow: 0 0 30px rgba(0,0,0,.8), 0 0 12px rgba(68,221,136,.15);
+  display: none; flex-direction: column;
+  z-index: 9995;
+}
+.chat-window.open { display: flex; }
+.chat-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; flex-shrink: 0;
+  background: var(--title-grad);
+  border-bottom: 1px solid var(--border-lo);
+}
+.chat-hdr-name {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: #fff8e0; flex: 1; letter-spacing: .3px;
+}
+.chat-hdr-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #fff8e0; background: none; border: none; cursor: pointer; padding: 2px 5px;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 10px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border-lo); }
+.chat-msg {
+  max-width: 80%; padding: 7px 10px;
+  border: 1px solid;
+}
+.chat-msg.mine {
+  align-self: flex-end;
+  background: rgba(68,221,136,.1);
+  border-color: var(--border-lo);
+}
+.chat-msg.theirs {
+  align-self: flex-start;
+  background: rgba(255,140,66,.08);
+  border-color: rgba(255,140,66,.2);
+}
+.chat-msg-text {
+  font-family: 'VT323', monospace; font-size: 17px;
+  color: var(--lcd-green); line-height: 1.3; word-break: break-word;
+}
+.chat-msg.theirs .chat-msg-text { color: #ffcc88; }
+.chat-msg-meta {
+  font-family: 'VT323', monospace; font-size: 11px;
+  color: var(--border-lo); margin-top: 3px; text-align: right;
+}
+.chat-msg.theirs .chat-msg-meta { text-align: left; }
+.chat-empty {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--border-lo); text-align: center; padding: 30px 10px; line-height: 2.4;
+}
+.chat-input-row {
+  display: flex; gap: 6px; padding: 8px 10px;
+  border-top: 1px solid var(--border-lo); flex-shrink: 0;
+}
+.chat-input {
+  flex: 1; background: var(--vis-bg);
+  border: 1px solid var(--border-lo);
+  border-bottom-color: var(--cat-orange);
+  color: var(--lcd-green);
+  font-family: 'VT323', monospace; font-size: 18px;
+  padding: 6px 10px; outline: none;
+}
+.chat-send-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  padding: 8px 12px; background: var(--btn-bg);
+  border-top: 1px solid var(--btn-hi); border-left: 1px solid var(--btn-hi);
+  border-bottom: 1px solid var(--btn-sh); border-right: 1px solid var(--btn-sh);
+  color: var(--lcd-green); cursor: pointer;
+}
+.chat-send-btn:hover { filter: brightness(1.3); }
+
+/* ── CONVO LIST ITEM ── */
+.convo-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-bottom: 1px solid var(--border-lo);
+  cursor: pointer;
+}
+.convo-item:hover { background: rgba(68,221,136,.06); }
+.convo-name {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--lcd-green); margin-bottom: 3px;
+}
+.convo-preview {
+  font-family: 'VT323', monospace; font-size: 14px;
+  color: var(--border-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.convo-unread {
+  background: var(--cat-orange); color: #000;
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  padding: 2px 5px; flex-shrink: 0;
+}
+
+/* ── DROP PERMISSIONS MODAL ── */
+.drop-perm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.88);
+  z-index: 99997; display: none;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.drop-perm-overlay.open { display: flex; }
+.drop-perm-box {
+  background: var(--win-bg);
+  border: 2px solid var(--border-hi);
+  width: 100%; max-width: 400px;
+  box-shadow: 0 0 30px rgba(0,0,0,.8), 0 0 12px rgba(68,221,136,.15);
+}
+.drop-perm-hdr {
+  background: var(--title-grad);
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: #fff8e0; letter-spacing: .5px;
+}
+.drop-perm-body { padding: 16px; }
+.drop-perm-track {
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: var(--lcd-green); margin-bottom: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.drop-perm-to {
+  font-family: 'VT323', monospace; font-size: 15px;
+  color: var(--cat-orange); margin-bottom: 14px;
+}
+.drop-perm-section {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); letter-spacing: .5px; margin-bottom: 8px;
+}
+.perm-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border-lo);
+  margin-bottom: 6px; cursor: pointer;
+  transition: background .1s, border-color .1s;
+}
+.perm-option:hover { background: rgba(68,221,136,.05); }
+.perm-option.selected {
+  border-color: var(--cat-orange);
+  background: rgba(255,140,66,.08);
+}
+.perm-option input[type="radio"] { display: none; }
+.perm-radio {
+  width: 14px; height: 14px; border: 1px solid var(--border-lo);
+  border-bottom-color: var(--cat-orange); border-right-color: var(--cat-orange);
+  background: var(--vis-bg); flex-shrink: 0; position: relative;
+}
+.perm-option.selected .perm-radio::after {
+  content: ''; position: absolute; inset: 3px;
+  background: var(--cat-orange); box-shadow: 0 0 4px rgba(255,140,66,.8);
+}
+.perm-label {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--lcd-green); display: block; margin-bottom: 3px;
+}
+.perm-desc {
+  font-family: 'VT323', monospace; font-size: 14px;
+  color: var(--border-lo); display: block;
+}
+.drop-perm-actions { display: flex; gap: 8px; margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -3664,15 +3858,50 @@ Listen here: {link}
 <!-- Notification Panel -->
 <div class="notif-panel" id="notif-panel">
   <div class="notif-panel-hdr">
-    <span>🔔 NOTIFICATIONS</span>
+    <span>💬 MESSAGES &amp; ALERTS</span>
     <div class="notif-panel-actions">
-      <button class="notif-panel-btn" onclick="markAllUserNotifsRead()">MARK ALL READ</button>
-      <button class="notif-panel-btn" onclick="clearAllUserNotifs()">CLEAR ALL</button>
+      <button class="notif-panel-btn" onclick="markAllUserNotifsRead()">READ ALL</button>
+      <button class="notif-panel-btn" onclick="clearAllUserNotifs()">CLEAR</button>
       <button class="notif-panel-btn" onclick="toggleNotifPanel()">✕</button>
     </div>
   </div>
-  <div class="notif-list" id="notif-list">
-    <div class="notif-empty">NO NOTIFICATIONS YET</div>
+  <!-- Tabs -->
+  <div class="notif-tabs">
+    <button class="notif-tab active" id="ntab-messages" onclick="switchNotifTab('messages')">
+      💬 MESSAGES <span class="notif-tab-badge" id="chat-badge" style="display:none;">0</span>
+    </button>
+    <button class="notif-tab" id="ntab-alerts" onclick="switchNotifTab('alerts')">
+      🔔 ALERTS <span class="notif-tab-badge" id="alert-badge" style="display:none;">0</span>
+    </button>
+  </div>
+  <!-- Messages tab -->
+  <div id="notif-tab-messages" class="notif-list">
+    <div class="notif-empty">NO MESSAGES YET<br><br>CONNECT WITH USERS<br>TO START CHATTING</div>
+  </div>
+  <!-- Alerts tab -->
+  <div id="notif-tab-alerts" class="notif-list" style="display:none;">
+    <div class="notif-list" id="notif-list">
+      <div class="notif-empty">NO NOTIFICATIONS YET</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHAT WINDOW ── -->
+<div class="chat-window" id="chat-window">
+  <div class="chat-hdr">
+    <div class="chat-hdr-name" id="chat-hdr-name">CHAT</div>
+    <button class="chat-hdr-btn" onclick="minimizeChatWindow()" data-tip="MINIMIZE">—</button>
+    <button class="chat-hdr-btn" onclick="closeChatWindow()" data-tip="CLOSE">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-empty">SAY SOMETHING...</div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" type="text"
+           placeholder="Type a message..."
+           autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false"
+           onkeydown="if(event.key==='Enter')sendChatMessage()">
+    <button class="chat-send-btn" onclick="sendChatMessage()">SEND</button>
   </div>
 </div>
 
@@ -3839,18 +4068,20 @@ function applyUnlock(username, role, token) {
   loadUserData();
   startBgSync();
   // Show notification bell for admin, start polling
-  // Admin tab — show/hide based on role from server
+  // Admin tab — show/hide based on role
   const _adminTabEl = document.getElementById('tab-admin');
   if (_adminTabEl) _adminTabEl.style.display = (role === 'admin') ? 'flex' : 'none';
+  // Double-check after a short delay in case DOM wasn't ready
+  setTimeout(() => {
+    const _at3 = document.getElementById('tab-admin');
+    if (_at3 && currentUser?.role === 'admin') _at3.style.display = 'flex';
+  }, 300);
   // Bell visible for everyone — shows connection requests + track drops
   const bellBtn = document.getElementById('wbtn-bell');
   if (bellBtn) { bellBtn.style.opacity = '1'; bellBtn.style.pointerEvents = 'auto'; }
-  fetchUserNotifications();
-  startUserNotifPolling();
-  if (role === 'admin') {
-    fetchNotifications();
-    startNotifPolling();
-  }
+  // Single unified heartbeat handles all polling
+  startHeartbeat();
+  if (role === 'admin') fetchNotifications(); // initial admin notif load
 }
 
 function logout() {
@@ -3922,6 +4153,9 @@ async function doLogin() {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ username: data.username, role: data.role, token: data.token }));
     hideLoginModal();
     applyUnlock(data.username, data.role, data.token);
+    // Directly set admin tab — data.role comes fresh from server at login time
+    const _atLogin = document.getElementById('tab-admin');
+    if (_atLogin) _atLogin.style.display = data.role === 'admin' ? 'flex' : 'none';
     notify('🐾', 'Welcome back, ' + data.username + '!');
   } catch(e) {
     setLoginMsg('😾 COULD NOT REACH SERVER', true);
@@ -3979,6 +4213,9 @@ async function doRegister() {
     parsed.role = freshRole;
     localStorage.setItem(SESSION_KEY, JSON.stringify(parsed));
     applyUnlock(username, freshRole, token);
+    // Explicitly sync admin tab after applyUnlock — belt and braces
+    const _at = document.getElementById('tab-admin');
+    if (_at) _at.style.display = freshRole === 'admin' ? 'flex' : 'none';
   } catch(e) {
     // Offline fallback — use cached role temporarily, recheck when back online
     const cachedRole = parsed.role || 'user';
@@ -4658,7 +4895,7 @@ let _notifications  = [];
 function startNotifPolling() {
   stopNotifPolling();
   // Poll every 30 seconds for new notifications
-  _notifPollTimer = setInterval(fetchNotifications, 30000);
+  // admin notifs handled by heartbeat
 }
 
 function stopNotifPolling() {
@@ -6469,10 +6706,7 @@ async function checkPromoHash() {
 
 // Run on load
 window.addEventListener('DOMContentLoaded', () => {
-  // Recheck admin role — run at 500ms, 2s, and 5s to handle slow deploys
-  setTimeout(recheckAdminRole, 500);
-  setTimeout(recheckAdminRole, 2000);
-  setTimeout(recheckAdminRole, 5000);
+  // recheckAdminRole called directly from autoLogin after verify succeeds
   const hash = window.location.hash;
   if (hash.startsWith('#playlist=') || hash.startsWith('#promo=') || hash.startsWith('#p=')) {
     checkPromoHash();
@@ -6765,49 +6999,70 @@ function cacheSet(key, val) {
 function cacheGet(key)      { if (!key) return null; try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
 
 // ── Background sync — poll cloud every 60s while logged in ──
-let _bgSyncTimer = null;
-function startBgSync() {
-  stopBgSync();
-  _bgSyncTimer = setInterval(async () => {
-    if (!currentUser?.token || !document.hasFocus()) return;
-    try {
-      const { ok, data } = await api('GET', '/playlist', null);
-      if (!ok) return;
-      // Playlist — update if cloud has more tracks
-      if (Array.isArray(data.playlist) && data.playlist.length > playlist.length) {
-        playlist = data.playlist;
-        cacheSet(CACHE_PLAYLIST(), playlist);
-        if (!_animPaused) renderPlaylist();
-        notify('☁️', 'Playlist updated from cloud!');
-      }
-      if (Array.isArray(data.promoPlaylists) && data.promoPlaylists.length !== promoPlaylists.length) {
-        promoPlaylists = data.promoPlaylists;
-        cacheSet(CACHE_PROMO_PL(), promoPlaylists);
-      }
-      if (Array.isArray(data.contacts) && data.contacts.length !== contacts.length) {
-        contacts = data.contacts;
-        cacheSet(CACHE_CONTACTS(), contacts);
-        selectedContacts = new Set(contacts.map((_,i) => i));
-        renderContacts();
-      }
-      // Inbox — always check, not just when on player tab
-      if (Array.isArray(data.inbox)) {
-        const newCount = data.inbox.filter(t => !t.listened).length;
-        const oldCount = inbox.filter(t => !t.listened).length;
-        const hasNew = data.inbox.length > inbox.length || newCount > oldCount;
-        inbox = data.inbox;
-        if (hasNew) {
-          notify('📬', (newCount - oldCount > 0 ? (newCount - oldCount) : 1) + ' new track' + (newCount - oldCount !== 1 ? 's' : '') + ' in your inbox!');
-        }
-        updateInboxBadge();
-        if (playlistMode === 'inbox') renderInbox();
-      }
-    } catch(e) { /* offline — ignore */ }
-  }, 15000); // every 15 seconds — inbox needs to feel responsive
+// ── UNIFIED HEARTBEAT — replaces all separate polling timers ──
+let _heartbeatTimer = null;
+let _bgSyncTimer = null; // kept for compat
+
+function startBgSync() { startHeartbeat(); } // legacy alias
+function stopBgSync()  { stopHeartbeat(); }
+
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeat(); // fire immediately on start
+  _heartbeatTimer = setInterval(heartbeat, 10000); // every 10s
 }
-function stopBgSync() {
+
+function stopHeartbeat() {
+  clearInterval(_heartbeatTimer);
   clearInterval(_bgSyncTimer);
-  _bgSyncTimer = null;
+  _heartbeatTimer = null;
+}
+
+async function heartbeat() {
+  if (!currentUser?.token) return;
+
+  // Run playlist sync + user notifs in parallel
+  await Promise.allSettled([
+    syncPlaylistData(),
+    fetchUserNotifications(),
+    _currentChatUser ? fetchChatMessages() : Promise.resolve(),
+    _activeNotifTab === 'messages' && document.getElementById('notif-panel')?.classList.contains('open')
+      ? loadConvoList() : Promise.resolve()
+  ]);
+}
+
+async function syncPlaylistData() {
+  try {
+    const { ok, data } = await api('GET', '/playlist', null);
+    if (!ok) return;
+    // Playlist
+    if (Array.isArray(data.playlist) && data.playlist.length > playlist.length) {
+      playlist = data.playlist;
+      cacheSet(CACHE_PLAYLIST(), playlist);
+      if (!_animPaused) renderPlaylist();
+      notify('☁️', 'Playlist updated from cloud!');
+    }
+    if (Array.isArray(data.promoPlaylists) && data.promoPlaylists.length !== promoPlaylists.length) {
+      promoPlaylists = data.promoPlaylists;
+      cacheSet(CACHE_PROMO_PL(), promoPlaylists);
+    }
+    if (Array.isArray(data.contacts) && data.contacts.length !== contacts.length) {
+      contacts = data.contacts;
+      cacheSet(CACHE_CONTACTS(), contacts);
+      selectedContacts = new Set(contacts.map((_,i) => i));
+      renderContacts();
+    }
+    // Inbox
+    if (Array.isArray(data.inbox)) {
+      const newCount = data.inbox.filter(t => !t.listened).length;
+      const oldCount = inbox.filter(t => !t.listened).length;
+      const hasNew   = data.inbox.length > inbox.length || newCount > oldCount;
+      inbox = data.inbox;
+      if (hasNew) notify('📬', (newCount - oldCount > 0 ? (newCount - oldCount) : 1) + ' new track' + (newCount - oldCount !== 1 ? 's' : '') + ' in your inbox!');
+      updateInboxBadge();
+      if (playlistMode === 'inbox') renderInbox();
+    }
+  } catch(e) { /* offline */ }
 }
 
 // Called once after login — pulls everything from the Worker
@@ -6998,12 +7253,28 @@ function renderInbox() {
       <div class="inbox-artist">${esc(t.artist)}${t.album ? ' · ' + esc(t.album) : ''}</div>
       ${t.note ? `<div class="inbox-note">"${esc(t.note)}"</div>` : ''}
       <div class="inbox-meta">
-        <span>FROM: ${esc(t.senderName || 'Anonymous')}</span>
-        ${t.senderEmail ? `<span>${esc(t.senderEmail)}</span>` : ''}
+        <span>FROM: ${esc(t.senderName || t.senderUsername || 'Anonymous')}</span>
         ${t.genre ? `<span>${esc(t.genre.toUpperCase())}</span>` : ''}
         ${t.bpm ? `<span>${t.bpm} BPM</span>` : ''}
-        <span>${new Date(t.receivedAt || Date.now()).toLocaleDateString()}</span>
+        <span>${new Date(t.submittedAt || t.receivedAt || Date.now()).toLocaleDateString()}</span>
       </div>
+      <!-- Permission badge -->
+      ${(() => {
+        const p = t.permission || 'stream';
+        const badge = p === 'free'     ? '🎁 FREE DOWNLOAD'
+                    : p === 'download' ? '⬇ DOWNLOAD ALLOWED'
+                    :                   '🎧 STREAM ONLY';
+        const col   = p === 'free'     ? '#ffdd44'
+                    : p === 'download' ? '#88ddff'
+                    :                   '#556655';
+        return `<div style="font-family:'Press Start 2P',monospace;font-size:4px;color:${col};margin-top:3px;letter-spacing:.3px;">${badge}</div>`;
+      })()}
+      <!-- Download links if permitted -->
+      ${(t.permission === 'download' || t.permission === 'free') ? `
+        <div class="inbox-actions" style="margin-top:4px;">
+          ${t.wavLink ? `<a class="pl-bar-btn" style="font-size:5px;padding:2px 6px;color:#88ddff;text-decoration:none;" href="${esc(t.wavLink)}" target="_blank" download>⬇ WAV</a>` : ''}
+          ${t.mp3Link ? `<a class="pl-bar-btn" style="font-size:5px;padding:2px 6px;color:#88ddff;text-decoration:none;" href="${esc(t.mp3Link)}" target="_blank" download>⬇ MP3</a>` : ''}
+        </div>` : ''}
       <div class="inbox-actions">
         <button class="pl-bar-btn" style="font-size:5px;padding:2px 6px;"
           onclick="event.stopPropagation();acceptInboxTrack(${i})">✅ ADD TO MY TRACKS</button>
@@ -7596,6 +7867,63 @@ function downloadEPK() {
     <div style="display:flex;gap:6px;">
       <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">📬 DROP TO INBOX</button>
       <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DROP PERMISSIONS MODAL ── -->
+<div class="drop-perm-overlay" id="drop-perm-overlay">
+  <div class="drop-perm-box">
+    <div class="drop-perm-hdr">
+      <span>📬 SET PERMISSIONS &amp; DROP</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeDropPerm()">✕</button>
+    </div>
+    <div class="drop-perm-body">
+      <div class="drop-perm-track" id="drop-perm-track"></div>
+      <div class="drop-perm-to" id="drop-perm-to"></div>
+
+      <div class="drop-perm-section">🔒 DOWNLOAD PERMISSIONS</div>
+
+      <div class="perm-option selected" id="perm-opt-stream" onclick="selectPerm('stream')">
+        <div class="perm-radio" id="perm-radio-stream"></div>
+        <div>
+          <span class="perm-label">🎧 STREAM ONLY</span>
+          <span class="perm-desc">Recipient can listen but cannot download</span>
+        </div>
+      </div>
+
+      <div class="perm-option" id="perm-opt-download" onclick="selectPerm('download')">
+        <div class="perm-radio" id="perm-radio-download"></div>
+        <div>
+          <span class="perm-label">⬇ DOWNLOAD ALLOWED</span>
+          <span class="perm-desc">Share WAV / MP3 download links if set</span>
+        </div>
+      </div>
+
+      <div class="perm-option" id="perm-opt-free" onclick="selectPerm('free')">
+        <div class="perm-radio" id="perm-radio-free"></div>
+        <div>
+          <span class="perm-label">🎁 FREE DOWNLOAD</span>
+          <span class="perm-desc">Recipient gets full download access</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="drop-perm-section">✏️ NOTE (OPTIONAL)</div>
+        <textarea class="finput" id="drop-perm-note"
+          placeholder="Add a note to the recipient..."
+          style="font-size:16px;min-height:60px;"
+          autocorrect="off" spellcheck="false"></textarea>
+      </div>
+
+      <div class="drop-perm-actions">
+        <button class="sub-btn" style="margin-top:0;flex:1;" onclick="confirmDropTrack()">
+          📬 DROP TO INBOX
+        </button>
+        <button class="back-btn" style="margin-top:0;flex:0;width:auto;padding:10px 14px;" onclick="closeDropPerm()">
+          CANCEL
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -8253,7 +8581,7 @@ function renderDropPicker(picker, t, trackIdx) {
         <div class="drop-picker-user">
           <div class="drop-picker-uname">@${esc(c.username)}</div>
           <button class="drop-picker-send"
-            onclick="dropTrackTo('${esc(c.username)}',${trackIdx});event.stopPropagation();">
+            onclick="openDropPerm('${esc(c.username)}','${esc(c.name||c.username)}',${trackIdx});event.stopPropagation();">
             📬 DROP
           </button>
         </div>`).join('')
@@ -8268,19 +8596,82 @@ function renderDropPicker(picker, t, trackIdx) {
     '<div class="drop-picker-list">' + listHtml + '</div>';
 }
 
-async function dropTrackTo(username, trackIdx) {
+// ── Drop permissions state ──
+let _dropPermUsername  = null;
+let _dropPermTrackIdx  = null;
+let _dropPermSelected  = 'stream';
+
+function openDropPerm(username, displayName, trackIdx) {
+  closeDropPicker();
   const t = playlist[trackIdx];
   if (!t) return;
-  closeDropPicker();
+  _dropPermUsername = username;
+  _dropPermTrackIdx = trackIdx;
+  _dropPermSelected = 'stream';
+
+  document.getElementById('drop-perm-track').textContent = t.title + ' — ' + t.artist;
+  document.getElementById('drop-perm-to').textContent    = 'TO: @' + username;
+  document.getElementById('drop-perm-note').value        = '';
+
+  // Hide download options if track has no download links
+  const hasLinks = !!(t.wavLink || t.mp3Link);
+  document.getElementById('perm-opt-download').style.display = hasLinks ? '' : 'none';
+  document.getElementById('perm-opt-free').style.display     = hasLinks ? '' : 'none';
+
+  selectPerm('stream');
+  document.getElementById('drop-perm-overlay').classList.add('open');
+}
+
+function selectPerm(type) {
+  _dropPermSelected = type;
+  ['stream','download','free'].forEach(p => {
+    document.getElementById('perm-opt-' + p)?.classList.toggle('selected', p === type);
+  });
+}
+
+function closeDropPerm() {
+  document.getElementById('drop-perm-overlay').classList.remove('open');
+  _dropPermUsername = null;
+  _dropPermTrackIdx = null;
+}
+
+async function confirmDropTrack() {
+  if (!_dropPermUsername || _dropPermTrackIdx === null) return;
+  const t = playlist[_dropPermTrackIdx];
+  if (!t) return;
+  const note = document.getElementById('drop-perm-note').value.trim();
+  const perm = _dropPermSelected;
+  closeDropPerm();
+  await dropTrackTo(_dropPermUsername, _dropPermTrackIdx, perm, note);
+}
+
+async function dropTrackTo(username, trackIdx, permission, note) {
+  const t = playlist[trackIdx];
+  if (!t) return;
+  permission = permission || 'stream';
+  note       = note || '';
+
+  // Build payload — only share download links if permission allows
+  const allowDownload = permission === 'download' || permission === 'free';
   try {
     const { ok, data } = await api('POST', '/submit-track/' + username, {
-      url: t.url, title: t.title, artist: t.artist,
-      album: t.album || '', year: t.year || '',
-      bpm: t.bpm || 0, genre: t.genre || '',
-      note: ''
+      url:      t.url,
+      title:    t.title,
+      artist:   t.artist,
+      album:    t.album  || '',
+      year:     t.year   || '',
+      bpm:      t.bpm    || 0,
+      genre:    t.genre  || '',
+      note,
+      permission,
+      wavLink:  allowDownload ? (t.wavLink || '') : '',
+      mp3Link:  allowDownload ? (t.mp3Link || '') : '',
     });
     if (!ok) { notify('😾', data.error || 'Could not drop track'); return; }
-    notify('📬', '"' + t.title + '" dropped into @' + username + '\'s inbox!');
+    const permLabel = permission === 'stream' ? '🎧 stream only'
+                    : permission === 'download' ? '⬇ download allowed'
+                    : '🎁 free download';
+    notify('📬', '"' + t.title + '" dropped to @' + username + ' (' + permLabel + ')');
   } catch(e) { notify('😾', 'Server unreachable'); }
 }
 
@@ -8448,6 +8839,7 @@ function renderConnectAccepted(following) {
       </div>
       <span class="follower-status accepted">🟢 CONNECTED</span>
       <div class="follower-actions">
+        <button class="soc-btn push" onclick="openChat('${esc(f.username)}','${esc(f.displayName||f.name||f.username)}')">💬 CHAT</button>
         <button class="soc-btn push" onclick="openPushTrack('${esc(f.username)}','${esc(f.name||f.username)}')">📬 DROP TRACK</button>
         <button class="soc-btn remove" onclick="removeFollower('${esc(f.username)}')">✕</button>
       </div>
@@ -8499,10 +8891,7 @@ async function fetchUserNotifications() {
   } catch(e) {}
 }
 
-function startUserNotifPolling() {
-  if (_userNotifPollTimer) clearInterval(_userNotifPollTimer);
-  _userNotifPollTimer = setInterval(fetchUserNotifications, 15000);
-}
+function startUserNotifPolling() { /* handled by heartbeat */ }
 
 function renderUserNotifList() {
   // Merge with admin notifs if admin, otherwise just user notifs
@@ -8620,6 +9009,228 @@ async function clearAllUserNotifs() {
     updateBellBadge(0);
   } catch(e) {}
 }
+
+
+// ═══════════════════════════════════════════════════════
+// CHAT SYSTEM
+// ═══════════════════════════════════════════════════════
+
+let _currentChatUser   = null;  // username of open chat
+let _currentChatName   = null;  // display name
+let _chatPollTimer     = null;
+let _chatMessages      = [];
+let _convos            = [];    // conversation list
+let _activeNotifTab    = 'messages';
+
+// ── Tab switching in notif panel ──
+function switchNotifTab(tab) {
+  _activeNotifTab = tab;
+  document.getElementById('ntab-messages').classList.toggle('active', tab === 'messages');
+  document.getElementById('ntab-alerts').classList.toggle('active', tab === 'alerts');
+  document.getElementById('notif-tab-messages').style.display = tab === 'messages' ? '' : 'none';
+  document.getElementById('notif-tab-alerts').style.display   = tab === 'alerts'   ? '' : 'none';
+  if (tab === 'messages') loadConvoList();
+}
+
+// ── Load conversation list ──
+async function loadConvoList() {
+  if (!currentUser) return;
+  try {
+    const { ok, data } = await api('GET', '/chat-list', null);
+    if (!ok) return;
+    _convos = data.convos || [];
+    renderConvoList();
+    // Update chat badge
+    const totalUnread = _convos.reduce((s, c) => s + (c.unread || 0), 0);
+    const badge = document.getElementById('chat-badge');
+    if (badge) {
+      badge.textContent = totalUnread;
+      badge.style.display = totalUnread > 0 ? 'inline' : 'none';
+    }
+    updateBellBadge(totalUnread + _userNotifications.filter(n => !n.read).length);
+  } catch(e) {}
+}
+
+function renderConvoList() {
+  const el = document.getElementById('notif-tab-messages');
+  if (!el) return;
+  if (!_convos.length) {
+    el.innerHTML = '<div class="notif-empty">NO MESSAGES YET<br><br>CONNECT WITH USERS<br>TO START CHATTING</div>';
+    return;
+  }
+  el.innerHTML = _convos.map(c => `
+    <div class="convo-item" onclick="openChat('${esc(c.username)}','${esc(c.displayName||c.username)}')">
+      <div style="flex:1;min-width:0;">
+        <div class="convo-name">${esc(c.displayName || c.username)}</div>
+        <div class="convo-preview">${c.lastMessage
+          ? (c.lastMessage.from === currentUser.username ? 'You: ' : '') + esc(c.lastMessage.text)
+          : 'No messages yet — say hi!'}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right;">
+        ${c.unread > 0 ? `<span class="convo-unread">${c.unread}</span>` : ''}
+        ${c.lastMessage ? `<div style="font-family:VT323,monospace;font-size:12px;color:var(--border-lo);margin-top:3px;">${timeAgo(c.lastMessage.at)}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── Open a chat conversation ──
+async function openChat(username, displayName) {
+  _currentChatUser = username;
+  _currentChatName = displayName || username;
+  document.getElementById('chat-hdr-name').textContent = _currentChatName.toUpperCase();
+  document.getElementById('chat-window').classList.add('open');
+  // Close notif panel
+  document.getElementById('notif-panel').classList.remove('open');
+  await fetchChatMessages();
+  startChatPoll();
+}
+
+async function fetchChatMessages() {
+  if (!_currentChatUser) return;
+  try {
+    const { ok, data } = await api('GET', '/chat/' + _currentChatUser, null);
+    if (!ok) return;
+    _chatMessages = data.messages || [];
+    renderChatMessages();
+    // Refresh convo list unread counts
+    loadConvoList();
+  } catch(e) {}
+}
+
+function renderChatMessages() {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  if (!_chatMessages.length) {
+    el.innerHTML = '<div class="chat-empty">NO MESSAGES YET<br>SAY SOMETHING!</div>';
+    return;
+  }
+  el.innerHTML = _chatMessages.map(m => {
+    const mine = m.from === currentUser.username;
+    return `
+    <div class="chat-msg ${mine ? 'mine' : 'theirs'}">
+      <div class="chat-msg-text">${esc(m.text)}</div>
+      <div class="chat-msg-meta">${mine ? 'you' : esc(m.from)} · ${timeAgo(m.at)}</div>
+    </div>`;
+  }).join('');
+  // Scroll to bottom
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || !_currentChatUser) return;
+  input.value = '';
+  // Optimistic local add
+  _chatMessages.push({ from: currentUser.username, to: _currentChatUser, text, at: Date.now(), read: false });
+  renderChatMessages();
+  try {
+    await api('POST', '/chat/' + _currentChatUser, { text });
+  } catch(e) { notify('😾', 'Could not send message'); }
+}
+
+function startChatPoll() { /* handled by heartbeat */ }
+
+function closeChatWindow() {
+  document.getElementById('chat-window').classList.remove('open');
+  if (_chatPollTimer) clearInterval(_chatPollTimer);
+  _currentChatUser = null;
+}
+
+function minimizeChatWindow() {
+  document.getElementById('chat-window').classList.remove('open');
+  if (_chatPollTimer) clearInterval(_chatPollTimer);
+  // Keep _currentChatUser so user can re-open
+}
+
+// ── Open chat from notification ──
+function openChatFromNotif(fromUser) {
+  openChat(fromUser, fromUser);
+}
+
+// ── Add "OPEN CHAT" button to chat notifications in the alerts tab ──
+// Extend renderUserNotifList to handle chat type
+const _prevRenderUserNotifList = renderUserNotifList;
+renderUserNotifList = function() {
+  _prevRenderUserNotifList();
+  // Add chat open buttons to chat notifications in alerts
+  // (handled inline in the render now — we patch the alerts tab content)
+  const alertsEl = document.getElementById('notif-tab-alerts');
+  if (!alertsEl) return;
+  // Render alerts into the nested notif-list inside the alerts tab
+  const el = alertsEl.querySelector('#notif-list') || alertsEl;
+  if (!_userNotifications.length && (!currentUser || currentUser.role !== 'admin' || !_notifications.length)) {
+    el.innerHTML = '<div class="notif-empty">NO ALERTS YET</div>';
+    return;
+  }
+  const adminNotifs = currentUser?.role === 'admin' ? _notifications : [];
+  const allAlerts = [..._userNotifications, ...adminNotifs].sort((a,b)=>(b.at||0)-(a.at||0));
+
+  el.innerHTML = allAlerts.map(n => {
+    const isRequest  = n.type === 'access_request';
+    const isGranted  = n.type === 'access_granted';
+    const isChat     = n.type === 'chat';
+    const isTrack    = n.type === 'track_submitted';
+    const isCodeUsed = n.type === 'new_user';
+
+    let border = '';
+    if (isRequest)  border = 'border-left:3px solid var(--cat-orange);';
+    if (isGranted)  border = 'border-left:3px solid #44ff88;';
+    if (isChat)     border = 'border-left:3px solid #88ddff;';
+    if (isTrack)    border = 'border-left:3px solid #88ddff;';
+    if (isCodeUsed) border = 'border-left:3px solid #44ff88;';
+
+    const actions = isRequest && n.fromUser ? `
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button class="soc-btn accept" style="font-size:6px;padding:5px 10px;"
+          onclick="acceptConnectFromNotif('${esc(n.fromUser)}','${esc(n.id||'')}')">✅ ACCEPT</button>
+        <button class="soc-btn decline" style="font-size:6px;padding:5px 10px;"
+          onclick="declineConnectFromNotif('${esc(n.fromUser)}','${esc(n.id||'')}')">✕ DECLINE</button>
+      </div>` : '';
+
+    const chatBtn = isChat && n.fromUser ? `
+      <button style="font-family:'Press Start 2P',monospace;font-size:5px;color:#88ddff;background:none;border:1px solid #005588;padding:3px 7px;cursor:pointer;margin-top:6px;"
+        onclick="openChat('${esc(n.fromUser)}','${esc(n.fromUser)}')">💬 OPEN CHAT</button>` : '';
+
+    const inboxBtn = isTrack ? `
+      <button style="font-family:'Press Start 2P',monospace;font-size:5px;color:#88ddff;background:none;border:1px solid #005588;padding:3px 7px;cursor:pointer;margin-top:6px;"
+        onclick="setPlaylistMode('inbox');switchTab('player');toggleNotifPanel();">📬 VIEW INBOX</button>` : '';
+
+    const codeExtra = isCodeUsed && n.usedCode
+      ? `<div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;letter-spacing:4px;margin-top:4px;">CODE: ${esc(n.usedCode)}</div>` : '';
+
+    return `
+    <div class="notif-item${n.read ? '' : ' unread'}" style="${border}">
+      <div class="notif-item-icon">${n.icon || '🔔'}</div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">${esc(n.title || '')}</div>
+        <div class="notif-item-sub">${esc(n.body || '')}</div>
+        ${codeExtra}${actions}${chatBtn}${inboxBtn}
+      </div>
+      <div class="notif-item-time">${timeAgo(n.at || Date.now())}</div>
+    </div>`;
+  }).join('') || '<div class="notif-empty">NO ALERTS YET</div>';
+};
+
+// ── Load convos when bell opens ──
+const _prevToggleNotifPanel = toggleNotifPanel;
+toggleNotifPanel = function() {
+  _prevToggleNotifPanel();
+  const panel = document.getElementById('notif-panel');
+  if (panel.classList.contains('open')) {
+    if (_activeNotifTab === 'messages') loadConvoList();
+    else renderUserNotifList();
+  }
+};
+
+// ── Also poll chat convos every 15s via bgSync ──
+// (handled by existing bgSync + fetchUserNotifications)
+
+
+// ── Fire heartbeat immediately when user returns to tab ──
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentUser?.token) heartbeat();
+});
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
 
@@ -8971,6 +9582,63 @@ window.addEventListener('pagehide', () => {
     <div style="display:flex;gap:6px;">
       <button class="settings-save-btn" onclick="doPushTrack()" style="flex:1;">📬 DROP TO INBOX</button>
       <button class="back-btn" onclick="document.getElementById('push-track-overlay').classList.remove('show')" style="flex:0;">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DROP PERMISSIONS MODAL ── -->
+<div class="drop-perm-overlay" id="drop-perm-overlay">
+  <div class="drop-perm-box">
+    <div class="drop-perm-hdr">
+      <span>📬 SET PERMISSIONS &amp; DROP</span>
+      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeDropPerm()">✕</button>
+    </div>
+    <div class="drop-perm-body">
+      <div class="drop-perm-track" id="drop-perm-track"></div>
+      <div class="drop-perm-to" id="drop-perm-to"></div>
+
+      <div class="drop-perm-section">🔒 DOWNLOAD PERMISSIONS</div>
+
+      <div class="perm-option selected" id="perm-opt-stream" onclick="selectPerm('stream')">
+        <div class="perm-radio" id="perm-radio-stream"></div>
+        <div>
+          <span class="perm-label">🎧 STREAM ONLY</span>
+          <span class="perm-desc">Recipient can listen but cannot download</span>
+        </div>
+      </div>
+
+      <div class="perm-option" id="perm-opt-download" onclick="selectPerm('download')">
+        <div class="perm-radio" id="perm-radio-download"></div>
+        <div>
+          <span class="perm-label">⬇ DOWNLOAD ALLOWED</span>
+          <span class="perm-desc">Share WAV / MP3 download links if set</span>
+        </div>
+      </div>
+
+      <div class="perm-option" id="perm-opt-free" onclick="selectPerm('free')">
+        <div class="perm-radio" id="perm-radio-free"></div>
+        <div>
+          <span class="perm-label">🎁 FREE DOWNLOAD</span>
+          <span class="perm-desc">Recipient gets full download access</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="drop-perm-section">✏️ NOTE (OPTIONAL)</div>
+        <textarea class="finput" id="drop-perm-note"
+          placeholder="Add a note to the recipient..."
+          style="font-size:16px;min-height:60px;"
+          autocorrect="off" spellcheck="false"></textarea>
+      </div>
+
+      <div class="drop-perm-actions">
+        <button class="sub-btn" style="margin-top:0;flex:1;" onclick="confirmDropTrack()">
+          📬 DROP TO INBOX
+        </button>
+        <button class="back-btn" style="margin-top:0;flex:0;width:auto;padding:10px 14px;" onclick="closeDropPerm()">
+          CANCEL
+        </button>
+      </div>
     </div>
   </div>
 </div>
