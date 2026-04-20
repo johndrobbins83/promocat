@@ -651,13 +651,15 @@ body.disco-mode .disco-ball-wrap { display: flex; }
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
-@media (min-width: 900px) { .pl-list { max-height:420px; }
-  .pl-title  { font-size:20px !important; }
-  .pl-artist { font-size:16px !important; }
-  .pl-num    { font-size:10px !important; min-width:28px !important; }
-  .pl-badge  { font-size:7px !important; padding:3px 5px !important; }
-  .avail-badge { font-size:7px !important; padding:3px 5px !important; }
-  .pl-bar-title, .pl-count { font-size:10px !important; }
+@media (min-width: 900px) { .pl-list { max-height: calc(100vh - 540px); min-height: 300px; }
+  .pl-item   { padding: 12px 18px !important; min-height: 56px !important; }
+  .pl-title  { font-size: 22px !important; }
+  .pl-artist { font-size: 17px !important; }
+  .pl-num    { font-size: 11px !important; min-width: 32px !important; }
+  .pl-badge  { font-size: 7px !important; padding: 3px 5px !important; }
+  .avail-badge { font-size: 7px !important; padding: 3px 5px !important; }
+  .pl-bar-title, .pl-count { font-size: 10px !important; }
+  .pl-expand-btn { font-size: 8px !important; padding: 7px 12px !important; }
   .pl-bar    { padding: 8px 16px; }
   .pl-foot   { padding: 8px 16px; }
   .pl-item   { padding: 10px 18px; gap:14px; min-height: 52px; }
@@ -3071,6 +3073,11 @@ body.rave-mode .lcd-art img {
 @media (min-width: 900px) {
   .people-subtab { font-size: 8px; padding: 12px 16px; }
 }
+
+/* Hide track count on mobile, show on desktop */
+@media (min-width: 900px) {
+  #pl-count { display: inline !important; }
+}
 </style>
 </head>
 <body>
@@ -3394,17 +3401,18 @@ body.rave-mode .lcd-art img {
 
       <!-- Playlist -->
       <div class="pl-section">
-        <!-- ROW 1: MY TRACKS / PROMOS mode buttons -->
-        <div class="pl-bar" style="padding:6px 8px;gap:8px;border-bottom:1px solid var(--border-lo);">
-          <div class="pl-mode-btns">
+        <!-- PLAYLIST BAR: all controls on one row -->
+        <div class="pl-bar" style="padding:5px 8px;gap:6px;border-bottom:1px solid var(--border-lo);flex-wrap:nowrap;">
+          <div class="pl-mode-btns" style="flex-shrink:0;">
             <button class="pl-mode-btn active" id="mode-btn-my" onclick="setPlaylistMode('my')" data-tip="YOUR OWN TRACKS">🐾 MY TRACKS</button>
             <button class="pl-mode-btn" id="mode-btn-inbox" onclick="setPlaylistMode('inbox')" data-tip="PROMOS SENT TO YOU">📬 PROMOS <span id="inbox-badge" style="display:none;color:#ff8844;">●</span></button>
           </div>
-          <span class="pl-count" id="pl-count" style="margin-left:auto;">0 TRACKS</span>
-          <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗 COPY URL</button>
-          <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬 LINK</button>
+          <button class="pl-bar-btn pl-bar-btn-copy" id="copy-url-btn" onclick="copyFullPlaylistUrl()" data-tip="COPY SHAREABLE URL">🔗</button>
+          <button class="pl-bar-btn pl-bar-btn-copy" id="inbox-url-btn" onclick="copyInboxUrl()" data-tip="COPY SUBMIT LINK" style="display:none;">📬</button>
           <button class="pl-bar-btn pl-bar-btn-copy" id="refresh-btn" onclick="refreshFromCloud()" data-tip="REFRESH FROM CLOUD">↻</button>
           <button class="pl-bar-btn pl-bar-btn-copy admin-only-btn" onclick="purgeGhostTracks()" style="display:none;color:#ff8844;">🧹</button>
+          <span class="pl-count" id="pl-count" style="margin-left:auto;display:none;">0 TRACKS</span>
+          <button class="pl-expand-btn" onclick="openPlPopout()" data-tip="EXPAND PLAYLIST">⛶ EXPAND</button>
         </div>
         <!-- ROW 2: Filter bar -->
         <div class="filter-bar" id="pl-filter-bar">
