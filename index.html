@@ -2890,16 +2890,42 @@ body.rave-mode .lcd-art img {
   margin-top: 10px;
 }
 
-/* ── DESKTOP PLAYER — single column ── */
+/* ── DESKTOP PLAYER — two column: controls left, playlist right ── */
 @media (min-width: 900px) {
   #panel-player.active {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    overflow: hidden;
   }
   .player-body {
-    width: 100%;
-    border-right: none;
-    padding: 18px 24px 16px;
+    width: 400px;
+    flex-shrink: 0;
+    border-right: 2px solid var(--border-lo);
+    padding: 16px 18px 14px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Scale down player elements to fit the column */
   }
+  /* Scale player components to fit 400px column */
+  .player-body .cat-deco  { padding: 2px 0 6px; }
+  .player-body .lcd       { height: 110px !important; padding: 12px 16px !important; margin-bottom: 10px !important; }
+  .player-body .lcd-title { font-size: 22px !important; height: 26px !important; }
+  .player-body .lcd-meta  { font-size: 20px !important; }
+  .player-body .lcd-time  { font-size: 20px !important; }
+  .player-body .vis       { height: 80px !important; margin-bottom: 10px !important; }
+  .player-body .seek      { height: 16px !important; margin-bottom: 10px !important; }
+  .player-body .sliders   { margin-bottom: 10px !important; }
+  .player-body .transport { gap: 6px !important; margin-bottom: 10px !important; }
+  .player-body .t-prev, .player-body .t-next  { width: 60px !important; height: 48px !important; }
+  .player-body .t-play                        { width: 72px !important; height: 48px !important; }
+  .player-body .t-pause, .player-body .t-stop { width: 60px !important; height: 48px !important; }
+  .player-body .admin-unlocked .t-eject       { width: 52px !important; height: 48px !important; }
+  .player-body .tbtn svg  { width: 24px !important; height: 24px !important; }
+  .player-body .modes     { gap: 6px !important; margin-bottom: 8px !important; flex-wrap: wrap !important; }
+  .player-body .mbtn      { font-size: 8px !important; padding: 7px 10px !important; }
+  .player-body .cat-svg   { width: 100px !important; height: 78px !important; }
+  .player-body .promocat-text { font-size: 42px !important; letter-spacing: 2px !important; }
+  .player-body .promocat-the  { font-size: 14px !important; }
   .pl-section {
     flex: 1;
     min-width: 0;
@@ -2907,6 +2933,15 @@ body.rave-mode .lcd-art img {
     flex-direction: column;
     overflow: hidden;
   }
+}
+@media (min-width: 1280px) {
+  .player-body { width: 440px; }
+  .player-body .lcd       { height: 120px !important; }
+  .player-body .lcd-title { font-size: 26px !important; }
+  .player-body .vis       { height: 90px !important; }
+  .player-body .t-prev, .player-body .t-next  { width: 68px !important; height: 54px !important; }
+  .player-body .t-play                        { width: 82px !important; height: 54px !important; }
+  .player-body .t-pause, .player-body .t-stop { width: 68px !important; height: 54px !important; }
 }
 
 
@@ -3077,6 +3112,86 @@ body.rave-mode .lcd-art img {
 /* Hide track count on mobile, show on desktop */
 @media (min-width: 900px) {
   #pl-count { display: inline !important; }
+}
+
+/* ── NOW PLAYING INFO PANEL — desktop left column only ── */
+.now-playing-info {
+  display: none; /* hidden on mobile */
+}
+@media (min-width: 900px) {
+  .now-playing-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border-lo);
+    background: var(--vis-bg);
+    flex: 1; /* fills remaining column space */
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .npi-art-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 280px;
+    flex-shrink: 0;
+    background: #010805;
+    border: 1px solid var(--border-lo);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .npi-art {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .npi-art-placeholder {
+    font-size: 64px; opacity: .15;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; position: absolute; inset: 0;
+  }
+  .npi-details {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .npi-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px; color: var(--lcd-green);
+    line-height: 1.7; letter-spacing: .5px;
+    word-break: break-word;
+  }
+  .npi-artist {
+    font-family: 'VT323', monospace; font-size: 20px;
+    color: var(--cat-orange);
+  }
+  .npi-album {
+    font-family: 'VT323', monospace; font-size: 16px;
+    color: var(--border-lo);
+  }
+  .npi-tags {
+    display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px;
+  }
+  .npi-tag {
+    font-family: 'Press Start 2P', monospace; font-size: 5px;
+    color: var(--border-lo); border: 1px solid var(--border-lo);
+    padding: 3px 6px; white-space: nowrap;
+  }
+  .npi-tag.avail-available { color: #44ff88; border-color: #006622; }
+  .npi-tag.avail-signed    { color: #8888ff; border-color: #444488; }
+  .npi-tag.avail-freebie   { color: #ffdd44; border-color: #886600; }
+  .npi-tag.avail-bootleg   { color: #ff7744; border-color: #882200; }
+  .npi-links {
+    display: flex; flex-direction: column; gap: 5px; margin-top: 4px;
+  }
+  .npi-link {
+    font-family: 'Press Start 2P', monospace; font-size: 6px;
+    color: var(--lcd-green); border: 1px solid var(--border-lo);
+    padding: 7px 10px; text-decoration: none; text-align: center;
+    background: var(--btn-bg); transition: filter .1s;
+    display: block;
+  }
+  .npi-link:hover { filter: brightness(1.4); border-color: var(--cat-orange); }
 }
 </style>
 </head>
@@ -3396,6 +3511,20 @@ body.rave-mode .lcd-art img {
           <button class="mbtn rave-btn" id="btn-rave" onclick="toggleRaveMode()" data-tip="RAVE MODE" title="Rave Mode">🪩 RAVE</button>
         </div>
 
+        <!-- NOW PLAYING INFO — desktop only, shows below controls -->
+        <div class="now-playing-info" id="now-playing-info">
+          <div class="npi-art-wrap">
+            <div class="npi-art-placeholder" id="npi-art-placeholder">🎵</div>
+            <img class="npi-art" id="npi-art" src="" alt="" onerror="this.style.display='none';document.getElementById('npi-art-placeholder').style.display='flex';">
+          </div>
+          <div class="npi-details">
+            <div class="npi-title" id="npi-title">NO TRACK LOADED</div>
+            <div class="npi-artist" id="npi-artist"></div>
+            <div class="npi-album" id="npi-album"></div>
+            <div class="npi-tags" id="npi-tags"></div>
+            <div class="npi-links" id="npi-links"></div>
+          </div>
+        </div>
 
       </div>
 
@@ -5970,6 +6099,8 @@ function loadTrack(i) {
     setCatMouth(0);
   }
 
+  // Update now-playing info panel
+  updateNowPlayingInfo();
   // Resync rave loop and bob to new track's BPM instantly
   if (raveModeOn) {
     _ravePhase = 0;
@@ -10590,6 +10721,67 @@ function switchPeopleTab(name) {
   if (name === 'connect')  loadConnectTab();
   if (name === 'contacts') renderContactsTab();
   if (name === 'promo')    renderPromoTab();
+}
+
+
+// ── Update Now Playing info panel ──
+function updateNowPlayingInfo() {
+  const t = playlist[curIdx];
+  const titleEl  = document.getElementById('npi-title');
+  const artistEl = document.getElementById('npi-artist');
+  const albumEl  = document.getElementById('npi-album');
+  const tagsEl   = document.getElementById('npi-tags');
+  const linksEl  = document.getElementById('npi-links');
+  const artEl    = document.getElementById('npi-art');
+  const phEl     = document.getElementById('npi-art-placeholder');
+  if (!titleEl) return;
+
+  if (!t) {
+    titleEl.textContent  = 'NO TRACK LOADED';
+    artistEl.textContent = '';
+    albumEl.textContent  = '';
+    tagsEl.innerHTML     = '';
+    linksEl.innerHTML    = '';
+    if (artEl) { artEl.src = ''; artEl.style.display = 'none'; }
+    if (phEl)  phEl.style.display = 'flex';
+    return;
+  }
+
+  titleEl.textContent  = t.title;
+  artistEl.textContent = t.artist;
+  albumEl.textContent  = t.album && t.album !== 'Unknown Album' ? t.album : '';
+
+  // Tags
+  const tags = [];
+  if (t.bpm)    tags.push({ text: t.bpm + ' BPM', cls: '' });
+  if (t.genre)  tags.push({ text: t.genre.replace(/-/g,' ').toUpperCase(), cls: '' });
+  if (t.year)   tags.push({ text: t.year, cls: '' });
+  if (t.status) tags.push({ text: t.status.toUpperCase(), cls: '' });
+  if (t.avail && t.avail !== 'undecided') tags.push({ text: t.avail.toUpperCase(), cls: 'avail-' + t.avail });
+  tagsEl.innerHTML = tags.map(tg =>
+    `<span class="npi-tag ${tg.cls}">${esc(tg.text)}</span>`
+  ).join('');
+
+  // Links
+  const links = [];
+  if (t.buyLink) links.push({ text: '🛒 BUY / STREAM', href: t.buyLink });
+  if (t.wavLink) links.push({ text: '⬇ DOWNLOAD WAV', href: t.wavLink });
+  if (t.mp3Link) links.push({ text: '⬇ DOWNLOAD MP3', href: t.mp3Link });
+  if (t.email)   links.push({ text: '✉ CONTACT ARTIST', href: 'mailto:' + t.email });
+  linksEl.innerHTML = links.map(l =>
+    `<a class="npi-link" href="${esc(l.href)}" target="_blank" rel="noopener">${l.text}</a>`
+  ).join('');
+
+  // Art
+  if (t.artUrl) {
+    artEl.style.display = 'block';
+    artEl.src = t.artUrl;
+    if (phEl) phEl.style.display = 'none';
+  } else {
+    artEl.style.display = 'none';
+    artEl.src = '';
+    if (phEl) phEl.style.display = 'flex';
+  }
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
