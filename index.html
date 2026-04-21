@@ -3199,6 +3199,143 @@ body.rave-mode .lcd-art img {
   }
   .npi-link:hover { filter: brightness(1.4); border-color: var(--cat-orange); }
 }
+
+/* ── HELP TAB ── */
+.help-body { padding: 0; overflow-y: auto; flex: 1; }
+.help-hero {
+  background: linear-gradient(180deg, #041a0a, #020e06);
+  border-bottom: 2px solid var(--border-lo);
+  padding: 24px 20px 20px;
+  text-align: center;
+}
+.help-hero-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px; color: var(--cat-orange);
+  text-shadow: 0 0 12px rgba(255,140,66,.6);
+  margin-bottom: 8px; letter-spacing: 1px;
+}
+.help-hero-sub {
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: var(--lcd-green); letter-spacing: 1px;
+}
+.help-toc {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border-lo);
+  background: var(--pl-bar-bg);
+}
+.help-toc-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: var(--border-lo); background: var(--btn-bg);
+  border: 1px solid var(--border-lo); padding: 5px 8px;
+  cursor: pointer; white-space: nowrap; transition: all .15s;
+}
+.help-toc-btn:hover { color: var(--cat-orange); border-color: var(--cat-orange); }
+.help-sections { padding: 0 0 40px; }
+.help-section {
+  border-bottom: 1px solid var(--border-lo);
+}
+.help-section-hdr {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--cat-orange); padding: 14px 18px 12px;
+  background: #040f07; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  letter-spacing: .5px; user-select: none;
+}
+.help-section-hdr:hover { background: #071508; }
+.help-section-hdr .help-arrow { margin-left: auto; font-size: 10px; transition: transform .2s; }
+.help-section-body {
+  padding: 0 18px 16px; display: none;
+  font-family: 'VT323', monospace; font-size: 17px;
+  color: #88aa88; line-height: 1.7;
+}
+.help-section-body.open { display: block; }
+.help-section-body h4 {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--lcd-green); margin: 14px 0 6px; letter-spacing: .4px;
+}
+.help-section-body p { margin-bottom: 10px; }
+.help-section-body ul { padding-left: 18px; margin-bottom: 10px; }
+.help-section-body ul li { margin-bottom: 4px; }
+.help-tip {
+  background: #021408; border-left: 3px solid var(--cat-orange);
+  padding: 8px 12px; margin: 10px 0;
+  font-family: 'VT323', monospace; font-size: 16px; color: #aacc88;
+}
+.help-step {
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px;
+}
+.help-step-num {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--cat-orange); background: #0a1a06;
+  border: 1px solid var(--border-lo); padding: 4px 6px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.help-badge {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  padding: 2px 6px; border: 1px solid;
+  vertical-align: middle; margin: 0 2px;
+}
+.help-badge.green  { color: #44ff88; border-color: #006622; }
+.help-badge.orange { color: var(--cat-orange); border-color: #884400; }
+.help-badge.blue   { color: #88aaff; border-color: #334488; }
+.help-badge.grey   { color: #888888; border-color: #444444; }
+
+/* ── QUICK START MODAL ── */
+.quickstart-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.92);
+  z-index: 99999; display: none;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.quickstart-overlay.open { display: flex; }
+.quickstart-box {
+  background: var(--win-bg); border: 2px solid var(--border-hi);
+  width: 100%; max-width: 520px; max-height: 90vh;
+  overflow-y: auto; box-shadow: 0 0 40px rgba(68,221,136,.2);
+}
+.quickstart-hdr {
+  background: var(--title-grad); padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 2px solid var(--border-lo); flex-shrink: 0;
+}
+.quickstart-hdr-title {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: #fff8e0; letter-spacing: .5px;
+}
+.quickstart-slides { padding: 20px; }
+.quickstart-slide { display: none; }
+.quickstart-slide.active { display: block; }
+.quickstart-slide-icon { font-size: 36px; text-align: center; margin-bottom: 12px; }
+.quickstart-slide-title {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--cat-orange); margin-bottom: 12px; text-align: center;
+  line-height: 1.8;
+}
+.quickstart-slide-body {
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: #88aa88; line-height: 1.7;
+}
+.quickstart-slide-body p { margin-bottom: 8px; }
+.quickstart-slide-body ul { padding-left: 16px; }
+.quickstart-slide-body ul li { margin-bottom: 4px; }
+.quickstart-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 16px; border-top: 1px solid var(--border-lo);
+}
+.quickstart-dots { display: flex; gap: 6px; }
+.quickstart-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-lo); transition: background .2s;
+}
+.quickstart-dot.active { background: var(--cat-orange); }
+.quickstart-prev, .quickstart-next, .quickstart-done {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  padding: 8px 14px; cursor: pointer; border: 1px solid;
+}
+.quickstart-prev { color: var(--border-lo); border-color: var(--border-lo); background: none; }
+.quickstart-next, .quickstart-done { color: var(--lcd-green); border-color: var(--lcd-green); background: #001a08; }
+.quickstart-prev:hover { color: #fff; border-color: #fff; }
+.quickstart-next:hover, .quickstart-done:hover { background: #003310; }
 </style>
 </head>
 <body>
@@ -3233,6 +3370,7 @@ body.rave-mode .lcd-art img {
         </div>
         <div class="wbtn" id="wbtn-profile" data-tip="ARTIST PROFILE" onclick="wbtnProfile()" title="Artist Profile">👤</div>
         <div class="wbtn" id="wbtn-settings" data-tip="SETTINGS" onclick="wbtnSettings()" title="Settings">⚙</div>
+        <div class="wbtn" id="wbtn-help" data-tip="HELP" onclick="switchTab('help')" title="Help">?</div>
         <div class="wbtn" id="wbtn-close" data-tip="LOGIN / LOGOUT" onclick="wbtnClose()" title="Log Out / Login">×</div>
       </div>
     </div>
@@ -3646,8 +3784,26 @@ body.rave-mode .lcd-art img {
         <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
           <label class="flbl" for="f-audio-url">🎧 AUDIO STREAM LINK</label>
+          <!-- Upload to R2 button -->
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
+            <label class="sub-btn" id="r2-upload-label" style="padding:7px 12px;font-size:6px;cursor:pointer;display:inline-block;margin:0;">
+              ⬆ UPLOAD PRIVATE FILE
+              <input type="file" id="r2-file-input" accept=".mp3,.wav,.flac,.ogg,.aac,.m4a,.aiff,.aif,.opus" style="display:none;" onchange="uploadToR2(this)">
+            </label>
+            <span id="r2-upload-status" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);"></span>
+          </div>
+          <!-- Storage quota meter -->
+          <div id="r2-quota-wrap" style="display:none;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);">PRIVATE STORAGE</span>
+              <span id="r2-quota-text" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);"></span>
+            </div>
+            <div style="height:6px;background:#0a1a0a;border:1px solid var(--border-lo);overflow:hidden;">
+              <div id="r2-quota-bar" style="height:100%;background:var(--lcd-green);width:0%;transition:width .4s;"></div>
+            </div>
+          </div>
           <input class="finput" type="url" id="f-audio-url"
-                 placeholder="https://... direct link to audio file"
+                 placeholder="https://... or upload above for private files"
                  oninput="checkAudioUrl()">
           <div class="audio-url-status" id="audio-url-status"></div>
         </div>
@@ -4441,6 +4597,245 @@ Listen here: {link}
       </div>
     </div><!-- /panel-admin -->
 
+
+    <!-- ════════ HELP PANEL ════════ -->
+    <div class="tab-panel" id="panel-help">
+      <div class="help-body">
+
+        <div class="help-hero">
+          <div class="help-hero-title">🐱 PROMOCAT HELP</div>
+          <div class="help-hero-sub">Everything you need to know about using PromoCat</div>
+          <div style="margin-top:14px;">
+            <button onclick="openQuickStart()" style="font-family:'Press Start 2P',monospace;font-size:6px;padding:9px 16px;background:#0a2010;border:1px solid var(--lcd-green);color:var(--lcd-green);cursor:pointer;">▶ SHOW QUICK START GUIDE</button>
+          </div>
+        </div>
+
+        <!-- Quick nav -->
+        <div class="help-toc">
+          <button class="help-toc-btn" onclick="openHelpSection('hs-overview')">📖 OVERVIEW</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-upload')">⬆ ADDING TRACKS</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-playlists')">🎵 PLAYLISTS</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-connect')">🤝 CONNECTIONS</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-drops')">📬 DROPPING TRACKS</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-promos')">🚀 PROMO BLASTS</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-artist')">🎤 ARTIST PROFILE</button>
+          <button class="help-toc-btn" onclick="openHelpSection('hs-player')">▶ PLAYER</button>
+        </div>
+
+        <div class="help-sections">
+
+          <!-- OVERVIEW -->
+          <div class="help-section" id="hs-overview">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-overview')">
+              📖 WHAT IS PROMOCAT?
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body open">
+              <p>PromoCat is a private music sharing platform built for DJs, producers, and artists. It lets you build a personal playlist, connect with other music people, and privately drop unreleased tracks directly into each other's inboxes — without the music ever going public.</p>
+              <p>Think of it as a retro-styled Winamp meets a private music trading system. Your tracks stay on your own servers. Only people you connect with can hear what you share with them.</p>
+              <div class="help-tip">🐾 PromoCat is invite-only. You need a 4-digit invite code from an existing member to register.</div>
+            </div>
+          </div>
+
+          <!-- ADDING TRACKS -->
+          <div class="help-section" id="hs-upload">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-upload')">
+              ⬆ ADDING TRACKS — THE TWO WAYS
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <p>There are two ways to add tracks to your PromoCat playlist. The right choice depends on whether your music is public or private/unreleased.</p>
+
+              <h4>🟢 THE EASY WAY — UPLOAD</h4>
+              <p>Click <strong>⬆ UPLOAD PRIVATE FILE</strong> in the ADD TRACK tab. Select any MP3, WAV, FLAC, or other audio file from your computer (max 100MB per file, 750MB total storage).</p>
+              <p>Your file is stored privately on PromoCat's servers. Nobody can access it without your permission — not even with a direct link. When you drop the track to someone's inbox, they get a temporary link that expires after 1 hour. Your unreleased music stays safe.</p>
+              <div class="help-tip">✅ Best for: unreleased tracks, demos, VIPs, exclusives — anything you don't want floating around the internet.</div>
+
+              <h4>🟡 THE NERDY WAY — DIRECT LINK</h4>
+              <p>Paste a direct audio URL into the <strong>🎧 AUDIO STREAM LINK</strong> field. This can be:</p>
+              <ul>
+                <li><strong>Your own server or website</strong> — paste the direct .mp3 or .wav URL. This keeps your music fully on your own infrastructure.</li>
+                <li><strong>Cloudflare R2 / AWS S3 / Backblaze B2</strong> — public cloud storage with proper CORS headers. Great for artists who already self-host.</li>
+                <li><strong>SoundCloud links</strong> — public or private (secret) SoundCloud URLs. Use the SOUNDCLOUD tab in Browse Cloud Files.</li>
+                <li><strong>Any public direct audio URL</strong> — if it ends in .mp3, .wav, .flac etc. and is publicly accessible, it will play.</li>
+              </ul>
+              <div class="help-tip">🔒 The nerdy way puts YOU in control of hosting. Your music stays on your own server and never touches PromoCat's storage. Perfect for technically-minded artists who self-host.</div>
+              <div class="help-tip">⚠ Services like Dropbox and Google Drive do NOT work as audio sources due to browser security restrictions (CORS). Use SoundCloud, your own server, or R2/S3 instead.</div>
+
+              <h4>📝 FILLING IN TRACK DETAILS</h4>
+              <p>After setting your audio source, fill in the track info sections:</p>
+              <ul>
+                <li><strong>🎼 TRACK INFO</strong> — Title, artist, album, year, BPM, genre. BPM animates the cat!</li>
+                <li><strong>📌 STATUS & CATEGORY</strong> — Mark as Released/Unreleased, set availability (Available, Signed, Freebie, Bootleg, Undecided), and category (DJ Stuff, Listening, Non-Electronic).</li>
+                <li><strong>🔗 LINKS & DOWNLOADS</strong> — Add buy/stream links, WAV download, MP3 download, booking email, label, management.</li>
+                <li><strong>🖼 ARTWORK</strong> — Upload square album art or paste an image URL.</li>
+                <li><strong>⭐ RATING</strong> — Rate your own track 1-5 stars.</li>
+              </ul>
+              <p>Hit <strong>🐾 ADD TO PLAYLIST</strong> to save. Your track appears in MY TRACKS.</p>
+
+              <h4>✏ EDITING A TRACK</h4>
+              <p>In your playlist, click the <strong>✏ pencil icon</strong> on any track row to edit it. All fields are pre-filled. Make changes and click <strong>💾 SAVE CHANGES</strong>.</p>
+            </div>
+          </div>
+
+          <!-- PLAYLISTS -->
+          <div class="help-section" id="hs-playlists">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-playlists')">
+              🎵 THE TWO PLAYLISTS
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <h4>🐾 MY TRACKS</h4>
+              <p>Your personal playlist — every track you've added yourself. This is your library. You control what's in it, how it's tagged, and who you share it with. Use the <strong>CATEGORY · STATUS · GENRE · SORT</strong> filters to browse your collection.</p>
+              <p>You can copy a shareable public URL for your full playlist using the <strong>🔗</strong> button — anyone with the link can listen to your public tracks in a read-only view.</p>
+
+              <h4>📬 PROMOS</h4>
+              <p>Tracks that other PromoCat users have dropped into your inbox. These are sent privately — only you can see them. Each promo shows:</p>
+              <ul>
+                <li>Who sent it and when</li>
+                <li>Permission badge — <span class="help-badge green">STREAM ONLY</span> <span class="help-badge orange">DOWNLOAD OK</span> or <span class="help-badge blue">FREE DL</span></li>
+                <li>Download links (if the sender allowed it)</li>
+                <li>A note from the sender</li>
+              </ul>
+              <p>You can <strong>✅ ADD TO MY TRACKS</strong> to keep it in your library, leave <strong>⭐ FEEDBACK</strong> which gets sent back to the artist, or <strong>✕ REMOVE</strong> it from your inbox.</p>
+            </div>
+          </div>
+
+          <!-- CONNECTIONS -->
+          <div class="help-section" id="hs-connect">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-connect')">
+              🤝 CONNECTING WITH USERS
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <p>The CONNECTIONS tab has three sections: <strong>🔍 FIND USERS</strong>, <strong>👥 CONTACTS</strong>, and <strong>🚀 PROMO</strong>.</p>
+
+              <h4>STEP BY STEP — HOW TO CONNECT</h4>
+              <div class="help-step"><span class="help-step-num">01</span><span>Go to <strong>CONNECTIONS → 🔍 FIND USERS</strong>. Search by username, display name, or email.</span></div>
+              <div class="help-step"><span class="help-step-num">02</span><span>Click <strong>🤝 SEND REQUEST</strong> next to the person you want to connect with. They'll get a notification.</span></div>
+              <div class="help-step"><span class="help-step-num">03</span><span>They accept or decline via the <strong>🔔 bell notification</strong> in the top bar. If accepted, the connection is mutual — you can both drop tracks to each other.</span></div>
+              <div class="help-step"><span class="help-step-num">04</span><span>Your accepted connections appear in <strong>CONNECTIONS → 👥 CONTACTS</strong>. You can also add people manually by name and email (for non-PromoCat contacts used in promo blasts).</span></div>
+              <div class="help-step"><span class="help-step-num">05</span><span>Once connected you can also <strong>💬 CHAT</strong> directly — click the chat button on any accepted connection.</span></div>
+
+              <div class="help-tip">🔔 Pending connection requests show up in your notification bell as ✅ ACCEPT / ✕ DECLINE buttons — no need to go to the Connections tab.</div>
+            </div>
+          </div>
+
+          <!-- DROPPING TRACKS -->
+          <div class="help-section" id="hs-drops">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-drops')">
+              📬 DROPPING TRACKS TO SOMEONE'S INBOX
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <p>Dropping a track sends it privately to another user's Promos inbox. Only they can see it. This is the core of PromoCat's music trading system.</p>
+
+              <h4>HOW TO DROP A TRACK</h4>
+              <div class="help-step"><span class="help-step-num">01</span><span>In your MY TRACKS playlist, find the track you want to send. Click the <strong>📬 drop button</strong> on the track row.</span></div>
+              <div class="help-step"><span class="help-step-num">02</span><span>A picker appears showing all your accepted connections. Click the person you want to send to.</span></div>
+              <div class="help-step"><span class="help-step-num">03</span><span>Choose a <strong>permission level</strong>:
+                <ul style="margin-top:6px;">
+                  <li><span class="help-badge green">STREAM ONLY</span> — they can listen but get no download links</li>
+                  <li><span class="help-badge orange">DOWNLOAD OK</span> — they get your WAV/MP3 download links</li>
+                  <li><span class="help-badge blue">FREE DOWNLOAD</span> — same as above, marked as a gift</li>
+                </ul>
+              </span></div>
+              <div class="help-step"><span class="help-step-num">04</span><span>Optionally add a <strong>personal note</strong>, then hit <strong>🚀 DROP IT</strong>. The recipient gets a notification immediately.</span></div>
+              <div class="help-step"><span class="help-step-num">05</span><span>When they listen and leave feedback, you'll get a <strong>⭐ feedback notification</strong> with their rating and comments.</span></div>
+
+              <div class="help-tip">🔒 For privately uploaded tracks (⬆ UPLOAD), the recipient gets a temporary stream link that expires after 1 hour — your file stays private and can't be shared.</div>
+            </div>
+          </div>
+
+          <!-- PROMO BLASTS -->
+          <div class="help-section" id="hs-promos">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-promos')">
+              🚀 PROMO EMAIL BLASTS
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <p>The <strong>CONNECTIONS → 🚀 PROMO</strong> section lets you build email promo campaigns and send them to your contact list through your own mail app (Gmail, Outlook, etc.).</p>
+
+              <h4>HOW PROMO BLASTS WORK</h4>
+              <div class="help-step"><span class="help-step-num">01</span><span><strong>SEND TO</strong> — Tick the contacts you want to include. Use ALL or NONE for quick selection. Add contacts via CONNECTIONS → 👥 CONTACTS.</span></div>
+              <div class="help-step"><span class="help-step-num">02</span><span><strong>EMAIL TEMPLATE</strong> — Write your promo message. Use placeholders:
+                <ul style="margin-top:6px;">
+                  <li><code style="color:var(--lcd-green);">{name}</code> — recipient's name</li>
+                  <li><code style="color:var(--lcd-green);">{tracklist}</code> — auto-generated list of your tracks</li>
+                  <li><code style="color:var(--lcd-green);">{link}</code> — your public playlist link</li>
+                </ul>
+              </span></div>
+              <div class="help-step"><span class="help-step-num">03</span><span><strong>SAVED PLAYLISTS</strong> — Choose which of your playlists to feature in the promo. Your main playlist is always available.</span></div>
+              <div class="help-step"><span class="help-step-num">04</span><span>Click <strong>🚀 BUILD & FIRE</strong> — this opens your email app (Gmail, Outlook, or system mail) pre-filled with your template for each recipient. You review and send from there — PromoCat never sends email directly.</span></div>
+
+              <div class="help-tip">📧 PromoCat opens your mail app with a pre-written email. You stay in control of what gets sent — nothing goes out automatically.</div>
+            </div>
+          </div>
+
+          <!-- ARTIST PROFILE -->
+          <div class="help-section" id="hs-artist">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-artist')">
+              🎤 SETTING UP YOUR ARTIST PROFILE
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <p>Your artist profile is your public-facing page on PromoCat. Other users see it when they find you in search. Go to the <strong>ARTIST</strong> tab to set it up.</p>
+
+              <h4>PROFILE FIELDS</h4>
+              <ul>
+                <li><strong>Display Name</strong> — Your artist or DJ name shown across PromoCat</li>
+                <li><strong>Tagline</strong> — One-line description (e.g. "Drum & Bass producer from Berlin")</li>
+                <li><strong>Bio</strong> — Longer description about you and your music</li>
+                <li><strong>Photo</strong> — Profile picture URL or upload</li>
+                <li><strong>Links</strong> — Add up to 6 links: Website, SoundCloud, Instagram, Facebook, TikTok, YouTube</li>
+                <li><strong>Email / Booking / Management</strong> — Contact details shown to your connections</li>
+              </ul>
+
+              <h4>MULTIPLE PROFILES</h4>
+              <p>You can create multiple artist profiles under one account — useful if you produce under different names or run a label. Switch between profiles using the profile selector at the top of the ARTIST tab.</p>
+
+              <div class="help-tip">👤 Your profile is visible to other PromoCat users when they search for you. Fill it in so people know who you are when your connection request arrives.</div>
+            </div>
+          </div>
+
+          <!-- PLAYER -->
+          <div class="help-section" id="hs-player">
+            <div class="help-section-hdr" onclick="toggleHelpSection('hs-player')">
+              ▶ THE PLAYER
+              <span class="help-arrow">▼</span>
+            </div>
+            <div class="help-section-body">
+              <h4>CONTROLS</h4>
+              <ul>
+                <li><strong>⏮ ▶ ⏸ ⏹ ⏭</strong> — Standard transport controls. Click a track in the playlist to load it.</li>
+                <li><strong>Seek bar</strong> — Click or drag to jump to any point in the track.</li>
+                <li><strong>VOL slider</strong> — Volume. The second slider controls playback speed.</li>
+                <li><strong>SHUFFLE</strong> — Randomise playlist order.</li>
+                <li><strong>REPEAT</strong> — Loop the current track.</li>
+              </ul>
+              <h4>MODES</h4>
+              <ul>
+                <li><strong>🎨 MOOD</strong> — Cycles through colour themes randomly.</li>
+                <li><strong>🪩 RAVE</strong> — Enables rave mode. You'll know it when you see it.</li>
+              </ul>
+              <h4>THE CAT</h4>
+              <p>The PromoCat mascot bobs its head in time with the track's BPM. The faster the BPM, the more frantic the bob. Set the BPM correctly when adding tracks for the full effect.</p>
+              <h4>LCD DISPLAY</h4>
+              <p>Shows the current track title (scrolling if long), artist, album, time elapsed / total duration, and BPM.</p>
+              <div class="help-tip">🖥 On desktop, the player sits in the left column. Your playlist fills the right column. Use <strong>⛶ EXPAND</strong> on mobile to open the playlist fullscreen.</div>
+            </div>
+          </div>
+
+        </div><!-- /help-sections -->
+
+        <div style="text-align:center;padding:20px 16px;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);line-height:2;">
+          STILL STUCK? REACH OUT TO YOUR INVITER OR CHECK FOR UPDATES.<br>
+          PROMOCAT — PURRFECT TUNES 🐱
+        </div>
+
+      </div>
+    </div><!-- /panel-help -->
+
   </div><!-- /win-window -->
 </div><!-- /shell -->
 
@@ -4571,6 +4966,7 @@ function switchTab(name) {
   if (name === 'connections') {
     switchPeopleTab(_activePeopleTab || 'connect');
   }
+  if (name === 'upload') { loadR2Quota(); }
   updateTitlebar();
 }
 
@@ -4636,6 +5032,8 @@ function applyUnlock(username, role, token) {
   document.getElementById('user-bar-name').textContent = username.toUpperCase();
   // Update titlebar to show logged-in user
   updateTitlebar();
+  // Show quick start for new users
+  setTimeout(maybeShowQuickStart, 800);
   // Update wbtn tooltips
   const wClose = document.getElementById('wbtn-close');
   if (wClose) wClose.title = 'Log Out';
@@ -6068,11 +6466,13 @@ function setCatMouth(bpm) {
   }
 }
 
-function loadTrack(i) {
+async function loadTrack(i) {
   if (i < 0 || i >= playlist.length) return;
   curIdx = i;
   const t = playlist[i];
-  audio.src = t.url;
+  // Resolve private R2 URLs to signed streaming URLs
+  const resolvedUrl = await resolveTrackUrl(t.url);
+  audio.src = resolvedUrl;
   audio.volume = volume;
   document.getElementById('lcd-title-text').textContent = t.title.toUpperCase();
   document.getElementById('lcd-title').classList.toggle('scrolling', t.title.length > 22);
@@ -8613,6 +9013,9 @@ function downloadEPK() {
 
 <!-- ── CLOUD STORAGE BROWSER ── -->
 
+
+</div>
+
 <!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
 <div class="pl-popout" id="pl-popout">
   <div class="pl-popout-hdr">
@@ -9178,6 +9581,7 @@ switchTab = function(name) {
   if (name === 'connections') {
     switchPeopleTab(_activePeopleTab || 'connect');
   }
+  if (name === 'upload') { loadR2Quota(); }
   if (name === 'admin') {
     renderInviteCodes();
     renderUserList();
@@ -10351,11 +10755,11 @@ async function browseStorage() {
   try {
     let files = [];
     switch (_storageProvider) {
-      case 'dropbox':  files = await browseDropbox(url);  break;
-      case 'gdrive':   files = await browseGDrive(url);   break;
+      case 'dropbox':  files = browseDropboxUrl(url);  break;
+      case 'gdrive':   files = browseGDriveUrl(url);   break;
       case 'r2':       files = await browseR2orS3(url);   break;
       case 's3':       files = await browseR2orS3(url);   break;
-      case 'onedrive': files = await browseOneDrive(url); break;
+      case 'onedrive': files = await browseOneDriveUrl(url); break;
       case 'direct':   files = browseDirectUrl(url);      break;
     }
     renderStorageResults(files);
@@ -10366,7 +10770,7 @@ async function browseStorage() {
 
 // ── DROPBOX ──
 // Transforms shared folder URLs to API calls
-function browseDropbox(url) {
+function browseDropboxUrl(url) {
   // No API calls — just convert the share link directly
   const converted = convertDropboxUrl(url);
   if (!converted) throw new Error('Could not convert Dropbox link. Paste a direct file share link.');
@@ -10376,7 +10780,7 @@ function browseDropbox(url) {
 
 // ── GOOGLE DRIVE ──
 // Uses the public Drive API v3 (no auth needed for public folders)
-function browseGDrive(url) {
+function browseGDriveUrl(url) {
   const streamUrl = convertGDriveUrl(url);
   if (!streamUrl) throw new Error('Could not extract file ID. Paste a Google Drive file share link.');
   return [{ name: 'Google Drive Track', url: streamUrl, provider: 'gdrive' }];
@@ -10408,7 +10812,7 @@ async function browseR2orS3(url) {
 }
 
 // ── ONEDRIVE ──
-async function browseOneDrive(url) {
+async function browseOneDriveUrl(url) {
   // OneDrive short links (1drv.ms) need to be resolved
   // Convert share URL to direct download for individual files
   if (isAudioFile(url)) {
@@ -10717,6 +11121,212 @@ function convertGDriveUrl(url) {
   // Use export=open — serves with streaming headers, bypasses virus scan page
   // File must be shared as "Anyone with the link" in Google Drive
   return 'https://drive.google.com/uc?export=open&id=' + fileId;
+}
+
+
+// ══════════════════════════════════════════════
+// R2 PRIVATE UPLOAD
+// ══════════════════════════════════════════════
+async function uploadToR2(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const MAX = 100 * 1024 * 1024;
+  if (file.size > MAX) {
+    notify('😾', 'File too large — max 100MB');
+    input.value = '';
+    return;
+  }
+
+  const statusEl = document.getElementById('r2-upload-status');
+  const labelEl  = document.getElementById('r2-upload-label');
+  statusEl.textContent = 'UPLOADING...';
+  statusEl.style.color = 'var(--cat-orange)';
+  labelEl.style.opacity = '0.5';
+  labelEl.style.pointerEvents = 'none';
+
+  try {
+    const token = localStorage.getItem('promocat_session');
+    const resp = await fetch(API_BASE + '/r2/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': file.type || 'audio/mpeg',
+        'X-Filename': file.name,
+        'Content-Length': file.size.toString()
+      },
+      body: file
+    });
+
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'Upload failed');
+
+    // Store the R2 key in the URL field as a special r2:// reference
+    // When saving/playing, the app fetches a signed URL on demand
+    document.getElementById('f-audio-url').value = 'r2://' + data.key;
+    document.getElementById('audio-url-status').textContent = '✓ Uploaded — ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + 'MB)';
+    document.getElementById('audio-url-status').className = 'audio-url-status ok';
+
+    // Auto-fill title from filename if empty
+    const titleInput = document.getElementById('f-title');
+    if (titleInput && !titleInput.value.trim()) {
+      titleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    }
+
+    statusEl.textContent = '✓ UPLOADED';
+    statusEl.style.color = '#44ff88';
+    notify('⬆', 'Track uploaded privately — ' + file.name);
+    // Update quota display
+    if (data.usedMB && data.limitMB) updateR2QuotaDisplay(parseFloat(data.usedMB), parseFloat(data.limitMB));
+
+  } catch(e) {
+    statusEl.textContent = 'ERROR';
+    statusEl.style.color = '#ff4444';
+    notify('😾', 'Upload failed: ' + e.message);
+  } finally {
+    labelEl.style.opacity = '';
+    labelEl.style.pointerEvents = '';
+    input.value = '';
+  }
+}
+
+// Resolve r2:// URLs to signed stream URLs before playback
+async function resolveTrackUrl(url) {
+  if (!url || !url.startsWith('r2://')) return url;
+  try {
+    const key = url.replace('r2://', '');
+    const token = localStorage.getItem('promocat_session');
+    const resp = await fetch(API_BASE + '/r2/url?key=' + encodeURIComponent(key), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error);
+    return data.url; // signed, expires in 1hr
+  } catch(e) {
+    console.warn('Could not resolve R2 URL:', e);
+    return url;
+  }
+}
+
+
+// ── R2 quota display ──
+async function loadR2Quota() {
+  try {
+    const token = localStorage.getItem('promocat_session');
+    if (!token) return;
+    const resp = await fetch(API_BASE + '/r2/list', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await resp.json();
+    if (data.ok) updateR2QuotaDisplay(parseFloat(data.usedMB), parseFloat(data.limitMB));
+  } catch(e) {}
+}
+
+function updateR2QuotaDisplay(usedMB, limitMB) {
+  const wrap = document.getElementById('r2-quota-wrap');
+  const text = document.getElementById('r2-quota-text');
+  const bar  = document.getElementById('r2-quota-bar');
+  if (!wrap) return;
+  const pct = Math.min(100, Math.round(usedMB / limitMB * 100));
+  wrap.style.display = 'block';
+  text.textContent = usedMB + ' / ' + limitMB + 'MB (' + pct + '%)';
+  bar.style.width = pct + '%';
+  bar.style.background = pct > 90 ? '#ff4444' : pct > 70 ? 'var(--cat-orange)' : 'var(--lcd-green)';
+}
+
+
+// ════════════════════════════════════════
+// HELP TAB
+// ════════════════════════════════════════
+function toggleHelpSection(id) {
+  const section = document.getElementById(id);
+  if (!section) return;
+  const body  = section.querySelector('.help-section-body');
+  const arrow = section.querySelector('.help-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function openHelpSection(id) {
+  // Close all, open target
+  document.querySelectorAll('.help-section-body').forEach(b => {
+    b.classList.remove('open');
+    const arrow = b.closest('.help-section')?.querySelector('.help-arrow');
+    if (arrow) arrow.style.transform = '';
+  });
+  const section = document.getElementById(id);
+  if (!section) return;
+  const body  = section.querySelector('.help-section-body');
+  const arrow = section.querySelector('.help-arrow');
+  if (body)  body.classList.add('open');
+  if (arrow) arrow.style.transform = 'rotate(180deg)';
+  // Scroll to section
+  setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+// ════════════════════════════════════════
+// QUICK START GUIDE
+// ════════════════════════════════════════
+let _qsSlide = 0;
+const QS_TOTAL = 5;
+
+function openQuickStart() {
+  _qsSlide = 0;
+  qsRender();
+  document.getElementById('quickstart-overlay').classList.add('open');
+}
+
+function closeQuickStart() {
+  document.getElementById('quickstart-overlay').classList.remove('open');
+  // Remember they've seen it
+  try { localStorage.setItem('pc_qs_seen', '1'); } catch(e) {}
+}
+
+function qsNav(dir) {
+  _qsSlide = Math.max(0, Math.min(QS_TOTAL - 1, _qsSlide + dir));
+  qsRender();
+}
+
+function qsRender() {
+  for (let i = 0; i < QS_TOTAL; i++) {
+    const slide = document.getElementById('qs-' + i);
+    if (slide) slide.classList.toggle('active', i === _qsSlide);
+  }
+  // Dots
+  const dotsEl = document.getElementById('qs-dots');
+  if (dotsEl) {
+    dotsEl.innerHTML = Array.from({ length: QS_TOTAL }, (_, i) =>
+      '<div class="quickstart-dot' + (i === _qsSlide ? ' active' : '') + '" onclick="qsGoto(' + i + ')"></div>'
+    ).join('');
+  }
+  // Prev button
+  const prev = document.getElementById('qs-prev');
+  if (prev) prev.style.visibility = _qsSlide === 0 ? 'hidden' : 'visible';
+  // Next / Done button
+  const next = document.getElementById('qs-next');
+  if (next) {
+    if (_qsSlide === QS_TOTAL - 1) {
+      next.textContent = '✓ DONE';
+      next.onclick = closeQuickStart;
+    } else {
+      next.textContent = 'NEXT ▶';
+      next.onclick = () => qsNav(1);
+    }
+  }
+}
+
+function qsGoto(i) {
+  _qsSlide = i;
+  qsRender();
+}
+
+// Show quick start for first-time users (no localStorage entry)
+function maybeShowQuickStart() {
+  try {
+    const seen = localStorage.getItem('pc_qs_seen');
+    if (!seen) openQuickStart();
+  } catch(e) {}
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
@@ -11132,6 +11742,8 @@ window.addEventListener('pagehide', () => {
 
 <!-- ── CLOUD STORAGE BROWSER ── -->
 
+</div>
+
 <!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
 <div class="pl-popout" id="pl-popout">
   <div class="pl-popout-hdr">
@@ -11163,6 +11775,98 @@ window.addEventListener('pagehide', () => {
   </div>
   <!-- The actual list — shared with main pl-list via JS -->
   <div class="pl-popout-list" id="pl-popout-list"></div>
+</div>
+
+<!-- ── QUICK START GUIDE ── -->
+<div class="quickstart-overlay" id="quickstart-overlay">
+  <div class="quickstart-box">
+    <div class="quickstart-hdr">
+      <span class="quickstart-hdr-title">🐱 WELCOME TO PROMOCAT</span>
+      <button onclick="closeQuickStart()" style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;">✕</button>
+    </div>
+    <div class="quickstart-slides">
+
+      <div class="quickstart-slide active" id="qs-0">
+        <div class="quickstart-slide-icon">🐱</div>
+        <div class="quickstart-slide-title">WELCOME TO PROMOCAT</div>
+        <div class="quickstart-slide-body">
+          <p>PromoCat is a private music sharing platform built for DJs, producers and artists.</p>
+          <p>It lets you build a personal playlist, connect with other music people, and privately drop unreleased tracks directly into each other's inboxes — without the music ever going public.</p>
+          <p>This guide walks you through the 4 steps to get started. Let's go!</p>
+        </div>
+      </div>
+
+      <div class="quickstart-slide" id="qs-1">
+        <div class="quickstart-slide-icon">🎤</div>
+        <div class="quickstart-slide-title">STEP 1 — CREATE YOUR ARTIST PROFILE</div>
+        <div class="quickstart-slide-body">
+          <p>Before anything else, set up your profile so people know who you are.</p>
+          <p>Go to the <strong>ARTIST</strong> tab and fill in:</p>
+          <ul>
+            <li><strong>Display name</strong> — your artist or DJ name</li>
+            <li><strong>Tagline &amp; bio</strong> — a quick description of you and your music</li>
+            <li><strong>Photo</strong> — a profile picture</li>
+            <li><strong>Links</strong> — SoundCloud, Instagram, website etc.</li>
+            <li><strong>Contact details</strong> — booking email, label, management</li>
+          </ul>
+          <p>Hit <strong>💾 SAVE PROFILE</strong> when done.</p>
+        </div>
+      </div>
+
+      <div class="quickstart-slide" id="qs-2">
+        <div class="quickstart-slide-icon">⬆</div>
+        <div class="quickstart-slide-title">STEP 2 — ADD YOUR TRACKS</div>
+        <div class="quickstart-slide-body">
+          <p>Go to <strong>ADD TRACK</strong> and add music to your playlist. Two ways to do it:</p>
+          <ul>
+            <li><strong>🟢 UPLOAD (Easy)</strong> — Upload a file directly from your computer (MP3, WAV, FLAC, max 100MB, 750MB total). Stored privately — perfect for unreleased music.</li>
+            <li><strong>🟡 DIRECT LINK (Nerdy)</strong> — Paste a direct audio URL from your own server, SoundCloud, or any public host. Your music stays on your own infrastructure.</li>
+          </ul>
+          <p>Fill in the track details — title, artist, BPM, genre, artwork — then hit <strong>🐾 ADD TO PLAYLIST</strong>.</p>
+        </div>
+      </div>
+
+      <div class="quickstart-slide" id="qs-3">
+        <div class="quickstart-slide-icon">🤝</div>
+        <div class="quickstart-slide-title">STEP 3 — FIND ARTISTS &amp; LABELS</div>
+        <div class="quickstart-slide-body">
+          <p>Go to <strong>CONNECTIONS → 🔍 FIND USERS</strong> and search for DJs, producers or labels you want to share music with.</p>
+          <ul>
+            <li>Click <strong>🤝 SEND REQUEST</strong> — they get a notification</li>
+            <li>Once they accept, the connection is <strong>mutual</strong> — you can both drop tracks to each other</li>
+            <li>Accept incoming requests via the <strong>🔔 bell</strong> in the top bar</li>
+            <li>Accepted connections appear in your <strong>👥 CONTACTS</strong> list</li>
+          </ul>
+          <p>You can also add non-PromoCat contacts manually for promo email blasts.</p>
+        </div>
+      </div>
+
+      <div class="quickstart-slide" id="qs-4">
+        <div class="quickstart-slide-icon">📬</div>
+        <div class="quickstart-slide-title">STEP 4 — SEND &amp; RECEIVE MUSIC</div>
+        <div class="quickstart-slide-body">
+          <p><strong>To send a track:</strong></p>
+          <ul>
+            <li>Click the <strong>📬 button</strong> on any track in MY TRACKS</li>
+            <li>Pick a connection, choose a permission (Stream / Download / Free), add a note and hit <strong>🚀 DROP IT</strong></li>
+            <li>They get an instant notification and can stream, leave feedback or save it</li>
+          </ul>
+          <p><strong>To receive tracks:</strong></p>
+          <ul>
+            <li>Check your <strong>📬 PROMOS</strong> playlist — all drops land here</li>
+            <li>Leave <strong>⭐ feedback</strong> sent back to the artist, or <strong>✅ add to your library</strong></li>
+          </ul>
+          <p style="color:#44ff88;margin-top:8px;">You're all set! Find the full guide in the <strong>? HELP</strong> button anytime. 🐾</p>
+        </div>
+      </div>
+
+    </div><!-- /slides -->
+    <div class="quickstart-nav">
+      <button class="quickstart-prev" id="qs-prev" onclick="qsNav(-1)" style="visibility:hidden;">◀ BACK</button>
+      <div class="quickstart-dots" id="qs-dots"></div>
+      <button class="quickstart-next" id="qs-next" onclick="qsNav(1)">NEXT ▶</button>
+    </div>
+  </div>
 </div>
 </body>
 </html>
