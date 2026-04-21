@@ -11220,7 +11220,8 @@ async function resolveTrackUrl(url) {
 // ── R2 quota display ──
 async function loadR2Quota() {
   try {
-    const token = localStorage.getItem('promocat_session');
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+    const token = session.token || '';
     if (!token) return;
     const resp = await fetch(API_BASE + '/r2/list', {
       headers: { 'Authorization': 'Bearer ' + token }
