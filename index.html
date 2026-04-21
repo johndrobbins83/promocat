@@ -10099,72 +10099,26 @@ async function browseR2() {
 }
 
 // ── Dropbox browser ──
-async function browseDropbox() {
+function browseDropbox() {
   const link = document.getElementById('sb-dropbox-link').value.trim();
   if (!link) { notify('😾', 'Paste a Dropbox link first'); return; }
   const listEl = document.getElementById('sb-dropbox-list');
   listEl.style.display = 'block';
 
-  // Direct file link — convert to streamable URL
-  if (link.includes('dropbox.com')) {
-    const streamUrl = convertDropboxUrl(link);
-    if (streamUrl) {
-      const name = link.split('/').pop().split('?')[0] || 'track';
-      listEl.innerHTML = '';
-      renderStorageFiles(listEl, [{ name, url: streamUrl }]);
-      return;
-    }
+  if (!link.includes('dropbox.com')) {
+    listEl.innerHTML = '<div class="storage-loading">NOT A DROPBOX LINK</div>';
+    return;
   }
 
-  // Shared folder link — use Dropbox API v2 with app key if available
-  try {
-    const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
-    const appKey = saved.dropboxKey;
-    if (!appKey) {
-      // No app key — show instructions
-      listEl.innerHTML = '<div class="storage-loading">ADD YOUR DROPBOX APP KEY IN SETTINGS<br>TO BROWSE FOLDERS<br><br>FOR SINGLE FILES:<br>PASTE A DIRECT DROPBOX SHARE LINK</div>';
-      return;
-    }
-
-    listEl.innerHTML = '<div class="storage-loading">LOADING DROPBOX FILES...</div>';
-
-    // Extract shared link path and use Dropbox list_shared_link_file_metadata
-    const res = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + appKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ path: saved.dropboxFolder || '', recursive: false })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      listEl.innerHTML = '<div class="storage-loading">DROPBOX ERROR: ' + (data.error_summary || 'Check App Key') + '</div>';
-      return;
-    }
-    const audio = (data.entries || []).filter(e =>
-      e['.tag'] === 'file' && AUDIO_EXTS.some(ext => e.name.toLowerCase().endsWith(ext))
-    );
-    if (!audio.length) {
-      listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND IN FOLDER</div>';
-      return;
-    }
-    // Get temporary links for each file
-    const files = await Promise.all(audio.slice(0,50).map(async f => {
-      try {
-        const lr = await fetch('https://api.dropboxapi.com/2/files/get_temporary_link', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + appKey, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: f.path_lower })
-        });
-        const ld = await lr.json();
-        return { name: f.name, url: ld.link || '' };
-      } catch(e) { return { name: f.name, url: '' }; }
-    }));
-    renderStorageFiles(listEl, files.filter(f => f.url));
-  } catch(e) {
-    listEl.innerHTML = '<div class="storage-loading">ERROR CONNECTING TO DROPBOX</div>';
+  const streamUrl = convertDropboxUrl(link);
+  if (!streamUrl) {
+    listEl.innerHTML = '<div class="storage-loading">COULD NOT CONVERT LINK<br>PASTE A FILE SHARE LINK FROM DROPBOX</div>';
+    return;
   }
+
+  const name = decodeURIComponent(link.split('/').pop().split('?')[0]) || 'Dropbox Track';
+  listEl.innerHTML = '';
+  renderStorageFiles(listEl, [{ name, url: streamUrl }]);
 }
 
 // ── Direct URL ──
@@ -10434,43 +10388,12 @@ async function browseStorage() {
 
 // ── DROPBOX ──
 // Transforms shared folder URLs to API calls
-async function browseDropbox(url) {
-  // Convert share URL to API URL
-  // https://www.dropbox.com/sh/xxx/yyy → API list
-  let apiUrl = url.replace('www.dropbox.com', 'api.dropboxapi.com');
-
-  // Use the Dropbox shared link contents API (no auth needed for shared folders)
-  const resp = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Dropbox-API-Path-Root': JSON.stringify({ '.tag': 'namespace_id', 'namespace_id': '' })
-    },
-    body: JSON.stringify({ path: '', shared_link: { url } })
-  });
-
-  if (!resp.ok) {
-    // Fallback: direct file link conversion
-    if (url.includes('dropbox.com') && isAudioFile(url)) {
-      const direct = url
-        .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-        .replace('?dl=0', '?dl=1')
-        + (url.includes('?') ? '' : '?dl=1');
-      const name = url.split('/').pop().split('?')[0];
-      return [{ name, url: direct, provider: 'dropbox' }];
-    }
-    throw new Error('Could not access Dropbox folder. Make sure the folder is shared publicly.');
-  }
-
-  const data = await resp.json();
-  return (data.entries || [])
-    .filter(e => e['.tag'] === 'file' && isAudioFile(e.name))
-    .map(e => ({
-      name: e.name,
-      url: 'https://dl.dropboxusercontent.com/sh/' + url.split('/sh/')[1]?.split('?')[0] + '/' + encodeURIComponent(e.name) + '?dl=1',
-      size: e.size,
-      provider: 'dropbox'
-    }));
+function browseDropbox(url) {
+  // No API calls — just convert the share link directly
+  const converted = convertDropboxUrl(url);
+  if (!converted) throw new Error('Could not convert Dropbox link. Paste a direct file share link.');
+  const name = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'Dropbox Track';
+  return [{ name, url: converted, provider: 'dropbox' }];
 }
 
 // ── GOOGLE DRIVE ──
@@ -10809,33 +10732,20 @@ function updateNowPlayingInfo() {
 function convertDropboxUrl(url) {
   if (!url || !url.includes('dropbox.com')) return null;
 
-  // Already a direct content URL
-  if (url.includes('dl.dropboxusercontent.com')) {
-    return url.includes('dl=1') ? url : url + (url.includes('?') ? '&dl=1' : '?dl=1');
-  }
+  // Already a dropboxusercontent URL — keep as-is (these are temporary links)
+  if (url.includes('dl.dropboxusercontent.com')) return url;
 
-  // New-style scl links: https://www.dropbox.com/scl/fi/xxx/file.mp3?rlkey=yyy&dl=0
-  // These need rlkey preserved and dl=1
-  if (url.includes('/scl/fi/')) {
-    return url
-      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-      .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
-      + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
-  }
+  // Strip any existing dl= or raw= param, then add raw=1
+  // raw=1 on www.dropbox.com serves the file with proper Content-Type for streaming
+  // (dl=1 forces a download attachment, dl.dropboxusercontent.com has no CORS headers)
+  let out = url
+    .replace(/[?&]dl=[01]/, '')   // remove dl=0 or dl=1
+    .replace(/[?&]raw=[01]/, ''); // remove any existing raw=
 
-  // Old-style: https://www.dropbox.com/s/xxx/file.mp3?dl=0
-  if (url.includes('/s/') || url.includes('/sh/')) {
-    return url
-      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-      .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
-      + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
-  }
+  // Add raw=1
+  out = out + (out.includes('?') ? '&raw=1' : '?raw=1');
 
-  // Fallback — try generic conversion
-  return url
-    .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-    .replace(/[?&]dl=0/, (m) => m.replace('dl=0', 'dl=1'))
-    + (url.includes('dl=') ? '' : (url.includes('?') ? '&dl=1' : '?dl=1'));
+  return out;
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
