@@ -11147,6 +11147,12 @@ async function uploadToR2(input) {
 
   try {
     const token = localStorage.getItem('promocat_session');
+    // Show progress size hint
+    statusEl.textContent = 'UPLOADING ' + (file.size/1024/1024).toFixed(1) + 'MB...';
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
     const resp = await fetch(API_BASE + '/r2/upload', {
       method: 'POST',
       headers: {
@@ -11154,8 +11160,10 @@ async function uploadToR2(input) {
         'Content-Type': file.type || 'audio/mpeg',
         'X-Filename': encodeURIComponent(file.name)
       },
-      body: file
+      body: file,
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     const data = await resp.json();
     if (!data.ok) throw new Error(data.error || 'Upload failed');
@@ -11179,9 +11187,10 @@ async function uploadToR2(input) {
     if (data.usedMB && data.limitMB) updateR2QuotaDisplay(parseFloat(data.usedMB), parseFloat(data.limitMB));
 
   } catch(e) {
-    statusEl.textContent = 'ERROR';
+    statusEl.textContent = 'FAILED';
     statusEl.style.color = '#ff4444';
-    notify('😾', 'Upload failed: ' + e.message);
+    const msg = e.name === 'AbortError' ? 'Upload timed out — try a smaller file' : e.message;
+    notify('😾', 'Upload failed: ' + msg);
   } finally {
     labelEl.style.opacity = '';
     labelEl.style.pointerEvents = '';
