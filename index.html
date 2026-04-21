@@ -8612,56 +8612,6 @@ function downloadEPK() {
 </div>
 
 <!-- ── CLOUD STORAGE BROWSER ── -->
-<div class="storage-overlay" id="storage-overlay">
-  <div class="storage-box">
-    <div class="storage-hdr">
-      <span class="storage-hdr-title">🗂️ BROWSE CLOUD STORAGE</span>
-      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
-    </div>
-    <div class="storage-body">
-
-      <!-- Provider selector -->
-      <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:8px;letter-spacing:.5px;">SELECT STORAGE PROVIDER</div>
-      <div class="storage-provider-grid">
-        <button class="storage-provider-btn" id="sp-dropbox"   onclick="selectProvider('dropbox')">
-          <span class="storage-provider-icon">📦</span>DROPBOX
-        </button>
-        <button class="storage-provider-btn" id="sp-gdrive"    onclick="selectProvider('gdrive')">
-          <span class="storage-provider-icon">📁</span>GOOGLE DRIVE
-        </button>
-        <button class="storage-provider-btn" id="sp-r2"        onclick="selectProvider('r2')">
-          <span class="storage-provider-icon">☁️</span>CLOUDFLARE R2
-        </button>
-        <button class="storage-provider-btn" id="sp-s3"        onclick="selectProvider('s3')">
-          <span class="storage-provider-icon">🪣</span>AWS S3
-        </button>
-        <button class="storage-provider-btn" id="sp-onedrive"  onclick="selectProvider('onedrive')">
-          <span class="storage-provider-icon">🔷</span>ONEDRIVE
-        </button>
-        <button class="storage-provider-btn" id="sp-direct"    onclick="selectProvider('direct')">
-          <span class="storage-provider-icon">🔗</span>DIRECT URL
-        </button>
-      </div>
-
-      <!-- URL input + hint -->
-      <div id="storage-hint" class="storage-hint">Select a provider above to get started.</div>
-      <div class="storage-url-row">
-        <input class="finput" type="url" id="storage-url-input"
-               placeholder="Paste your shared folder or file URL..."
-               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-               style="font-size:15px;flex:1;"
-               onkeydown="if(event.key==='Enter')browseStorage()">
-        <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 14px;" onclick="browseStorage()">
-          🔍 BROWSE
-        </button>
-      </div>
-
-      <!-- Results -->
-      <div id="storage-results"></div>
-
-    </div>
-  </div>
-</div>
 
 <!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
 <div class="pl-popout" id="pl-popout">
@@ -10073,28 +10023,36 @@ async function browseR2() {
   if (!url) { notify('😾', 'Enter your bucket URL first'); return; }
   const listEl = document.getElementById('sb-r2-list');
   listEl.style.display = 'block';
-  listEl.innerHTML = '<div class="storage-loading">FETCHING FILE LIST...</div>';
+  listEl.innerHTML = '<div class="storage-loading">SCANNING BUCKET...</div>';
 
+  const base = url.replace(/\/+$/, '');
   try {
-    // R2 public buckets support S3-style XML listing at the bucket root
-    const base = url.endsWith('/') ? url : url + '/';
-    // Try S3 XML list (works for R2 public buckets with ?list-type=2)
-    const res = await fetch(base + '?list-type=2', { headers: { Accept: 'application/xml' } });
-    if (res.ok) {
-      const xml  = await res.text();
-      const keys = [...xml.matchAll(/<Key>([^<]+)<\/Key>/g)].map(m => m[1]);
-      const audio = keys.filter(k => AUDIO_EXTS.some(e => k.toLowerCase().endsWith(e)));
-      if (!audio.length) {
-        listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND<br>CHECK URL OR BUCKET PERMISSIONS</div>';
-        return;
-      }
-      renderStorageFiles(listEl, audio.map(k => ({ name: k, url: base + k })));
-    } else {
-      // Fallback: treat the URL itself as a single file
-      listEl.innerHTML = '<div class="storage-loading">COULD NOT LIST BUCKET<br>MAKE SURE THE BUCKET IS PUBLIC<br>OR USE DIRECT URL TAB</div>';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(base + '/?list-type=2&max-keys=200', {
+      headers: { Accept: 'application/xml' },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      listEl.innerHTML = '<div class="storage-loading">BUCKET RETURNED ' + res.status + '<br>MAKE SURE PUBLIC ACCESS IS ENABLED</div>';
+      return;
     }
+    const xml = await res.text();
+    const keys = [...xml.matchAll(/<Key>([^<]+)<\/Key>/g)].map(m => m[1]);
+    const audio = keys.filter(k => AUDIO_EXTS.some(e => k.toLowerCase().endsWith(e)));
+    if (!audio.length) {
+      listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND IN BUCKET<br>SUPPORTED: MP3 WAV FLAC OGG M4A</div>';
+      return;
+    }
+    renderStorageFiles(listEl, audio.map(k => ({ name: k.split('/').pop(), url: base + '/' + k })));
   } catch(e) {
-    listEl.innerHTML = '<div class="storage-loading">CORS ERROR OR BUCKET NOT PUBLIC<br>TRY DIRECT URL TAB INSTEAD</div>';
+    if (e.name === 'AbortError') {
+      listEl.innerHTML = '<div class="storage-loading">TIMED OUT — BUCKET NOT REACHABLE<br>CHECK URL AND PUBLIC ACCESS SETTINGS</div>';
+    } else {
+      listEl.innerHTML = '<div class="storage-loading">CORS ERROR — BUCKET MUST HAVE<br>CORS HEADERS ENABLED FOR PUBLIC ACCESS</div>';
+    }
   }
 }
 
@@ -10130,57 +10088,25 @@ function useDirectUrl() {
 
 
 // ── Google Drive browser ──
-async function browseGDrive() {
+function browseGDrive() {
   const link = document.getElementById('sb-gdrive-link').value.trim();
   if (!link) { notify('😾', 'Paste a Google Drive link first'); return; }
   const listEl = document.getElementById('sb-gdrive-list');
   listEl.style.display = 'block';
-  listEl.innerHTML = '<div class="storage-loading">RESOLVING GOOGLE DRIVE LINK...</div>';
 
-  try {
-    // Extract file ID from various Google Drive URL formats
-    const fileMatch = link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    const folderMatch = link.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-
-    if (fileMatch) {
-      // Single file — build direct stream URL
-      const fileId = fileMatch[1];
-      const streamUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
-      const name = 'Google Drive File (' + fileId.slice(0,8) + '...)';
-      listEl.innerHTML = '';
-      renderStorageFiles(listEl, [{ name, url: streamUrl, hint: 'File must be shared as Anyone with link' }]);
-
-    } else if (folderMatch) {
-      // Folder — need API key to list contents
-      const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
-      const apiKey = saved.gdriveKey;
-      if (!apiKey) {
-        listEl.innerHTML = '<div class="storage-loading">ADD YOUR GOOGLE API KEY IN SETTINGS<br>TO BROWSE DRIVE FOLDERS<br><br>FOR SINGLE FILES:<br>USE A DIRECT FILE SHARE LINK</div>';
-        return;
-      }
-      const folderId = folderMatch[1];
-      const res = await fetch(
-        'https://www.googleapis.com/drive/v3/files?q=' +
-        encodeURIComponent('"' + folderId + '" in parents and mimeType contains "audio/"') +
-        '&fields=files(id,name,mimeType)&key=' + apiKey
-      );
-      const data = await res.json();
-      if (!res.ok || !data.files?.length) {
-        listEl.innerHTML = '<div class="storage-loading">NO AUDIO FILES FOUND<br>CHECK FOLDER SHARING SETTINGS</div>';
-        return;
-      }
-      const files = data.files.map(f => ({
-        name: f.name,
-        url: 'https://drive.google.com/uc?export=download&id=' + f.id
-      }));
-      renderStorageFiles(listEl, files);
-
-    } else {
-      listEl.innerHTML = '<div class="storage-loading">UNRECOGNISED GOOGLE DRIVE URL<br>PASTE A FILE OR FOLDER SHARE LINK</div>';
-    }
-  } catch(e) {
-    listEl.innerHTML = '<div class="storage-loading">ERROR — CHECK URL AND TRY AGAIN</div>';
+  const streamUrl = convertGDriveUrl(link);
+  if (!streamUrl) {
+    listEl.innerHTML =
+      '<div class="storage-loading">UNRECOGNISED GOOGLE DRIVE LINK<br><br>' +
+      'PASTE A FILE SHARE LINK — e.g.<br>' +
+      'drive.google.com/file/d/xxx/view</div>';
+    return;
   }
+
+  // Extract a readable filename from the URL if possible
+  const name = 'Google Drive Track';
+  listEl.innerHTML = '';
+  renderStorageFiles(listEl, [{ name, url: streamUrl }]);
 }
 
 // ── OneDrive browser ──
@@ -10344,6 +10270,9 @@ function applyStorageFile(file) {
   if (fileUrl.includes('dropbox.com')) {
     fileUrl = convertDropboxUrl(fileUrl) || fileUrl;
   }
+  if (fileUrl.includes('drive.google.com') || fileUrl.includes('docs.google.com')) {
+    fileUrl = convertGDriveUrl(fileUrl) || fileUrl;
+  }
   const urlInput = document.getElementById('f-audio-url');
   if (urlInput) { urlInput.value = fileUrl; checkAudioUrl(); }
   // Auto-fill title from filename if empty
@@ -10389,11 +10318,7 @@ const PROVIDER_HINTS = {
   onedrive: 'Paste a OneDrive shared folder link.\nExample: https://1drv.ms/f/xxxx\nor https://onedrive.live.com/...',
   direct:   'Paste a direct link to a single audio file.\nWorks with any public URL ending in .mp3, .wav, .flac etc.\nThe URL must be a direct stream link, not a webpage.',
 };
-// (duplicate openStorageBrowser removed — see primary above)
-
-function closeStorageBrowser() {
-  document.getElementById('storage-overlay').classList.remove('open');
-}
+// closeStorageBrowser defined above
 
 function selectProvider(p) {
   _storageProvider = p;
@@ -10451,44 +10376,11 @@ function browseDropbox(url) {
 
 // ── GOOGLE DRIVE ──
 // Uses the public Drive API v3 (no auth needed for public folders)
-async function browseGDrive(url) {
-  // Extract folder ID
-  const folderMatch = url.match(/folders\/([a-zA-Z0-9_-]+)/);
-  const fileMatch   = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
-  const idMatch     = url.match(/id=([a-zA-Z0-9_-]+)/);
-
-  if (fileMatch || idMatch) {
-    // Single file
-    const id = fileMatch?.[1] || idMatch?.[1];
-    const directUrl = 'https://drive.google.com/uc?export=download&id=' + id;
-    return [{ name: 'Google Drive File', url: directUrl, provider: 'gdrive', id }];
-  }
-
-  if (!folderMatch) throw new Error('Could not find a Google Drive folder ID in the URL.');
-  const folderId = folderMatch[1];
-
-  // List files in folder via public API
-  const apiResp = await fetch(
-    'https://www.googleapis.com/drive/v3/files?q=' +
-    encodeURIComponent('"' + folderId + '" in parents') +
-    '&key=AIzaSyD-dummy&fields=files(id,name,size,mimeType)&pageSize=100'
-  );
-
-  // Google Drive API requires an API key — guide user to get direct links instead
-  // Fallback: parse the folder page
-  const pageResp = await fetch('https://drive.google.com/drive/folders/' + folderId, {
-    headers: { 'Accept': 'text/html' }
-  });
-  const html = await pageResp.text();
-  // Extract file IDs from the page source
-  const idMatches = [...html.matchAll(/"([a-zA-Z0-9_-]{25,})"/g)];
-  // This is limited — guide user to individual file links
-  throw new Error(
-    'Google Drive folder scanning requires individual file links due to API restrictions.\n' +
-    'Right-click each audio file in Drive → Get link → paste here one at a time,\nor use the DIRECT URL option with the file\'s direct download link.'
-  );
+function browseGDrive(url) {
+  const streamUrl = convertGDriveUrl(url);
+  if (!streamUrl) throw new Error('Could not extract file ID. Paste a Google Drive file share link.');
+  return [{ name: 'Google Drive Track', url: streamUrl, provider: 'gdrive' }];
 }
-
 // ── CLOUDFLARE R2 / AWS S3 (public bucket with XML listing) ──
 async function browseR2orS3(url) {
   // Clean up URL
@@ -10799,6 +10691,32 @@ function convertDropboxUrl(url) {
   out = out + (out.includes('?') ? '&raw=1' : '?raw=1');
 
   return out;
+}
+
+
+// ── Google Drive URL converter ──
+function convertGDriveUrl(url) {
+  if (!url || !url.includes('drive.google.com') && !url.includes('docs.google.com')) return null;
+
+  // Extract file ID from any share link format:
+  // /file/d/ID/view, /d/ID, ?id=ID, /open?id=ID
+  const patterns = [
+    /\/file\/d\/([a-zA-Z0-9_-]{10,})/,
+    /\/d\/([a-zA-Z0-9_-]{10,})\//,
+    /[?&]id=([a-zA-Z0-9_-]{10,})/,
+  ];
+
+  let fileId = null;
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) { fileId = m[1]; break; }
+  }
+
+  if (!fileId) return null;
+
+  // Use export=open — serves with streaming headers, bypasses virus scan page
+  // File must be shared as "Anyone with the link" in Google Drive
+  return 'https://drive.google.com/uc?export=open&id=' + fileId;
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
@@ -11213,152 +11131,6 @@ window.addEventListener('pagehide', () => {
 </div>
 
 <!-- ── CLOUD STORAGE BROWSER ── -->
-<div class="storage-modal-overlay" id="storage-modal-overlay">
-  <div class="storage-modal">
-    <div class="storage-modal-hdr">
-      <span>🗂️ IMPORT FROM CLOUD</span>
-      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
-    </div>
-    <div class="storage-tabs" style="flex-wrap:wrap;">
-      <button class="storage-tab active" id="stab-r2"        onclick="switchStorageTab('r2')">☁️ R2</button>
-      <button class="storage-tab"        id="stab-dropbox"   onclick="switchStorageTab('dropbox')">📦 DROPBOX</button>
-      <button class="storage-tab"        id="stab-gdrive"    onclick="switchStorageTab('gdrive')">📁 G.DRIVE</button>
-      <button class="storage-tab"        id="stab-onedrive"  onclick="switchStorageTab('onedrive')">☁ ONEDRIVE</button>
-      <button class="storage-tab"        id="stab-soundcloud" onclick="switchStorageTab('soundcloud')">🎵 SOUNDCLOUD</button>
-      <button class="storage-tab"        id="stab-url"       onclick="switchStorageTab('url')">🔗 DIRECT URL</button>
-    </div>
-    <div class="storage-body">
-
-      <!-- ── R2 / PUBLIC BUCKET ── -->
-      <div id="stab-content-r2">
-        <div class="storage-hint">Paste your Cloudflare R2 public bucket URL. The bucket must have public access enabled.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-r2-url" placeholder="https://pub-xxxx.r2.dev/music/"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseR2()">🔍 SCAN</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Also works with any S3-compatible public bucket (Backblaze B2, AWS S3, etc.)</div>
-        <div id="sb-r2-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── DROPBOX ── -->
-      <div id="stab-content-dropbox" style="display:none;">
-        <div class="storage-hint">Paste a Dropbox share link. Single file or shared folder — both work.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-dropbox-link"
-                 placeholder="https://www.dropbox.com/s/... or /sh/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseDropbox()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Single file links are converted to stream URLs automatically. For folders, add your Dropbox App Token in Settings.</div>
-        <div id="sb-dropbox-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── GOOGLE DRIVE ── -->
-      <div id="stab-content-gdrive" style="display:none;">
-        <div class="storage-hint">Paste a Google Drive file or folder share link.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-gdrive-link"
-                 placeholder="https://drive.google.com/file/d/... or /drive/folders/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseGDrive()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">File must be shared as "Anyone with the link". Folders require a Google API key in Settings.</div>
-        <div id="sb-gdrive-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── ONEDRIVE ── -->
-      <div id="stab-content-onedrive" style="display:none;">
-        <div class="storage-hint">Paste a OneDrive share link to a file or folder.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-onedrive-link"
-                 placeholder="https://1drv.ms/... or onedrive.live.com/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseOneDrive()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Share link must be set to "Anyone with the link can view".</div>
-        <div id="sb-onedrive-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── SOUNDCLOUD ── -->
-      <div id="stab-content-soundcloud" style="display:none;">
-        <div class="storage-hint">Paste a SoundCloud track URL. The track must be public.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-sc-url"
-                 placeholder="https://soundcloud.com/artist/trackname"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseSoundCloud()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Imports title, artist and stream URL from the SoundCloud oEmbed API. No account needed for public tracks.</div>
-        <div id="sb-sc-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── DIRECT URL ── -->
-      <div id="stab-content-url" style="display:none;">
-        <div class="storage-hint">Paste any direct audio URL (MP3, WAV, FLAC, OGG, AAC). Works with any public host.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-direct-url"
-                 placeholder="https://example.com/mytrack.mp3"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="useDirectUrl()">✅ USE</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ── CLOUD STORAGE BROWSER ── -->
-<div class="storage-overlay" id="storage-overlay">
-  <div class="storage-box">
-    <div class="storage-hdr">
-      <span class="storage-hdr-title">🗂️ BROWSE CLOUD STORAGE</span>
-      <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
-    </div>
-    <div class="storage-body">
-
-      <!-- Provider selector -->
-      <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);margin-bottom:8px;letter-spacing:.5px;">SELECT STORAGE PROVIDER</div>
-      <div class="storage-provider-grid">
-        <button class="storage-provider-btn" id="sp-dropbox"   onclick="selectProvider('dropbox')">
-          <span class="storage-provider-icon">📦</span>DROPBOX
-        </button>
-        <button class="storage-provider-btn" id="sp-gdrive"    onclick="selectProvider('gdrive')">
-          <span class="storage-provider-icon">📁</span>GOOGLE DRIVE
-        </button>
-        <button class="storage-provider-btn" id="sp-r2"        onclick="selectProvider('r2')">
-          <span class="storage-provider-icon">☁️</span>CLOUDFLARE R2
-        </button>
-        <button class="storage-provider-btn" id="sp-s3"        onclick="selectProvider('s3')">
-          <span class="storage-provider-icon">🪣</span>AWS S3
-        </button>
-        <button class="storage-provider-btn" id="sp-onedrive"  onclick="selectProvider('onedrive')">
-          <span class="storage-provider-icon">🔷</span>ONEDRIVE
-        </button>
-        <button class="storage-provider-btn" id="sp-direct"    onclick="selectProvider('direct')">
-          <span class="storage-provider-icon">🔗</span>DIRECT URL
-        </button>
-      </div>
-
-      <!-- URL input + hint -->
-      <div id="storage-hint" class="storage-hint">Select a provider above to get started.</div>
-      <div class="storage-url-row">
-        <input class="finput" type="url" id="storage-url-input"
-               placeholder="Paste your shared folder or file URL..."
-               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-               style="font-size:15px;flex:1;"
-               onkeydown="if(event.key==='Enter')browseStorage()">
-        <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 14px;" onclick="browseStorage()">
-          🔍 BROWSE
-        </button>
-      </div>
-
-      <!-- Results -->
-      <div id="storage-results"></div>
-
-    </div>
-  </div>
-</div>
 
 <!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
 <div class="pl-popout" id="pl-popout">
