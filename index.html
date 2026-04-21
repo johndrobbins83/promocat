@@ -10215,48 +10215,101 @@ async function browseOneDrive() {
 // ── SoundCloud browser ──
 async function browseSoundCloud() {
   const url = document.getElementById('sb-sc-url').value.trim();
-  if (!url) { notify('😾', 'Paste a SoundCloud track URL first'); return; }
+  if (!url) { notify('😾', 'Paste a SoundCloud URL first'); return; }
   const listEl = document.getElementById('sb-sc-list');
   listEl.style.display = 'block';
   listEl.innerHTML = '<div class="storage-loading">FETCHING FROM SOUNDCLOUD...</div>';
 
   try {
-    // Use SoundCloud oEmbed API — no key needed for public tracks
+    // oEmbed works for both public AND private links (secret_token in URL)
+    // Pass the full URL including /s-xxxxxx secret token for private tracks
     const oembedUrl = 'https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(url);
     const res = await fetch(oembedUrl);
-    if (!res.ok) throw new Error('oEmbed failed');
+    if (!res.ok) throw new Error('Could not fetch track info. Check the URL is correct.');
     const data = await res.json();
 
-    // Extract stream URL from oEmbed iframe src
-    const iframeSrcMatch = data.html?.match(/src="([^"]+)"/);
-    let streamUrl = url; // fallback to the page URL
-
-    // Parse author and title
-    const title  = (data.title || '').replace(/ by .*$/, '').trim();
+    const title  = (data.title || '').replace(/ by [^|]+$/, '').trim();
     const artist = data.author_name || '';
+    const artUrl = data.thumbnail_url || '';
+
+    // Build the widget stream URL from the oEmbed iframe src
+    // The iframe src is the SoundCloud widget URL — we use it as the audio src
+    // For private tracks, the iframe src includes the secret_token automatically
+    const iframeSrcMatch = data.html?.match(/src="([^"]+)"/);
+    let widgetUrl = iframeSrcMatch ? iframeSrcMatch[1].replace(/&amp;/g, '&') : null;
+
+    // The SoundCloud widget URL format:
+    // https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/xxx&secret_token=s-xxx
+    // We use this as the stream URL — PromoCat uses an iframe embed for SC tracks
+    // since SoundCloud does not allow direct audio streaming from third-party pages
+
+    // Construct the cleanest widget embed URL
+    let streamUrl;
+    if (widgetUrl) {
+      // Ensure auto_play and show_artwork are set nicely
+      streamUrl = widgetUrl;
+    } else {
+      // Fallback: build widget URL from the page URL directly
+      const secretMatch = url.match(/\/s-([a-zA-Z0-9]+)/);
+      const secretToken = secretMatch ? 's-' + secretMatch[1] : '';
+      streamUrl = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url)
+        + '&color=%2344dd88&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false'
+        + (secretToken ? '&secret_token=' + secretToken : '');
+    }
 
     listEl.innerHTML = '';
-    renderStorageFiles(listEl, [{
-      name: title || url.split('/').pop(),
-      url: streamUrl,
-      artist,
-      title,
-      artUrl: data.thumbnail_url || ''
-    }]);
 
-    // Also pre-fill artist if we got it
-    if (artist) {
-      const artistInput = document.getElementById('f-artist');
-      if (artistInput && !artistInput.value.trim()) artistInput.value = artist;
-    }
-    if (title) {
-      const titleInput = document.getElementById('f-title');
-      if (titleInput && !titleInput.value.trim()) titleInput.value = title;
-    }
+    // Show track info card with USE button
+    listEl.innerHTML =
+      '<div class="storage-file-item" style="flex-direction:column;align-items:flex-start;gap:8px;padding:12px;">' +
+        (artUrl ? '<img src="' + esc(artUrl) + '" style="width:60px;height:60px;object-fit:cover;border:1px solid var(--border-lo);float:left;margin-right:10px;">' : '') +
+        '<div style="flex:1;">' +
+          '<div style="font-family:monospace;font-size:9px;color:var(--lcd-green);margin-bottom:4px;font-weight:bold;">' + esc(title || 'SoundCloud Track') + '</div>' +
+          '<div style="font-family:VT323,monospace;font-size:15px;color:var(--cat-orange);">' + esc(artist) + '</div>' +
+          '<div style="font-family:monospace;font-size:9px;color:var(--border-lo);margin-top:4px;">' +
+            (url.includes('/s-') ? '🔒 PRIVATE TRACK' : '🌐 PUBLIC TRACK') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;width:100%;margin-top:4px;">' +
+          '<button class="storage-file-use" style="flex:1;" onclick="applySoundCloudTrack(' +
+            JSON.stringify({url: streamUrl, title, artist, artUrl}).replace(/"/g, '&quot;') +
+          ')">🎵 USE TRACK</button>' +
+        '</div>' +
+      '</div>';
+
+    // Pre-fill form fields
+    const artistInput = document.getElementById('f-artist');
+    const titleInput  = document.getElementById('f-title');
+    if (artistInput && !artistInput.value.trim()) artistInput.value = artist;
+    if (titleInput  && !titleInput.value.trim())  titleInput.value  = title;
 
   } catch(e) {
-    listEl.innerHTML = '<div class="storage-loading">COULD NOT FETCH TRACK<br>MAKE SURE THE TRACK IS PUBLIC<br>AND THE URL IS CORRECT</div>';
+    listEl.innerHTML =
+      '<div class="storage-loading" style="color:#ff8844;">' +
+      esc(e.message) + '<br><br>' +
+      'FOR PRIVATE TRACKS: make sure you paste the full secret link<br>' +
+      'e.g. soundcloud.com/artist/track/s-xxxxxxx</div>';
   }
+}
+
+function applySoundCloudTrack(file) {
+  const urlInput = document.getElementById('f-audio-url');
+  if (urlInput) { urlInput.value = file.url; checkAudioUrl(); }
+  const titleInput  = document.getElementById('f-title');
+  const artistInput = document.getElementById('f-artist');
+  if (titleInput  && !titleInput.value.trim())  titleInput.value  = file.title  || '';
+  if (artistInput && !artistInput.value.trim()) artistInput.value = file.artist || '';
+  // Store art URL
+  if (file.artUrl) {
+    const artInput = document.getElementById('f-art-data');
+    if (artInput && !artInput.value) {
+      document.getElementById('f-art-url-input') && (document.getElementById('f-art-url-input').value = file.artUrl);
+    }
+  }
+  closeStorageBrowser();
+  switchTab('upload');
+  if (typeof openSection === 'function') openSection('fs-info');
+  notify('🎵', 'SoundCloud track imported!');
 }
 
 // ── Render file list ──
