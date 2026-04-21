@@ -11152,8 +11152,7 @@ async function uploadToR2(input) {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': file.type || 'audio/mpeg',
-        'X-Filename': file.name,
-        'Content-Length': file.size.toString()
+        'X-Filename': encodeURIComponent(file.name)
       },
       body: file
     });
