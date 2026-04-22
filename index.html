@@ -3779,7 +3779,7 @@ body.rave-mode .lcd-art img {
       <div class="upload-body" id="upload-form" style="display:none">
 
         <div class="upload-title" id="upload-title">🎵 ADD TRACK TO CATAMP</div>
-        <button class="sub-btn" style="margin-bottom:14px;padding:10px;font-size:7px;" onclick="openStorageBrowser()">🗂️ BROWSE CLOUD FILES</button>
+        <button class="sub-btn" style="margin-bottom:14px;padding:10px;font-size:7px;" onclick="openStorageBrowser()">☁️ CONNECT YOUR CLOUDFLARE</button>
 
         <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
@@ -8990,13 +8990,16 @@ function downloadEPK() {
 
           <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 4 — CONNECT TO PROMOCAT</div>
           <p style="margin-bottom:6px;">→ Paste your R2 public URL below and click CONNECT:</p>
-          <div style="display:flex;gap:6px;margin:8px 0;">
-            <input class="finput" type="url" id="setup-r2-url"
-                   placeholder="https://pub-xxxx.r2.dev"
-                   style="flex:1;font-size:14px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-            <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 16px;"
-                    onclick="connectR2FromSetup()">⚡ CONNECT &amp; SCAN</button>
-          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin:8px 0;padding:0 2px;">
+          <input class="finput" type="url" id="setup-r2-url"
+                 placeholder="https://pub-xxxx.r2.dev"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none"
+                 onkeydown="if(event.key==='Enter')connectR2FromSetup()">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:12px 18px;font-size:7px;"
+                  onclick="connectR2FromSetup()">⚡ CONNECT</button>
+        </div>
+        <div style="font-family:'VT323',monospace;font-size:16px;color:#88aa88;line-height:1.7;padding:4px 0;">
 
           <div style="background:#021408;border-left:3px solid var(--cat-orange);padding:8px 10px;margin:10px 0;font-size:15px;color:#aacc88;">
             💡 R2 free tier: 10GB storage, 10M reads/month — more than enough for a music catalogue. No credit card needed.
@@ -11352,21 +11355,28 @@ function maybeShowQuickStart() {
 
 
 function connectR2FromSetup() {
-  const url = (document.getElementById('setup-r2-url')?.value || '').trim();
-  if (!url) { notify('😾', 'Paste your R2 bucket URL first'); return; }
-  // Save to settings
+  const inputEl = document.getElementById('setup-r2-url');
+  const url = (inputEl ? inputEl.value : '').trim();
+  if (!url) { notify('😾', 'Paste your R2 public bucket URL first'); return; }
+
+  // Strip trailing slash
+  const cleanUrl = url.replace(/\/+$/, '');
+
+  // Save to localStorage
   try {
     const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
-    saved.r2Url = url;
+    saved.r2Url = cleanUrl;
     localStorage.setItem('pc_cloud_storage', JSON.stringify(saved));
-    // Also update settings field if open
     const s = document.getElementById('s-r2-url');
-    if (s) s.value = url;
+    if (s) s.value = cleanUrl;
   } catch(e) {}
-  // Switch to R2 tab with URL pre-filled
-  document.getElementById('sb-r2-url').value = url;
+
+  // Switch to R2 scan tab and scan
+  const r2Input = document.getElementById('sb-r2-url');
+  if (r2Input) r2Input.value = cleanUrl;
   switchStorageTab('r2');
-  browseR2();
+  setTimeout(() => browseR2(), 100);
+  notify('☁️', 'Connecting to your R2 bucket...');
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
