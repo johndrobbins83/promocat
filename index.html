@@ -8991,14 +8991,18 @@ function downloadEPK() {
           <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 4 — CONNECT TO PROMOCAT</div>
           <p style="margin-bottom:6px;">→ Paste your R2 public URL below and click CONNECT:</p>
 
-          <div style="display:flex;gap:6px;margin:8px 0;">
-            <input class="finput" type="url" id="setup-r2-url"
-                   placeholder="https://pub-xxxx.r2.dev"
-                   style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none"
-                   onkeydown="if(event.key==='Enter')connectR2FromSetup()">
-            <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:12px 18px;font-size:7px;"
-                    onclick="connectR2FromSetup()">⚡ CONNECT</button>
-          </div>
+        </div><!-- /vt323 steps -->
+
+        <div style="display:flex;gap:6px;margin:8px 0;">
+          <input class="finput" type="url" id="setup-r2-url"
+                 placeholder="https://pub-xxxx.r2.dev"
+                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none"
+                 onkeydown="if(event.key==='Enter')connectR2FromSetup()">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:12px 18px;font-size:7px;"
+                  onclick="connectR2FromSetup()">⚡ CONNECT</button>
+        </div>
+
+        <div style="font-family:'VT323',monospace;font-size:16px;color:#88aa88;line-height:1.7;padding:4px 0;">
 
           <div style="background:#021408;border-left:3px solid var(--cat-orange);padding:8px 10px;margin:10px 0;font-size:15px;color:#aacc88;">
             💡 R2 free tier: 10GB storage, 10M reads/month — more than enough for a music catalogue. No credit card needed.
@@ -9018,9 +9022,6 @@ function downloadEPK() {
 
     </div>
   </div>
-</div>
-
-
 </div>
 
 <!-- ── PLAYLIST FULLSCREEN POPOUT ── -->
