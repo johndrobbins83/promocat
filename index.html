@@ -8989,8 +8989,14 @@ function downloadEPK() {
           → You can create folders too (e.g. <em>unreleased/</em>, <em>demos/</em>)</p>
 
           <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 4 — CONNECT TO PROMOCAT</div>
-          <p style="margin-bottom:6px;">→ Come back here → R2 / S3 tab<br>
-          → Paste your public URL → SCAN FOLDER → select your tracks</p>
+          <p style="margin-bottom:6px;">→ Paste your R2 public URL below and click CONNECT:</p>
+          <div style="display:flex;gap:6px;margin:8px 0;">
+            <input class="finput" type="url" id="setup-r2-url"
+                   placeholder="https://pub-xxxx.r2.dev"
+                   style="flex:1;font-size:14px;" autocomplete="off" autocorrect="off" autocapitalize="none">
+            <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 16px;"
+                    onclick="connectR2FromSetup()">⚡ CONNECT &amp; SCAN</button>
+          </div>
 
           <div style="background:#021408;border-left:3px solid var(--cat-orange);padding:8px 10px;margin:10px 0;font-size:15px;color:#aacc88;">
             💡 R2 free tier: 10GB storage, 10M reads/month — more than enough for a music catalogue. No credit card needed.
@@ -10397,12 +10403,19 @@ function loadCloudStorageSettings() {
 // ── Modal open / close ──
 function openStorageBrowser() {
   loadCloudStorageSettings();
-  // Pre-fill R2 url from settings
   try {
     const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
-    if (saved.r2Url) document.getElementById('sb-r2-url').value = saved.r2Url;
-  } catch(e) {}
-  switchStorageTab('r2');
+    if (saved.r2Url) {
+      // Already set up — go straight to R2 scan tab with URL pre-filled
+      document.getElementById('sb-r2-url').value = saved.r2Url;
+      switchStorageTab('r2');
+    } else {
+      // First time — show setup guide
+      switchStorageTab('setup');
+    }
+  } catch(e) {
+    switchStorageTab('setup');
+  }
   document.getElementById('storage-modal-overlay').classList.add('open');
 }
 
@@ -11335,6 +11348,25 @@ function maybeShowQuickStart() {
     const seen = localStorage.getItem('pc_qs_seen');
     if (!seen) openQuickStart();
   } catch(e) {}
+}
+
+
+function connectR2FromSetup() {
+  const url = (document.getElementById('setup-r2-url')?.value || '').trim();
+  if (!url) { notify('😾', 'Paste your R2 bucket URL first'); return; }
+  // Save to settings
+  try {
+    const saved = JSON.parse(localStorage.getItem('pc_cloud_storage') || '{}');
+    saved.r2Url = url;
+    localStorage.setItem('pc_cloud_storage', JSON.stringify(saved));
+    // Also update settings field if open
+    const s = document.getElementById('s-r2-url');
+    if (s) s.value = url;
+  } catch(e) {}
+  // Switch to R2 tab with URL pre-filled
+  document.getElementById('sb-r2-url').value = url;
+  switchStorageTab('r2');
+  browseR2();
 }
 
 // ─────────────── STOP ON CLOSE / HIDE ───────────────
