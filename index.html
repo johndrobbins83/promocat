@@ -3784,24 +3784,7 @@ body.rave-mode .lcd-art img {
         <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
           <label class="flbl" for="f-audio-url">🎧 AUDIO STREAM LINK</label>
-          <!-- Upload to R2 button -->
-          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
-            <label class="sub-btn" id="r2-upload-label" style="padding:7px 12px;font-size:6px;cursor:pointer;display:inline-block;margin:0;">
-              ⬆ UPLOAD PRIVATE FILE
-              <input type="file" id="r2-file-input" accept=".mp3,.wav,.flac,.ogg,.aac,.m4a,.aiff,.aif,.opus" style="display:none;" onchange="uploadToR2(this)">
-            </label>
-            <span id="r2-upload-status" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);"></span>
-          </div>
-          <!-- Storage quota meter -->
-          <div id="r2-quota-wrap" style="display:none;margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-              <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);">PRIVATE STORAGE</span>
-              <span id="r2-quota-text" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);"></span>
-            </div>
-            <div style="height:6px;background:#0a1a0a;border:1px solid var(--border-lo);overflow:hidden;">
-              <div id="r2-quota-bar" style="height:100%;background:var(--lcd-green);width:0%;transition:width .4s;"></div>
-            </div>
-          </div>
+
           <input class="finput" type="url" id="f-audio-url"
                  placeholder="https://... or upload above for private files"
                  oninput="checkAudioUrl()">
@@ -8922,96 +8905,112 @@ function downloadEPK() {
       <span>🗂️ IMPORT FROM CLOUD</span>
       <button style="font-family:'Press Start 2P',monospace;font-size:7px;background:#440000;color:#ff4444;border:1px solid #ff4444;padding:4px 8px;cursor:pointer;" onclick="closeStorageBrowser()">✕</button>
     </div>
-    <div class="storage-tabs" style="flex-wrap:wrap;">
-      <button class="storage-tab active" id="stab-r2"        onclick="switchStorageTab('r2')">☁️ R2</button>
-      <button class="storage-tab"        id="stab-dropbox"   onclick="switchStorageTab('dropbox')">📦 DROPBOX</button>
-      <button class="storage-tab"        id="stab-gdrive"    onclick="switchStorageTab('gdrive')">📁 G.DRIVE</button>
-      <button class="storage-tab"        id="stab-onedrive"  onclick="switchStorageTab('onedrive')">☁ ONEDRIVE</button>
+    <div class="storage-tabs">
+      <button class="storage-tab active" id="stab-r2"        onclick="switchStorageTab('r2')">☁ R2 / S3</button>
       <button class="storage-tab"        id="stab-soundcloud" onclick="switchStorageTab('soundcloud')">🎵 SOUNDCLOUD</button>
       <button class="storage-tab"        id="stab-url"       onclick="switchStorageTab('url')">🔗 DIRECT URL</button>
+      <button class="storage-tab"        id="stab-setup"     onclick="switchStorageTab('setup')">? SETUP GUIDE</button>
     </div>
     <div class="storage-body">
 
-      <!-- ── R2 / PUBLIC BUCKET ── -->
+      <!-- ── R2 / S3 FOLDER SCAN ── -->
       <div id="stab-content-r2">
-        <div class="storage-hint">Paste your Cloudflare R2 public bucket URL. The bucket must have public access enabled.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-r2-url" placeholder="https://pub-xxxx.r2.dev/music/"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseR2()">🔍 SCAN</button>
+        <div class="storage-hint">
+          Connect your own R2, S3, or Backblaze B2 bucket. Paste your bucket's public base URL and scan to see all your audio files.
         </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Also works with any S3-compatible public bucket (Backblaze B2, AWS S3, etc.)</div>
+        <!-- Saved URL from settings pre-filled -->
+        <div class="storage-input-row">
+          <input class="finput" type="url" id="sb-r2-url"
+                 placeholder="https://pub-xxxx.r2.dev  or  https://my-bucket.s3.amazonaws.com"
+                 style="flex:1;font-size:14px;" autocomplete="off" autocorrect="off" autocapitalize="none"
+                 onkeydown="if(event.key==='Enter')browseR2()">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 16px;" onclick="browseR2()">🔍 SCAN FOLDER</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:2px;font-size:13px;">
+          Works with: Cloudflare R2 · AWS S3 · Backblaze B2 · DigitalOcean Spaces · any S3-compatible bucket with public access
+        </div>
         <div id="sb-r2-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── DROPBOX ── -->
-      <div id="stab-content-dropbox" style="display:none;">
-        <div class="storage-hint">Paste a Dropbox share link. Single file or shared folder — both work.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-dropbox-link"
-                 placeholder="https://www.dropbox.com/s/... or /sh/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseDropbox()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Single file links are converted to stream URLs automatically. For folders, add your Dropbox App Token in Settings.</div>
-        <div id="sb-dropbox-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── GOOGLE DRIVE ── -->
-      <div id="stab-content-gdrive" style="display:none;">
-        <div class="storage-hint">Paste a Google Drive file or folder share link.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-gdrive-link"
-                 placeholder="https://drive.google.com/file/d/... or /drive/folders/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseGDrive()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">File must be shared as "Anyone with the link". Folders require a Google API key in Settings.</div>
-        <div id="sb-gdrive-list" class="storage-file-list" style="display:none;"></div>
-      </div>
-
-      <!-- ── ONEDRIVE ── -->
-      <div id="stab-content-onedrive" style="display:none;">
-        <div class="storage-hint">Paste a OneDrive share link to a file or folder.</div>
-        <div class="storage-input-row">
-          <input class="finput" type="url" id="sb-onedrive-link"
-                 placeholder="https://1drv.ms/... or onedrive.live.com/..."
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseOneDrive()">🔍 IMPORT</button>
-        </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Share link must be set to "Anyone with the link can view".</div>
-        <div id="sb-onedrive-list" class="storage-file-list" style="display:none;"></div>
       </div>
 
       <!-- ── SOUNDCLOUD ── -->
       <div id="stab-content-soundcloud" style="display:none;">
-        <div class="storage-hint">Paste a SoundCloud track URL. The track must be public.</div>
+        <div class="storage-hint">
+          Paste any SoundCloud track URL — public or private (secret links with /s-xxxxx work too).
+        </div>
         <div class="storage-input-row">
           <input class="finput" type="url" id="sb-sc-url"
-                 placeholder="https://soundcloud.com/artist/trackname"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="browseSoundCloud()">🔍 IMPORT</button>
+                 placeholder="https://soundcloud.com/artist/trackname  or  .../s-xxxxx"
+                 style="flex:1;font-size:14px;" autocomplete="off" autocorrect="off" autocapitalize="none"
+                 onkeydown="if(event.key==='Enter')browseSoundCloud()">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 16px;" onclick="browseSoundCloud()">🔍 IMPORT</button>
         </div>
-        <div class="storage-hint" style="color:#334433;margin-top:4px;">Imports title, artist and stream URL from the SoundCloud oEmbed API. No account needed for public tracks.</div>
+        <div class="storage-hint" style="color:#334433;margin-top:2px;font-size:13px;">
+          Fetches track title, artist and artwork automatically. Private links stay private.
+        </div>
         <div id="sb-sc-list" class="storage-file-list" style="display:none;"></div>
       </div>
 
       <!-- ── DIRECT URL ── -->
       <div id="stab-content-url" style="display:none;">
-        <div class="storage-hint">Paste any direct audio URL (MP3, WAV, FLAC, OGG, AAC). Works with any public host.</div>
+        <div class="storage-hint">
+          Paste a direct link to a single audio file. Must be a public URL ending in .mp3, .wav, .flac etc.
+        </div>
         <div class="storage-input-row">
           <input class="finput" type="url" id="sb-direct-url"
-                 placeholder="https://example.com/mytrack.mp3"
-                 style="flex:1;font-size:15px;" autocomplete="off" autocorrect="off" autocapitalize="none">
-          <button class="settings-save-btn" style="flex:0;white-space:nowrap;" onclick="useDirectUrl()">✅ USE</button>
+                 placeholder="https://yourserver.com/tracks/mytrack.mp3"
+                 style="flex:1;font-size:14px;" autocomplete="off" autocorrect="off" autocapitalize="none"
+                 onkeydown="if(event.key==='Enter')useDirectUrl()">
+          <button class="settings-save-btn" style="flex:0;white-space:nowrap;padding:10px 16px;" onclick="useDirectUrl()">✅ USE THIS URL</button>
+        </div>
+        <div class="storage-hint" style="color:#334433;margin-top:2px;font-size:13px;">
+          Works with any self-hosted audio file. Your music stays on your own server.
+        </div>
+      </div>
+
+      <!-- ── SETUP GUIDE ── -->
+      <div id="stab-content-setup" style="display:none;">
+        <div style="font-family:'VT323',monospace;font-size:16px;color:#88aa88;line-height:1.7;padding:4px 0;">
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--cat-orange);margin-bottom:10px;">
+            🏆 RECOMMENDED: CLOUDFLARE R2
+          </div>
+          <p style="margin-bottom:8px;">R2 is free (10GB), fast, and designed for exactly this — serving audio files to browsers with zero CORS issues. Setup takes about 5 minutes.</p>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 1 — CREATE A FREE R2 BUCKET</div>
+          <p style="margin-bottom:6px;">→ Go to <strong>cloudflare.com</strong> → Sign up free → R2 Object Storage → Create bucket<br>
+          → Name it anything (e.g. <em>my-music</em>) → Leave all defaults → Create</p>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 2 — ENABLE PUBLIC ACCESS</div>
+          <p style="margin-bottom:6px;">→ Open your bucket → Settings → Public Access → Allow Access<br>
+          → Copy the public URL — it looks like: <strong>https://pub-xxxx.r2.dev</strong></p>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 3 — UPLOAD YOUR MUSIC</div>
+          <p style="margin-bottom:6px;">→ In R2 bucket → Upload files → drag your MP3/WAV files in<br>
+          → You can create folders too (e.g. <em>unreleased/</em>, <em>demos/</em>)</p>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);margin:10px 0 6px;">STEP 4 — CONNECT TO PROMOCAT</div>
+          <p style="margin-bottom:6px;">→ Come back here → R2 / S3 tab<br>
+          → Paste your public URL → SCAN FOLDER → select your tracks</p>
+
+          <div style="background:#021408;border-left:3px solid var(--cat-orange);padding:8px 10px;margin:10px 0;font-size:15px;color:#aacc88;">
+            💡 R2 free tier: 10GB storage, 10M reads/month — more than enough for a music catalogue. No credit card needed.
+          </div>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:#556655;margin:10px 0 6px;">OTHER OPTIONS THAT WORK</div>
+          <p>→ <strong>Backblaze B2</strong> — free 10GB, set CORS to allow all origins<br>
+          → <strong>AWS S3</strong> — configure bucket policy for public read + CORS<br>
+          → <strong>Your own web server</strong> — any server with audio files and CORS headers<br>
+          → <strong>SoundCloud</strong> — public or private tracks via the tab above</p>
+
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:#443333;margin:10px 0 6px;">❌ DOES NOT WORK</div>
+          <p style="color:#665555;">Dropbox · Google Drive · OneDrive — these services block audio streaming from third-party sites for all link types. No workaround exists.</p>
+
         </div>
       </div>
 
     </div>
   </div>
 </div>
-
-<!-- ── CLOUD STORAGE BROWSER ── -->
 
 
 </div>
@@ -10413,7 +10412,7 @@ function closeStorageBrowser() {
 
 function switchStorageTab(tab) {
   _storageTab = tab;
-  ['r2','dropbox','gdrive','onedrive','soundcloud','url'].forEach(t => {
+  ['r2','soundcloud','url','setup'].forEach(t => {
     const btn = document.getElementById('stab-' + t);
     const body = document.getElementById('stab-content-' + t);
     if (btn)  btn.classList.toggle('active', t === tab);
