@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>PromoCat v1.0</title>
 
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#030e06">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PromoCat">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23030e06'/><text y='.9em' font-size='90'>🐱</text></svg>">
+
 <!-- Favicon — cat emoji as SVG data URI -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
 
@@ -12,13 +20,13 @@
 <meta property="og:title"       content="PromoCat — Purrfect Tunes">
 <meta property="og:description" content="A retro music player and promo toolkit for artists. Share tracks, build promo playlists, and send to your email list.">
 <meta property="og:type"        content="website">
-<meta property="og:image"       content="https://promocat.johndrobbins83.workers.dev/og-image">
+<meta property="og:image"       content="https://thepromocat.com/og-image.png">
 <meta property="og:image:width"  content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card"        content="summary_large_image">
 <meta name="twitter:title"       content="PromoCat — Purrfect Tunes">
 <meta name="twitter:description" content="Retro music player and promo toolkit for artists.">
-<meta name="twitter:image"       content="https://promocat.johndrobbins83.workers.dev/og-image">
+<meta name="twitter:image"       content="https://thepromocat.com/og-image.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Righteous&display=swap');
 
@@ -3355,6 +3363,10 @@ body.rave-mode .lcd-art img {
     <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display:none">⚙ ADMIN</div>
     <!-- Settings tab hidden — use ⚙ gear button in titlebar instead -->
     <div id="tab-settings" style="display:none"></div>
+    <!-- PWA Install button — shown by JS when browser supports it -->
+    <button id="pwa-install-btn" onclick="triggerPwaInstall()"
+      style="display:none;align-items:center;gap:4px;margin-left:auto;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--lcd-green);background:none;border:1px solid var(--border-lo);padding:4px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:center;"
+      title="Install PromoCat as an app">⬇ INSTALL APP</button>
   </div>
 
   <!-- WINDOW -->
@@ -3779,7 +3791,41 @@ body.rave-mode .lcd-art img {
       <div class="upload-body" id="upload-form" style="display:none">
 
         <div class="upload-title" id="upload-title">🎵 ADD TRACK TO CATAMP</div>
-        <button class="sub-btn" style="margin-bottom:14px;padding:10px;font-size:7px;" onclick="openStorageBrowser()">☁️ CONNECT YOUR CLOUDFLARE</button>
+        <!-- ── PRIVATE FILE UPLOAD WIDGET ── -->
+        <div style="margin-bottom:14px;border:2px solid var(--border-lo);background:var(--lcd-bg);padding:10px 12px;">
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--cat-orange);margin-bottom:8px;">⬆ UPLOAD PRIVATE FILE</div>
+          <!-- Drop zone -->
+          <label id="r2-upload-label" for="r2-file-input" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--border-lo);padding:16px 10px;cursor:pointer;transition:border-color .2s;background:var(--panel-bg);">
+            <span style="font-size:24px;">🎵</span>
+            <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--lcd-green);">DRAG & DROP OR CLICK</span>
+            <span style="font-family:'VT323',monospace;font-size:14px;color:var(--border-lo);">MP3 · WAV · FLAC · AIFF · OGG · M4A · MAX 100MB</span>
+          </label>
+          <input type="file" id="r2-file-input" accept="audio/*,.mp3,.wav,.flac,.aiff,.ogg,.m4a" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" onchange="uploadToR2(this)">
+          <div id="r2-upload-status" style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--border-lo);margin-top:6px;min-height:12px;"></div>
+          <!-- Over 100MB tip -->
+          <div style="margin-top:10px;border:1px solid var(--border-lo);padding:8px 10px;background:var(--panel-bg);">
+            <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--cat-orange);margin-bottom:6px;">📦 FILE OVER 100MB?</div>
+            <div style="font-family:'VT323',monospace;font-size:13px;color:var(--lcd-green);line-height:1.5;">
+              Upload your WAV/FLAC to a free host like
+              <strong>Dropbox</strong>, <strong>Google Drive</strong>, or <strong>SoundCloud</strong>,
+              set it to <em>public</em> or <em>anyone with link</em>, then paste the
+              direct stream URL into the <strong>AUDIO STREAM LINK</strong> field below instead.
+            </div>
+          </div>
+          </label>
+          <input type="file" id="r2-file-input" accept="audio/*,.mp3,.wav,.flac,.aiff,.ogg,.m4a" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" onchange="uploadToR2(this)">
+          <div id="r2-upload-status" style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--border-lo);margin-top:6px;min-height:12px;"></div>
+          <!-- Quota bar -->
+          <div id="r2-quota-wrap" style="display:none;margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--border-lo);">STORAGE USED</span>
+              <span id="r2-quota-text" style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--lcd-green);"></span>
+            </div>
+            <div style="height:4px;background:var(--track-bg);border:1px solid var(--border-lo);">
+              <div id="r2-quota-bar" style="height:100%;width:0%;background:var(--lcd-green);transition:width .3s;"></div>
+            </div>
+          </div>
+        </div>
 
         <!-- AUDIO STREAM — always visible, outside sections -->
         <div class="frow">
@@ -4956,7 +5002,7 @@ function switchTab(name) {
 // ═══════════════════════════════════════════════
 // API CONFIG
 // ═══════════════════════════════════════════════
-const API_BASE = 'https://promocat.johndrobbins83.workers.dev';
+const API_BASE = 'https://api.thepromocat.com';
 const SESSION_KEY = 'promocat_session';
 
 // ── AUTH STATE ──
@@ -8016,11 +8062,14 @@ async function syncPlaylistData() {
       promoPlaylists = data.promoPlaylists;
       cacheSet(CACHE_PROMO_PL(), promoPlaylists);
     }
-    if (Array.isArray(data.contacts) && data.contacts.length !== contacts.length) {
-      contacts = data.contacts;
-      cacheSet(CACHE_CONTACTS(), contacts);
-      selectedContacts = new Set(contacts.map((_,i) => i));
-      renderContacts();
+    if (Array.isArray(data.contacts)) {
+      if (JSON.stringify(data.contacts) !== JSON.stringify(contacts)) {
+        contacts = data.contacts;
+        cacheSet(CACHE_CONTACTS(), contacts);
+        selectedContacts = new Set(contacts.map((_,i) => i));
+        renderContacts();
+        renderContactsTab();
+      }
     }
     // Inbox
     if (Array.isArray(data.inbox)) {
@@ -8038,13 +8087,10 @@ async function syncPlaylistData() {
 // Called once after login — pulls everything from the Worker
 async function loadUserData() {
   await Promise.all([ loadUserProfiles(), loadCloudPlaylist() ]);
-  // Silently remove ghost tracks (no URL, or Unknown title/artist placeholders)
+  // Silently remove ghost tracks (no URL only — keep tracks even with default titles)
   const before = playlist.length;
   playlist = playlist.filter(t => {
-    const hasUrl    = t.url && t.url.trim() !== '';
-    const hasTitle  = t.title && t.title.trim() !== '' && t.title !== 'Unknown';
-    const hasArtist = t.artist && t.artist.trim() !== '' && t.artist !== 'Unknown Artist';
-    return hasUrl && hasTitle && hasArtist;
+    return t.url && t.url.trim() !== '';
   });
   if (playlist.length < before) {
     renderPlaylist();
@@ -8120,6 +8166,14 @@ async function loadCloudPlaylist() {
       cacheSet(CACHE_CONTACTS(), contacts);
       selectedContacts = new Set(contacts.map((_, i) => i));
       renderContacts();
+      renderContactsTab();
+    }
+    // ── Load inbox from server ──
+    if (Array.isArray(data.inbox) && data.inbox.length > 0) {
+      inbox = data.inbox;
+      updateInboxBadge();
+      if (playlistMode === 'inbox') renderInbox();
+      if (data.inbox.length > 0) notify('📬', data.inbox.length + ' track' + (data.inbox.length !== 1 ? 's' : '') + ' in your promos!');
     }
   } catch(e) {
     const cachedPl  = cacheGet(CACHE_PLAYLIST());
@@ -11146,34 +11200,39 @@ async function uploadToR2(input) {
   const file = input.files[0];
   if (!file) return;
 
-  const MAX = 100 * 1024 * 1024;
+  const MAX = 100 * 1024 * 1024; // 100MB — above this, use a direct link instead
   if (file.size > MAX) {
-    notify('😾', 'File too large — max 100MB');
+    notify('😾', 'File too large (' + (file.size/1024/1024).toFixed(0) + 'MB) — upload to Dropbox/Drive and paste the link instead');
+    const statusEl = document.getElementById('r2-upload-status');
+    if (statusEl) {
+      statusEl.style.color = 'var(--cat-orange)';
+      statusEl.textContent = '⚠ ' + (file.size/1024/1024).toFixed(0) + 'MB exceeds 100MB limit — use AUDIO STREAM LINK below';
+    }
     input.value = '';
     return;
   }
 
   const statusEl = document.getElementById('r2-upload-status');
   const labelEl  = document.getElementById('r2-upload-label');
-  statusEl.textContent = 'UPLOADING...';
-  statusEl.style.color = 'var(--cat-orange)';
-  labelEl.style.opacity = '0.5';
-  labelEl.style.pointerEvents = 'none';
+  if (statusEl) { statusEl.textContent = 'UPLOADING ' + (file.size/1024/1024).toFixed(1) + 'MB...'; statusEl.style.color = 'var(--cat-orange)'; }
+  if (labelEl)  { labelEl.style.opacity = '0.5'; labelEl.style.pointerEvents = 'none'; }
 
   try {
-    const token = localStorage.getItem('promocat_session');
-    // Show progress size hint
-    statusEl.textContent = 'UPLOADING ' + (file.size/1024/1024).toFixed(1) + 'MB...';
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+    const token   = session.token || '';
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+    const timeout = setTimeout(() => controller.abort(), 300000); // 5 min for large files
 
-    const resp = await fetch(API_BASE + '/r2/upload', {
+    const mimeType = file.type || 'audio/mpeg';
+    const resp = await fetch(API_BASE + '/upload', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': file.type || 'audio/mpeg',
-        'X-Filename': encodeURIComponent(file.name)
+        'Authorization':  'Bearer ' + token,
+        'Content-Type':   'application/octet-stream',
+        'X-File-Name':    file.name,
+        'X-File-Size':    String(file.size),
+        'X-File-Type':    mimeType,
       },
       body: file,
       signal: controller.signal
@@ -11183,9 +11242,8 @@ async function uploadToR2(input) {
     const data = await resp.json();
     if (!data.ok) throw new Error(data.error || 'Upload failed');
 
-    // Store the R2 key in the URL field as a special r2:// reference
-    // When saving/playing, the app fetches a signed URL on demand
-    document.getElementById('f-audio-url').value = 'r2://' + data.key;
+    // Store the direct audio URL — no signed URL needed, UUIDs are unguessable
+    document.getElementById('f-audio-url').value = data.url;
     document.getElementById('audio-url-status').textContent = '✓ Uploaded — ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + 'MB)';
     document.getElementById('audio-url-status').className = 'audio-url-status ok';
 
@@ -11195,40 +11253,33 @@ async function uploadToR2(input) {
       titleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
     }
 
-    statusEl.textContent = '✓ UPLOADED';
-    statusEl.style.color = '#44ff88';
-    notify('⬆', 'Track uploaded privately — ' + file.name);
+    if (statusEl) { statusEl.textContent = '✓ UPLOADED'; statusEl.style.color = '#44ff88'; }
+    notify('⬆', 'Track uploaded — ' + file.name);
+
     // Update quota display
-    if (data.usedMB && data.limitMB) updateR2QuotaDisplay(parseFloat(data.usedMB), parseFloat(data.limitMB));
+    if (data.used != null && data.limit != null) {
+      updateR2QuotaDisplay(data.used / 1024 / 1024, data.limit / 1024 / 1024);
+    }
 
   } catch(e) {
-    statusEl.textContent = 'FAILED';
-    statusEl.style.color = '#ff4444';
-    const msg = e.name === 'AbortError' ? 'Upload timed out — try a smaller file' : e.message;
+    if (statusEl) { statusEl.textContent = 'FAILED'; statusEl.style.color = '#ff4444'; }
+    const msg = e.name === 'AbortError' ? 'Upload timed out — file may be too large' : e.message;
     notify('😾', 'Upload failed: ' + msg);
   } finally {
-    labelEl.style.opacity = '';
-    labelEl.style.pointerEvents = '';
+    if (labelEl)  { labelEl.style.opacity = ''; labelEl.style.pointerEvents = ''; }
     input.value = '';
   }
 }
 
-// Resolve r2:// URLs to signed stream URLs before playback
+// Resolve r2:// legacy references to direct audio URLs
 async function resolveTrackUrl(url) {
-  if (!url || !url.startsWith('r2://')) return url;
-  try {
+  if (!url) return url;
+  // Legacy r2:// format — convert to direct URL
+  if (url.startsWith('r2://')) {
     const key = url.replace('r2://', '');
-    const token = localStorage.getItem('promocat_session');
-    const resp = await fetch(API_BASE + '/r2/url?key=' + encodeURIComponent(key), {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    const data = await resp.json();
-    if (!data.ok) throw new Error(data.error);
-    return data.url; // signed, expires in 1hr
-  } catch(e) {
-    console.warn('Could not resolve R2 URL:', e);
-    return url;
+    return API_BASE + '/audio/' + key;
   }
+  return url;
 }
 
 
@@ -11238,11 +11289,11 @@ async function loadR2Quota() {
     const session = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
     const token = session.token || '';
     if (!token) return;
-    const resp = await fetch(API_BASE + '/r2/list', {
+    const resp = await fetch(API_BASE + '/storage', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     const data = await resp.json();
-    if (data.ok) updateR2QuotaDisplay(parseFloat(data.usedMB), parseFloat(data.limitMB));
+    if (data.ok) updateR2QuotaDisplay(data.used / 1024 / 1024, data.limit / 1024 / 1024);
   } catch(e) {}
 }
 
@@ -11918,5 +11969,31 @@ window.addEventListener('pagehide', () => {
     </div>
   </div>
 </div>
+
+<!-- PWA Service Worker + Install Prompt -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'none';
+  _pwaPrompt = null;
+});
+function triggerPwaInstall() {
+  if (!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  _pwaPrompt.userChoice.then(() => { _pwaPrompt = null; });
+}
+</script>
 </body>
 </html>
